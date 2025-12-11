@@ -10,6 +10,8 @@ import 'package:safe_campus/features/contacts/domain/usecases/fetch_contacts.dar
 import 'package:safe_campus/features/contacts/domain/usecases/update_contacts.dart';
 import 'package:safe_campus/features/contacts/presentation/bloc/contact_list_bloc.dart';
 import 'package:safe_campus/features/core/presentation/bloc/auth/login_state.dart';
+import 'package:safe_campus/features/core/presentation/bloc/edit_profile_bloc/edit_profile_bloc.dart';
+import 'package:safe_campus/features/core/presentation/bloc/profile/profile_bloc.dart';
 import 'package:safe_campus/features/core/presentation/screens/admin/security_dashboard.dart';
 import 'package:safe_campus/features/core/presentation/screens/admin_page.dart'
     show AdminPage;
@@ -58,6 +60,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
+        BlocProvider<ProfileBloc>(create: (_) => ProfileBloc()),
+        BlocProvider<EditProfileBloc>(create: (_) => EditProfileBloc()),
         BlocProvider(create: (_) => PanicAlertBloc()),
         BlocProvider(create: (_) => RegisterBloc()),
 
@@ -128,14 +132,14 @@ class MyApp extends StatelessWidget {
         home: BlocBuilder<LoginBloc, LoginState>(
           builder: (context, state) {
             if (state is LoginSuccess) {
-              switch (state.user.role) {
-                case 'admin':
-                  return const AdminPage();
-                case 'security':
-                  return const SecurityDashboard();
-                default:
+              // switch (state.user.role) {
+              //   case 'admin':
+              //     return const AdminPage();
+              //   case 'security':
+              //     return const SecurityDashboard();
+              //   default:
                   return const Home();
-              }
+              //}
             }
             return const IntroPage();
           },

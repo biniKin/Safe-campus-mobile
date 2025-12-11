@@ -36,10 +36,10 @@ class _SignInPageState extends State<SignInPage> {
   
   void _navigateToDashboard(User user) {
     if (user.role == 'admin') {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const AdminPage()),
-      );
+      // Navigator.pushReplacement(
+      //   context,
+      //   MaterialPageRoute(builder: (context) => const AdminPage()),
+      // );
     } else if (user.role == 'security') {
       Navigator.pushReplacement(
         context,
@@ -148,15 +148,8 @@ class _SignInPageState extends State<SignInPage> {
                           },
                           obscureText: true,
                         ),
-                        const SizedBox(height: 10),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: TextButton(
-                            onPressed: () {},
-                            child: const Text('Forgot password?'),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
+                        
+                        const SizedBox(height: 50),
                         ElevatedButton(
                           onPressed: () {
                             if (_formKey.currentState!.validate()) {

@@ -42,12 +42,8 @@ class AuthService {
     return await _dataSource.login(email, password);
   }
 
-  Future<Map<String, dynamic>> register(
-    String email,
-    String password,
-    String name,
-  ) async {
-    return await _dataSource.register(email, password, name);
+  Future<Map<String, dynamic>> register(String email, String password, String name, String studentId) async {
+    return await _dataSource.register(email, password, name, studentId);
   }
 
   Future<void> logout() async {
@@ -65,4 +61,12 @@ class AuthService {
   Future<User?> getUser() async {
     return await _dataSource.getUser();
   }
-}
+
+  Future<void> updateUser(String fullName, String email) async {
+    return await _dataSource.updateUser(fullName, email);
+  }
+
+  Future<bool> refreshToken({required String refToken})async{
+    return await _dataSource.refreshToken(refreshToken: refToken);
+  }
+} 
