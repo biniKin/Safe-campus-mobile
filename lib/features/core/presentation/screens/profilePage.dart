@@ -302,12 +302,12 @@ class _ProfilepageState extends State<Profilepage> {
                         borderRadius: BorderRadius.circular(28),
                       ),
                     ),
-                    onPressed: () {
+                    onPressed: () async{
                       print("log out pressed");
                       context.read<LoginBloc>().add(LogoutRequested());
-                      final prefs = await SharedPreferences.getInstance();
-                      await prefs.remove('accessToken');
-                      await prefs.remove('refreshToken');
+                      // final prefs = await SharedPreferences.getInstance();
+                      // await prefs.remove('accessToken');
+                      // await prefs.remove('refreshToken');
                     },
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,

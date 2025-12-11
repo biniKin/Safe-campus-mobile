@@ -121,9 +121,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   @override
   Future<Map<String, dynamic>> register(
-    String email,
-    String password,
-    String name,
+    String email, String password, String name, String studentId
   ) async {
     try {
       // Log input
@@ -183,13 +181,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
             'An unexpected error occurred during registration: ${e.toString()}',
       };
     }
-  } catch (e, stack) {
-    debugPrint('Unexpected error during registration: $e');
-    return {
-      'success': false,
-      'error': 'An unexpected error occurred during registration: ${e.toString()}',
-    };
-  }
+  } 
 
   @override
   Future<void> logout() async {
