@@ -1,5 +1,8 @@
 import 'dart:convert';
+import 'package:flutter/widgets.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
+import 'package:safe_campus/features/auth/data/services/auth_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:safe_campus/features/auth/domain/entities/user.dart';
@@ -10,62 +13,80 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   final http.Client client;
   final SharedPreferences prefs;
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
-  static const String baseUrl = 'http://10.0.2.2:8000/api';
-  AuthRemoteDataSourceImpl({required this.client, required this.prefs});
-  @override
+  // 'https://safe-campus-backend.onrender.com/api';
+    static const String baseUrl = 'http://10.2.75.1:5000/api';
+
+
+  AuthRemoteDataSourceImpl({
+    required this.client,
+    required this.prefs,
+  });
+  
+@override
   Future<Map<String, dynamic>> login(String email, String password) async {
+  try {
+    // Validate inputs
+    if (email.isEmpty || password.isEmpty) {
+      return {
+        'success': false,
+        'error': 'Email and password are required',
+      };
+    }
+
+    // Get device token
+    String? deviceToken = await _firebaseMessaging.getToken();
+    print(deviceToken);
+
+    // Send login request
+    final response = await client.post(
+      Uri.parse('$baseUrl/auth/login'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: jsonEncode({
+        'email': email,
+        'password': password,
+        'deviceToken': deviceToken,
+      }),
+    );
+
+    print('Status Code: ${response.statusCode}');
+    print('Response Body: ${response.body}');
+
+    late final Map<String, dynamic> responseBody;
     try {
-      // Validate inputs
-      if (email.isEmpty || password.isEmpty) {
-        return {'success': false, 'error': 'Email and password are required'};
-      }
+      responseBody = jsonDecode(response.body);
+    } catch (e) {
+      print('JSON decode error: $e');
 
-      // Get device token
-      String? deviceToken = await _firebaseMessaging.getToken();
+      return {
+        'success': false,
+        'error': 'Invalid response format from server: ${response.body}',
+      };
+    }
 
-      // Send login request
-      final response = await client.post(
-        Uri.parse('$baseUrl/auth/login'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        body: jsonEncode({
-          'email': email,
-          'password': password,
-          'deviceToken': deviceToken,
-        }),
-      );
+    if (response.statusCode == 200) {
+      final data = responseBody['data'];
+      String? token = data?['token'];
+      String? refreshToken = data?['refreshToken'];
+      final userJson = data?['user'];
 
-      developer.log('Status Code: ${response.statusCode}');
-      developer.log('Response Body: ${response.body}');
+      if (token != null && userJson != null && refreshToken != null) {
+        // Add token to user JSON before saving
+        userJson['token'] = token;
+        
 
-      late final Map<String, dynamic> responseBody;
-      try {
-        responseBody = jsonDecode(response.body);
-      } catch (e) {
-        developer.log('JSON decode error: $e');
-        return {
-          'success': false,
-          'error': 'Invalid response format from server: ${response.body}',
-        };
-      }
+        await prefs.setString('token', token);
+        await prefs.setString('ref_token', refreshToken);
+        await prefs.setString('user', jsonEncode(userJson));
 
-      if (response.statusCode == 200) {
-        final data = responseBody['data'];
-        String? token = data?['token'];
-        final userJson = data?['user'];
+        token = prefs.getString('token');
+        
 
-        if (token != null && userJson != null) {
-          // Add token to user JSON before saving
-          userJson['token'] = token;
+        print("accessToken: ${token.toString()}");
+        print("Refresh token: ${prefs.getString("ref_token").toString()}");
 
-          await prefs.setString('token', token);
-          await prefs.setString('user', jsonEncode(userJson));
-
-          token = prefs.getString('token');
-
-          developer.log(token.toString());
 
           return {'success': true, 'data': data};
         } else {
@@ -162,6 +183,12 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
             'An unexpected error occurred during registration: ${e.toString()}',
       };
     }
+  } catch (e, stack) {
+    debugPrint('Unexpected error during registration: $e');
+    return {
+      'success': false,
+      'error': 'An unexpected error occurred during registration: ${e.toString()}',
+    };
   }
 
   @override
@@ -173,21 +200,25 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     if (deviceToken != null && userToken != null) {
       try {
         // Remove the device token from the backend
-        await client.post(
-          Uri.parse('$baseUrl/auth/remove-device-token'),
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer $userToken',
-          },
-          body: jsonEncode({'deviceToken': deviceToken}),
-        );
+        // await client.post(
+        //   Uri.parse('$baseUrl/auth/remove-device-token'),
+        //   headers: {
+        //     'Content-Type': 'application/json',
+        //     'Authorization': 'Bearer $userToken',
+        //   },
+        //   body: jsonEncode({
+        //     'deviceToken': deviceToken,
+        //   }),
+        // );
+        // prefs.remove('token');
+        await prefs.remove('token');
+        await prefs.remove('user');
       } catch (e) {
         print('Failed to remove device token: $e');
       }
     }
 
-    await prefs.remove('token');
-    await prefs.remove('user');
+    
   }
 
   @override
@@ -200,12 +231,145 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     return prefs.getString('token');
   }
 
+  // change it to fetch user
   @override
   Future<User?> getUser() async {
     final userJson = prefs.getString('user');
     if (userJson != null) {
+      print(User.fromJson(jsonDecode(userJson)));
       return User.fromJson(jsonDecode(userJson));
     }
     return null;
   }
+
+  // @override
+  // Future<void> updateUser(String fullName, String email)async{
+  //   final endPoint = "${baseUrl}/profile";
+  //   try{
+      
+  //     final userToken = prefs.getString('token');
+  //     final req = await http.put(
+  //       Uri.parse(endPoint),
+  //       headers: {
+  //         // 'Content-Type': 'application/json',
+  //         'Authorization': 'Bearer $userToken',
+  //       },
+  //       body: {
+  //         'fullName': fullName,
+  //         'email':email,
+  //       }
+  //     );
+  //     print(req.body);
+  //     if(req.statusCode == 200){
+  //       Fluttertoast.showToast(msg: "User updated successfully.");
+  //     } else{
+  //       Fluttertoast.showToast(msg: "Error on updating use data. Please try again later.");
+  //     }
+      
+  //   }catch(e){
+  //     print(e);
+  //   }
+
+  // }
+
+  @override
+Future<void> updateUser(String fullName, String email) async {
+  final endPoint = "$baseUrl/profile";
+
+  try {
+    final userToken = prefs.getString('token') ?? '';
+    final refreshToken = prefs.getString('ref_token') ?? '';
+
+    
+    var response = await http.put(
+      Uri.parse(endPoint),
+      headers: {
+        'Authorization': 'Bearer $userToken',
+      },
+      body: {
+        'fullName': fullName,
+        'email': email,
+      },
+    );
+
+    
+    if (response.statusCode == 200) {
+      Fluttertoast.showToast(msg: "User updated successfully.");
+      return;
+    }
+
+  
+    if (response.statusCode == 401) {
+      print("Token expired. Attempting refresh...");
+
+      final authService = AuthService(prefs);
+      final bool refreshSuccess =
+          await authService.refreshToken(refToken: refreshToken);
+
+      if (!refreshSuccess) {
+        Fluttertoast.showToast(msg: "Session expired. Please log in again.");
+        return;
+      }
+
+      final newToken = prefs.getString('token') ?? '';
+
+      response = await http.put(
+        Uri.parse(endPoint),
+        headers: {
+          'Authorization': 'Bearer $newToken',
+        },
+        body: {
+          'fullName': fullName,
+          'email': email,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        Fluttertoast.showToast(msg: "User updated successfully.");
+      } else {
+        Fluttertoast.showToast(msg: "Update failed. Please try again.");
+      }
+      return;
+    }
+
+    
+    Fluttertoast.showToast(
+        msg: "Error updating user (${response.statusCode}). Try again later.");
+  } catch (e) {
+    print("updateUser error: $e");
+    Fluttertoast.showToast(msg: "Unexpected error. Please try again.");
+  }
 }
+
+
+  @override
+  Future<bool> refreshToken({required String refreshToken})async{
+    final endPoint = "$baseUrl/auth/refresh";
+    final refToken = prefs.getString('ref_token');
+    try{
+      final res = await http.post(
+        Uri.parse(endPoint),
+        
+        body: {
+          'refresh_token':refToken
+        }
+      );
+
+      if(res.statusCode == 200){
+        final data = jsonDecode(res.body);
+        print(data);
+        print("new token: ${data['data']['token']}" );
+        await prefs.setString('token', data['data']['token']);
+        
+        return true;
+      } else{
+        print("on else bloc: ${res.statusCode}");
+        return false;
+      }
+    }catch(e){
+      print("error on refresh token: $e");
+      return false;
+    }
+
+  }
+} 

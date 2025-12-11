@@ -384,11 +384,45 @@ class _HomePageState extends State<HomePage> {
   void _showActivityDetails(Map<String, String> activity) {
     showDialog(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            title: Text(
-              activity['name'] ?? '',
-              style: GoogleFonts.poppins(fontWeight: FontWeight.bold),
+      builder: (context) => AlertDialog(
+        title: Text(
+          activity['name'] ?? '',
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (activity['type'] == 'incident') ...[
+              Text(
+                'Type: ${activity['description']?.split('\n')[0].replaceAll('Type: ', '') ?? ''}',
+                style: GoogleFonts.poppins(),
+              ),
+              SizedBox(height: 8),
+              Text(
+                'Severity: ${activity['description']?.split('\n')[1].replaceAll('Severity: ', '') ?? ''}',
+                style: GoogleFonts.poppins(),
+              ),
+            ] else ...[
+              Text(
+                'Phone: ${activity['description']?.split('\n')[0].replaceAll('Phone: ', '') ?? ''}',
+                style: GoogleFonts.poppins(),
+              ),
+              SizedBox(height: 8),
+              Text(
+                'Email: ${activity['description']?.split('\n')[1].replaceAll('Email: ', '') ?? ''}',
+                style: GoogleFonts.poppins(),
+              ),
+            ],
+            SizedBox(height: 16),
+            Text(
+              'Reported ${formatTimestamp(activity['timestamp'] ?? '')}',
+              style: GoogleFonts.poppins(
+                color: Colors.grey[600],
+                fontSize: 12,
+              ),
             ),
             content: Column(
               mainAxisSize: MainAxisSize.min,
@@ -438,46 +472,46 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget buildRoundedIconButton({
-    required IconData icon,
-    required String label,
-    required VoidCallback onPressed,
-  }) {
-    return GestureDetector(
-      onTap: onPressed,
-      child: Container(
-        width: 150,
-        height: 100,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          gradient: const LinearGradient(
-            colors: [Color(0xFFF6F2FF), Color(0xFFEDE7F6)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black12,
-              blurRadius: 4,
-              offset: Offset(2, 4),
-            ),
-          ],
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 32, color: Colors.black),
-            const SizedBox(height: 8),
-            Text(
-              label,
-              textAlign: TextAlign.center,
-              style: GoogleFonts.poppins(fontSize: 14, color: Colors.black),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  // Widget buildRoundedIconButton({
+  //   required IconData icon,
+  //   required String label,
+  //   required VoidCallback onPressed,
+  // }) {
+  //   return GestureDetector(
+  //     onTap: onPressed,
+  //     child: Container(
+  //       width: 150,
+  //       height: 100,
+  //       decoration: BoxDecoration(
+  //         borderRadius: BorderRadius.circular(20),
+  //         gradient: const LinearGradient(
+  //           colors: [Color(0xFFF6F2FF), Color(0xFFEDE7F6)],
+  //           begin: Alignment.topLeft,
+  //           end: Alignment.bottomRight,
+  //         ),
+  //         boxShadow: [
+  //           BoxShadow(
+  //             color: Colors.black12,
+  //             blurRadius: 4,
+  //             offset: Offset(2, 4),
+  //           ),
+  //         ],
+  //       ),
+  //       child: Column(
+  //         mainAxisAlignment: MainAxisAlignment.center,
+  //         children: [
+  //           Icon(icon, size: 32, color: Colors.black),
+  //           const SizedBox(height: 8),
+  //           Text(
+  //             label,
+  //             textAlign: TextAlign.center,
+  //             style: GoogleFonts.poppins(fontSize: 14, color: Colors.black),
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
 
   Widget buildRecentActivities() {
     final activitiesToShow =
@@ -615,7 +649,7 @@ class _HomePageState extends State<HomePage> {
                           ),
                           SizedBox(height: 4),
                           Text(
-                            _formatTimestamp(activity['timestamp'] ?? ''),
+                            formatTimestamp(activity['timestamp'] ?? ''),
                             style: GoogleFonts.poppins(
                               fontSize: 12,
                               color: Colors.grey[500],
@@ -659,105 +693,48 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  String _formatTimestamp(String timestamp) {
-    try {
-      final dateTime = DateTime.parse(timestamp);
-      final now = DateTime.now();
-      final difference = now.difference(dateTime);
-
-      if (difference.inDays > 0) {
-        return '${difference.inDays}d ago';
-      } else if (difference.inHours > 0) {
-        return '${difference.inHours}h ago';
-      } else if (difference.inMinutes > 0) {
-        return '${difference.inMinutes}m ago';
-      } else {
-        return 'Just now';
-      }
-    } catch (e) {
-      return '';
-    }
-  }
-
-  void _navigateToAdminPage() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => AdminPage()),
-    );
-  }
-
-  void _navigateToSecurityPage() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => SecurityPage()),
-    );
-  }
-
+  
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-
     return BlocBuilder<SosCubit, SosState>(
       builder: (context, state) {
         return Scaffold(
-          backgroundColor:
-              state.isEmergencyMode
-                  ? Colors.red.withOpacity(0.1)
-                  : Colors.white,
-          body: SafeArea(
-            child: Stack(
-              children: [
-                // Quarter-circle background
-                Positioned(
-                  top: 0,
-                  left: 0,
-                  child: Container(
-                    width: 210,
-                    height: 80,
-                    decoration: const BoxDecoration(
-                      color: Color(0xFFE8DEF8), // 78% opacity of B7AFE7
-                      borderRadius: BorderRadius.only(
-                        bottomRight: Radius.circular(358),
-                      ),
-                    ),
-                  ),
+          
+          appBar: AppBar(
+            backgroundColor: Colors.white,
+            surfaceTintColor: Colors.transparent,
+            title: Text(
+                "SafeCampus",
+                style: Theme.of(
+                  context,
+                ).textTheme.headlineSmall?.copyWith(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
                 ),
+              
+            ),
+           
+            actions: [
+              Image.asset(
+                    'assets/images/ICON.PNG',
+                    width: 40,
+                    height: 40,
+                    fit: BoxFit.cover,
+                  ),
+                
+            ],
+          ),
+          backgroundColor: Colors.white,
+          body: SafeArea(
+            child: ListView(
+              children: [
+                
                 SingleChildScrollView(
                   child: Column(
                     children: [
-                      const SizedBox(height: 20), // Space under status bar
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: Stack(
-                          children: [
-                            Align(
-                              alignment: Alignment.centerLeft,
-                              child: Text(
-                                "SafeCampus",
-                                style: Theme.of(
-                                  context,
-                                ).textTheme.headlineSmall?.copyWith(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                            Align(
-                              alignment: Alignment.centerRight,
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(12),
-                                child: Image.asset(
-                                  'assets/images/ICON.PNG',
-                                  width: 40,
-                                  height: 40,
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 40),
+                      
+  
+                      const SizedBox(height: 10),
                       SingleChildScrollView(
                         padding: const EdgeInsets.fromLTRB(20, 0, 20, 30),
                         child: Column(
@@ -857,60 +834,60 @@ class _HomePageState extends State<HomePage> {
                     ],
                   ),
                 ),
-                if (state.isEmergencyMode)
-                  Positioned.fill(
-                    child: Container(
-                      color: Colors.red.withOpacity(0.1),
-                      child: Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            TweenAnimationBuilder<double>(
-                              tween: Tween(begin: 1.0, end: 1.5),
-                              duration: const Duration(milliseconds: 1000),
-                              builder: (context, value, child) {
-                                return Transform.scale(
-                                  scale: value,
-                                  child: Container(
-                                    padding: const EdgeInsets.all(20),
-                                    decoration: BoxDecoration(
-                                      color: Colors.red,
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: Text(
-                                      "SOS",
-                                      style: GoogleFonts.poppins(
-                                        color: Colors.white,
-                                        fontSize: 32,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-                            const SizedBox(height: 20),
-                            ElevatedButton(
-                              onPressed: _stopSOSMode,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                              child: Text(
-                                "Cancel Emergency",
-                                style: GoogleFonts.poppins(
-                                  color: Colors.red,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
+                // if (state.isEmergencyMode)
+                  // Positioned.fill(
+                  //   child: Container(
+                  //     color: Colors.red.withOpacity(0.1),
+                  //     child: Center(
+                  //       child: Column(
+                  //         mainAxisAlignment: MainAxisAlignment.center,
+                  //         children: [
+                  //           TweenAnimationBuilder<double>(
+                  //             tween: Tween(begin: 1.0, end: 1.5),
+                  //             duration: const Duration(milliseconds: 1000),
+                  //             builder: (context, value, child) {
+                  //               return Transform.scale(
+                  //                 scale: value,
+                  //                 child: Container(
+                  //                   padding: const EdgeInsets.all(20),
+                  //                   decoration: BoxDecoration(
+                  //                     color: Colors.red,
+                  //                     shape: BoxShape.circle,
+                  //                   ),
+                  //                   child: Text(
+                  //                     "SOS",
+                  //                     style: GoogleFonts.poppins(
+                  //                       color: Colors.white,
+                  //                       fontSize: 32,
+                  //                       fontWeight: FontWeight.bold,
+                  //                     ),
+                  //                   ),
+                  //                 ),
+                  //               );
+                  //             },
+                  //           ),
+                  //           const SizedBox(height: 20),
+                  //           ElevatedButton(
+                  //             onPressed: _stopSOSMode,
+                  //             style: ElevatedButton.styleFrom(
+                  //               backgroundColor: Colors.white,
+                  //               shape: RoundedRectangleBorder(
+                  //                 borderRadius: BorderRadius.circular(10),
+                  //               ),
+                  //             ),
+                  //             child: Text(
+                  //               "Cancel Emergency",
+                  //               style: GoogleFonts.poppins(
+                  //                 color: Colors.red,
+                  //                 fontWeight: FontWeight.bold,
+                  //               ),
+                  //             ),
+                  //           ),
+                  //         ],
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
               ],
             ),
           ),
@@ -1008,6 +985,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  // trusted contacts
   Widget buildTrustedContacts() {
     return BlocBuilder<ContactListBloc, ContactListState>(
       builder: (context, state) {
