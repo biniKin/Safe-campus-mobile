@@ -32,13 +32,13 @@ class _RegisterPageState extends State<RegisterPage> {
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
       context.read<RegisterBloc>().add(
-            RegisterSubmitted(
-              fullName: _fullNameController.text,
-              email: _emailController.text,
-              studentId: _studentIdController.text,
-              password: _passwordController.text,
-            ),
-          );
+        RegisterSubmitted(
+          fullName: _fullNameController.text,
+          email: _emailController.text,
+          studentId: _studentIdController.text,
+          password: _passwordController.text,
+        ),
+      );
     }
   }
 
@@ -61,7 +61,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 begin: Alignment.bottomCenter,
                 end: Alignment.topCenter,
                 colors: [
-                  Color.fromARGB(255, 192, 186, 222),
+                  Color.fromRGBO(14, 212, 41, 1),
                   Color.fromARGB(255, 223, 222, 236),
                 ],
               ),
@@ -112,7 +112,9 @@ class _RegisterPageState extends State<RegisterPage> {
                             if (value == null || value.isEmpty) {
                               return "Please enter your email";
                             }
-                            if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                            if (!RegExp(
+                              r'^[^@]+@[^@]+\.[^@]+',
+                            ).hasMatch(value)) {
                               return 'Enter a valid email';
                             }
                             return null;
@@ -152,7 +154,8 @@ class _RegisterPageState extends State<RegisterPage> {
                         ),
                         const SizedBox(height: 20),
                         ElevatedButton(
-                          onPressed: state is RegisterLoading ? null : _submitForm,
+                          onPressed:
+                              state is RegisterLoading ? null : _submitForm,
                           style: ElevatedButton.styleFrom(
                             minimumSize: const Size(double.infinity, 50),
                             backgroundColor: Color(0xFF65558F),
@@ -160,16 +163,19 @@ class _RegisterPageState extends State<RegisterPage> {
                               borderRadius: BorderRadius.circular(10),
                             ),
                           ),
-                          child: state is RegisterLoading
-                              ? const CircularProgressIndicator(color: Colors.white)
-                              : Text(
-                                  'Register',
-                                  style: GoogleFonts.poppins(
+                          child:
+                              state is RegisterLoading
+                                  ? const CircularProgressIndicator(
                                     color: Colors.white,
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 17,
+                                  )
+                                  : Text(
+                                    'Register',
+                                    style: GoogleFonts.poppins(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 17,
+                                    ),
                                   ),
-                                ),
                         ),
                         const SizedBox(height: 20),
                         Row(
@@ -177,7 +183,8 @@ class _RegisterPageState extends State<RegisterPage> {
                           children: [
                             const Text('Already have account?'),
                             TextButton(
-                              onPressed: () => Navigator.pushNamed(context, '/signin'),
+                              onPressed:
+                                  () => Navigator.pushNamed(context, '/signin'),
                               child: const Text('Sign In'),
                             ),
                           ],

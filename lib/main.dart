@@ -2,10 +2,21 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:safe_campus/features/contacts/data/contact_list_datasource/contact_list_datasource.dart';
+import 'package:safe_campus/features/contacts/data/repository/contact_list_repositoryimpl.dart';
+import 'package:safe_campus/features/contacts/domain/usecases/add_contacts.dart';
+import 'package:safe_campus/features/contacts/domain/usecases/delete_contacts.dart';
+import 'package:safe_campus/features/contacts/domain/usecases/fetch_contacts.dart';
+import 'package:safe_campus/features/contacts/domain/usecases/update_contacts.dart';
+import 'package:safe_campus/features/contacts/presentation/bloc/contact_list_bloc.dart';
 import 'package:safe_campus/features/core/presentation/bloc/auth/login_state.dart';
 import 'package:safe_campus/features/core/presentation/screens/admin/security_dashboard.dart';
-import 'package:safe_campus/features/core/presentation/screens/admin_page.dart' show AdminPage;
-import 'features/core/presentation/bloc/add_contacts_cubit/contact_cubit.dart';
+import 'package:safe_campus/features/core/presentation/screens/admin_page.dart'
+    show AdminPage;
+import 'package:safe_campus/features/report/data/report_data_source.dart';
+import 'package:safe_campus/features/report/data/report_repositry._impl.dart';
+import 'package:safe_campus/features/report/presentation/bloc/report_bloc.dart';
+import 'package:safe_campus/features/report/usecases/send_report.dart';
 import 'features/core/presentation/bloc/panic_alert/panic_alert_bloc.dart';
 import 'features/core/presentation/firebase_notification_handler.dart';
 import 'features/core/presentation/bloc/NavigationCubit.dart';
@@ -20,21 +31,21 @@ import 'features/core/presentation/bloc/register/register_bloc.dart';
 import 'features/core/presentation/bloc/auth/login_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-void main() async {  
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  
+
   final prefs = await SharedPreferences.getInstance();
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
   final AndroidInitializationSettings initializationSettingsAndroid =
-    AndroidInitializationSettings('@mipmap/ic_launcher');
+      AndroidInitializationSettings('@mipmap/ic_launcher');
 
-final InitializationSettings initializationSettings =
-    InitializationSettings(android: initializationSettingsAndroid);
+  final InitializationSettings initializationSettings = InitializationSettings(
+    android: initializationSettingsAndroid,
+  );
 
-await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+  await flutterLocalNotificationsPlugin.initialize(initializationSettings);
 
- 
   runApp(MyApp(prefs: prefs));
 }
 
@@ -60,7 +71,51 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (BuildContext context) => SosCubit()),
 
         BlocProvider(
-          create: (context) => ContactCubit(token: prefs.getString('token') ?? ''),
+          create:
+              (BuildContext context) => ContactListBloc(
+                addContact: AddContacts(
+                  repository: ContactListRepositoryImpl(
+                    contactListDataSource: ContactListDatasourceImpl(
+                      sharedPreferences: prefs,
+                      prefs: prefs,
+                    ),
+                  ),
+                ),
+                fetchContacts: FetchContacts(
+                  repository: ContactListRepositoryImpl(
+                    contactListDataSource: ContactListDatasourceImpl(
+                      sharedPreferences: prefs,
+                      prefs: prefs,
+                    ),
+                  ),
+                ),
+                updateContacts: UpdateContacts(
+                  repository: ContactListRepositoryImpl(
+                    contactListDataSource: ContactListDatasourceImpl(
+                      sharedPreferences: prefs,
+                      prefs: prefs,
+                    ),
+                  ),
+                ),
+                deleteContacts: DeleteContacts(
+                  repository: ContactListRepositoryImpl(
+                    contactListDataSource: ContactListDatasourceImpl(
+                      prefs: prefs,
+                      sharedPreferences: prefs,
+                    ),
+                  ),
+                ),
+              ),
+        ),
+        BlocProvider(
+          create:
+              (_) => ReportBloc(
+                sendReport: SendReport(
+                  repository: ReportRepositryImpl(
+                    reportDatasource: ReportDataSourceImpl(),
+                  ),
+                ),
+              ),
         ),
       ],
       child: MaterialApp(

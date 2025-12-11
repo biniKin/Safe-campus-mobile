@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:safe_campus/features/core/data/models/contacts_model.dart';
-import 'package:safe_campus/features/core/presentation/bloc/add_contacts_cubit/contact_cubit.dart';
 
 class ContactFormBottomSheet extends StatefulWidget {
   final Function(String, String, String) onSave;
@@ -21,7 +19,12 @@ class _ContactFormBottomSheetState extends State<ContactFormBottomSheet> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.fromLTRB(20, 20, 20, MediaQuery.of(context).viewInsets.bottom + 20),
+      padding: EdgeInsets.fromLTRB(
+        20,
+        20,
+        20,
+        MediaQuery.of(context).viewInsets.bottom + 20,
+      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -82,16 +85,9 @@ class _ContactFormBottomSheetState extends State<ContactFormBottomSheet> {
             width: double.infinity,
             child: ElevatedButton(
               onPressed: () {
-
-                if (nameController.text.isNotEmpty && 
-                    phoneController.text.isNotEmpty && 
+                if (nameController.text.isNotEmpty &&
+                    phoneController.text.isNotEmpty &&
                     emailController.text.isNotEmpty) {
-
-                  
-                  context.read<ContactCubit>().addContact(
-                    Contact(fullName: nameController.text, email: emailController.text, phoneNumber: phoneController.text,),);
-      
-
                   Navigator.pop(context);
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -111,10 +107,7 @@ class _ContactFormBottomSheetState extends State<ContactFormBottomSheet> {
               ),
               child: Text(
                 "Save Contact",
-                style: GoogleFonts.poppins(
-                  fontSize: 16,
-                  color: Colors.white,
-                ),
+                style: GoogleFonts.poppins(fontSize: 16, color: Colors.white),
               ),
             ),
           ),

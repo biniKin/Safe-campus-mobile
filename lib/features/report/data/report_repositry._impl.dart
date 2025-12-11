@@ -1,0 +1,34 @@
+import 'dart:developer' as console show log;
+
+import 'package:safe_campus/features/report/data/report_data_source.dart';
+import 'package:safe_campus/features/report/domain/report_repositry.dart';
+
+class ReportRepositryImpl implements ReportRepository {
+  ReportDataSource reportDatasource;
+  ReportRepositryImpl({required this.reportDatasource});
+
+  @override
+  Future<void> sendReport({
+    required String description,
+    required String tags,
+    required String image,
+    required Map<String, String> location,
+    required String token,
+  }) async {
+    try {
+      console.log(
+        'Sending report with description: $description, tags: $tags, image: $image, location: $location',
+      );
+      await reportDatasource.sendReport(
+        description: description,
+        tag: tags,
+        image: image,
+        location: location,
+        token: token,
+      );
+      console.log('Report sent successfully');
+    } catch (e) {
+      console.log('Error happening while sending report $e');
+    }
+  }
+}

@@ -5,6 +5,7 @@ import 'package:safe_campus/features/core/presentation/screens/editProfile.dart'
 import 'package:safe_campus/features/core/presentation/bloc/auth/login_bloc.dart';
 import 'package:safe_campus/features/core/presentation/bloc/auth/login_event.dart';
 import 'package:safe_campus/features/core/presentation/bloc/auth/login_state.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Profilepage extends StatefulWidget {
   const Profilepage({super.key});
@@ -85,7 +86,11 @@ class _ProfilepageState extends State<Profilepage> {
                           child: CircleAvatar(
                             backgroundColor: Colors.white,
                             radius: 40,
-                            child: Icon(Icons.person, size: 40, color: Color(0xFF65558F)),
+                            child: Icon(
+                              Icons.person,
+                              size: 40,
+                              color: Color(0xFF65558F),
+                            ),
                           ),
                         ),
                       ),
@@ -200,9 +205,8 @@ class _ProfilepageState extends State<Profilepage> {
                           });
                         },
                         label: "Sound alerts",
-                        lasticon: isPressedAlert
-                            ? Icons.toggle_on
-                            : Icons.toggle_off,
+                        lasticon:
+                            isPressedAlert ? Icons.toggle_on : Icons.toggle_off,
                         isActive: isPressedAlert,
                       ),
                       SizedBox(height: 12),
@@ -214,9 +218,10 @@ class _ProfilepageState extends State<Profilepage> {
                           });
                         },
                         label: "Vibrations",
-                        lasticon: isPressedVibration
-                            ? Icons.toggle_on
-                            : Icons.toggle_off,
+                        lasticon:
+                            isPressedVibration
+                                ? Icons.toggle_on
+                                : Icons.toggle_off,
                         isActive: isPressedVibration,
                       ),
                     ],
@@ -250,8 +255,11 @@ class _ProfilepageState extends State<Profilepage> {
                         borderRadius: BorderRadius.circular(28),
                       ),
                     ),
-                    onPressed: () {
+                    onPressed: () async {
                       context.read<LoginBloc>().add(LogoutRequested());
+                      final prefs = await SharedPreferences.getInstance();
+                      await prefs.remove('accessToken');
+                      await prefs.remove('refreshToken');
                     },
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,

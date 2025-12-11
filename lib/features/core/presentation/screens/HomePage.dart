@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:location/location.dart';
+import 'package:safe_campus/features/contacts/presentation/bloc/contact_list_bloc.dart';
 import 'package:safe_campus/features/core/presentation/screens/sos_cubit/sos_cubit.dart';
+import 'package:safe_campus/features/report/presentation/bloc/report_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'components/contact_form_bottom_sheet.dart';
 import 'package:safe_campus/features/core/presentation/screens/mapPage.dart';
 import 'dart:async';
@@ -11,6 +15,7 @@ import 'security_page.dart';
 import 'adm_sec_login_page.dart';
 import 'package:safe_campus/features/core/presentation/bloc/NavigationCubit.dart';
 import 'package:image_picker/image_picker.dart';
+import 'dart:developer' as console show log;
 
 class HomePage extends StatefulWidget {
   final List<Map<String, String>> initialContacts; // Accept initial contacts
@@ -28,29 +33,22 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  LocationData? _currentLocation;
   List<Map<String, String>> recentActivities = [];
-  List<Map<String, String>> contacts = [
-    {
-      'name': 'John Doe',
-      'phone': '+251 912 345 678',
-      'email': 'john.doe@example.com',
-    },
-    {
-      'name': 'Jane Smith',
-      'phone': '+251 911 234 567',
-      'email': 'jane.smith@example.com',
-    },
-  ];
+  //List<Map<String, String>> contacts = [];
+
   List<Map<String, String>> incidents = [
     {
       'name': 'Low visibility area',
-      'description': 'Poor lighting near the main gate\nType: general\nSeverity: medium',
+      'description':
+          'Poor lighting near the main gate\nType: general\nSeverity: medium',
       'type': 'incident',
       'timestamp': DateTime.now().subtract(Duration(hours: 2)).toString(),
     },
     {
       'name': 'Construction work',
-      'description': 'Ongoing construction near Block A\nType: construction\nSeverity: low',
+      'description':
+          'Ongoing construction near Block A\nType: construction\nSeverity: low',
       'type': 'incident',
       'timestamp': DateTime.now().subtract(Duration(hours: 5)).toString(),
     },
@@ -62,20 +60,19 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+
+    context.read<ContactListBloc>().add(FetchContactListEvent());
     // Initialize recent activities with both incidents and contacts
     recentActivities = [
-      ...incidents.map((incident) => {
-        'name': incident['name'] ?? '',
-        'description': 'Type: ${incident['description']?.split('\n')[0]}\nSeverity: ${incident['description']?.split('\n')[1]}',
-        'type': 'incident',
-        'timestamp': incident['timestamp'] ?? DateTime.now().toString(),
-      }),
-      ...contacts.map((contact) => {
-        'name': contact['name'] ?? '',
-        'description': 'Phone: ${contact['phone']}\nEmail: ${contact['email']}',
-        'type': 'contact',
-        'timestamp': DateTime.now().toString(),
-      }),
+      ...incidents.map(
+        (incident) => {
+          'name': incident['name'] ?? '',
+          'description':
+              'Type: ${incident['description']?.split('\n')[0]}\nSeverity: ${incident['description']?.split('\n')[1]}',
+          'type': 'incident',
+          'timestamp': incident['timestamp'] ?? DateTime.now().toString(),
+        },
+      ),
     ];
   }
 
@@ -96,225 +93,275 @@ class _HomePageState extends State<HomePage> {
     String selectedSeverity = 'medium';
     XFile? selectedMedia;
     TextEditingController descriptionController = TextEditingController();
-    
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setState) => Padding(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom,
-            left: 16,
-            right: 16,
-            top: 16,
+      builder:
+          (context) => StatefulBuilder(
+            builder:
+                (context, setState) => Padding(
+                  padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(context).viewInsets.bottom,
+                    left: 16,
+                    right: 16,
+                    top: 16,
+                  ),
+                  child: BlocBuilder<ReportBloc, ReportState>(
+                    builder: (context, state) {
+                      return SingleChildScrollView(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              "Report Incident",
+                              style: GoogleFonts.poppins(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(height: 16),
+                            TextField(
+                              controller: descriptionController,
+                              decoration: InputDecoration(
+                                labelText: "Describe the incident",
+                                labelStyle: GoogleFonts.poppins(),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              maxLines: 3,
+                            ),
+                            SizedBox(height: 16),
+                            DropdownButtonFormField<String>(
+                              initialValue: selectedType,
+
+                              decoration: InputDecoration(
+                                labelText: "Incident Type",
+                                labelStyle: GoogleFonts.poppins(),
+
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              items: [
+                                DropdownMenuItem(
+                                  value: 'general',
+                                  child: Text('General'),
+                                ),
+                                DropdownMenuItem(
+                                  value: 'crime',
+                                  child: Text('Crime'),
+                                ),
+                                DropdownMenuItem(
+                                  value: 'accident',
+                                  child: Text('Accident'),
+                                ),
+                                DropdownMenuItem(
+                                  value: 'construction',
+                                  child: Text('Construction'),
+                                ),
+                              ],
+                              onChanged: (value) {
+                                setState(() {
+                                  selectedType = value!;
+                                });
+                              },
+                            ),
+                            SizedBox(height: 16),
+                            DropdownButtonFormField<String>(
+                              initialValue: selectedSeverity,
+                              decoration: InputDecoration(
+                                labelText: "Severity Level",
+                                labelStyle: GoogleFonts.poppins(),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              items: [
+                                DropdownMenuItem(
+                                  value: 'low',
+                                  child: Text('Low'),
+                                ),
+                                DropdownMenuItem(
+                                  value: 'medium',
+                                  child: Text('Medium'),
+                                ),
+                                DropdownMenuItem(
+                                  value: 'high',
+                                  child: Text('High'),
+                                ),
+                              ],
+                              onChanged: (value) {
+                                setState(() {
+                                  selectedSeverity = value!;
+                                });
+                              },
+                            ),
+                            SizedBox(height: 16),
+                            ElevatedButton.icon(
+                              onPressed: () async {
+                                final result = await picker.pickImage(
+                                  source: ImageSource.gallery,
+                                );
+                                if (result != null) {
+                                  setState(() {
+                                    selectedMedia = result;
+                                  });
+                                }
+                              },
+                              icon: Icon(
+                                Icons.attach_file,
+                                color: Colors.white,
+                              ),
+                              label: Text(
+                                "Attach Media",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Color(0xFF65558F),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                            ),
+                            if (selectedMedia != null)
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 16),
+                                child: Text(
+                                  "Media selected: ${selectedMedia!.name}",
+                                  style: GoogleFonts.poppins(
+                                    color: Colors.green,
+                                  ),
+                                ),
+                              ),
+                            SizedBox(height: 16),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: OutlinedButton(
+                                    onPressed: () => Navigator.pop(context),
+                                    style: OutlinedButton.styleFrom(
+                                      side: BorderSide(color: Colors.grey),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      padding: EdgeInsets.symmetric(
+                                        vertical: 15,
+                                      ),
+                                    ),
+                                    child: Text(
+                                      "Cancel",
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 16,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(width: 10),
+                                Expanded(
+                                  child: ElevatedButton(
+                                    onPressed: () async {
+                                      final prefs =
+                                          await SharedPreferences.getInstance();
+                                      final token =
+                                          prefs.getString('token') ?? '';
+
+                                      console.log('The token is $token');
+                                      Navigator.pop(context);
+
+                                      context.read<ReportBloc>().add(
+                                        SendReportEvent(
+                                          description:
+                                              descriptionController.text,
+                                          tags:
+                                              '$selectedType, $selectedSeverity',
+                                          image: selectedMedia?.path ?? '',
+                                          location: {
+                                            'latitude':
+                                                _currentLocation?.latitude
+                                                    .toString() ??
+                                                '',
+                                            'longitude':
+                                                _currentLocation?.longitude
+                                                    .toString() ??
+                                                '',
+                                          },
+                                          token: token,
+                                        ),
+                                      );
+
+                                      if (state is ReportSuccess) {
+                                        Fluttertoast.showToast(
+                                          msg: "Incident reported successfully",
+                                          toastLength: Toast.LENGTH_SHORT,
+                                          gravity: ToastGravity.BOTTOM,
+                                          timeInSecForIosWeb: 1,
+                                          backgroundColor: Colors.green,
+                                          textColor: Colors.white,
+                                        );
+                                      }
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Color(0xFF65558F),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      padding: EdgeInsets.symmetric(
+                                        vertical: 15,
+                                      ),
+                                    ),
+                                    child: Text(
+                                      "Submit",
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 16,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 16),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
           ),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  "Report Incident",
-                  style: GoogleFonts.poppins(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(height: 16),
-                TextField(
-                  controller: descriptionController,
-                  decoration: InputDecoration(
-                    labelText: "Describe the incident",
-                    labelStyle: GoogleFonts.poppins(),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  maxLines: 3,
-                ),
-                SizedBox(height: 16),
-                DropdownButtonFormField<String>(
-                  initialValue: selectedType,
-                  decoration: InputDecoration(
-                    labelText: "Incident Type",
-                    labelStyle: GoogleFonts.poppins(),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  items: [
-                    DropdownMenuItem(value: 'general', child: Text('General')),
-                    DropdownMenuItem(value: 'crime', child: Text('Crime')),
-                    DropdownMenuItem(value: 'accident', child: Text('Accident')),
-                    DropdownMenuItem(value: 'construction', child: Text('Construction')),
-                  ],
-                  onChanged: (value) {
-                    setState(() {
-                      selectedType = value!;
-                    });
-                  },
-                ),
-                SizedBox(height: 16),
-                DropdownButtonFormField<String>(
-                  initialValue: selectedSeverity,
-                  decoration: InputDecoration(
-                    labelText: "Severity Level",
-                    labelStyle: GoogleFonts.poppins(),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  items: [
-                    DropdownMenuItem(value: 'low', child: Text('Low')),
-                    DropdownMenuItem(value: 'medium', child: Text('Medium')),
-                    DropdownMenuItem(value: 'high', child: Text('High')),
-                  ],
-                  onChanged: (value) {
-                    setState(() {
-                      selectedSeverity = value!;
-                    });
-                  },
-                ),
-                SizedBox(height: 16),
-                ElevatedButton.icon(
-                  onPressed: () async {
-                    final result = await picker.pickImage(source: ImageSource.gallery);
-                    if (result != null) {
-                      setState(() {
-                        selectedMedia = result;
-                      });
-                    }
-                  },
-                  icon: Icon(Icons.attach_file),
-                  label: Text("Attach Media"),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF65558F),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                ),
-                if (selectedMedia != null)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 16),
-                    child: Text(
-                      "Media selected: ${selectedMedia!.name}",
-                      style: GoogleFonts.poppins(color: Colors.green),
-                    ),
-                  ),
-                SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () => Navigator.pop(context),
-                        style: OutlinedButton.styleFrom(
-                          side: BorderSide(color: Colors.grey),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          padding: EdgeInsets.symmetric(vertical: 15),
-                        ),
-                        child: Text(
-                          "Cancel",
-                          style: GoogleFonts.poppins(
-                            fontSize: 16,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 10),
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                          setState(() {
-                            incidents.insert(0, {
-                              'name': 'Incident Report',
-                              'description': '${descriptionController.text}\nType: $selectedType\nSeverity: $selectedSeverity',
-                              'type': 'incident',
-                              'timestamp': DateTime.now().toString(),
-                            });
-                            recentActivities.insert(0, {
-                              'name': 'Incident Report',
-                              'description': '${descriptionController.text}\nType: $selectedType\nSeverity: $selectedSeverity',
-                              'type': 'incident',
-                              'timestamp': DateTime.now().toString(),
-                            });
-                          });
-                          Fluttertoast.showToast(
-                            msg: "Incident reported successfully",
-                            toastLength: Toast.LENGTH_SHORT,
-                            gravity: ToastGravity.BOTTOM,
-                            timeInSecForIosWeb: 1,
-                            backgroundColor: Colors.green,
-                            textColor: Colors.white,
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Color(0xFF65558F),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          padding: EdgeInsets.symmetric(vertical: 15),
-                        ),
-                        child: Text(
-                          "Submit",
-                          style: GoogleFonts.poppins(
-                            fontSize: 16,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 16),
-              ],
-            ),
-          ),
-        ),
-      ),
     );
   }
 
   void openShareRouteSheet() {
-    context.read<NavigationCubit>().updateIndex(1); // Navigate to map page (index 1)
+    context.read<NavigationCubit>().updateIndex(
+      1,
+    ); // Navigate to map page (index 1)
   }
 
   void openManageContactsSheet() async {
     final result = await showModalBottomSheet<Map<String, String>>(
       context: context,
       isScrollControlled: true,
-      builder: (context) => ContactFormBottomSheet(
-        onSave: (name, phone, email) {
-          Navigator.of(context).pop({
-            'name': name,
-            'description': 'Phone: $phone\nEmail: $email',
-            'type': 'contact',
-            'timestamp': DateTime.now().toString(),
-          });
-        },
-      ),
+      builder:
+          (context) => ContactFormBottomSheet(
+            onSave: (name, phone, email) {
+              context.read<ContactListBloc>().add(
+                AddContactEvent(
+                  contact: {'name': name, 'phoneNumber': phone, 'email': email},
+                ),
+              );
+              Navigator.of(context).pop({
+                'name': name,
+                'description': 'Phone: $phone\nEmail: $email',
+                'type': 'contact',
+                'timestamp': DateTime.now().toString(),
+              });
+            },
+          ),
     );
-
-    if (result != null && mounted) {
-      setState(() {
-        // Add to contacts array
-        contacts.add({
-          'name': result['name'] ?? '',
-          'phone': result['description']?.split('\n')[0].replaceAll('Phone: ', '') ?? '',
-          'email': result['description']?.split('\n')[1].replaceAll('Email: ', '') ?? '',
-        });
-        
-        // Add to recent activities
-        recentActivities.insert(0, result);
-        
-        // Notify parent of contact update
-        widget.onContactsUpdated(contacts);
-      });
-    }
   }
 
   void deleteContact(int index) {
@@ -337,60 +384,57 @@ class _HomePageState extends State<HomePage> {
   void _showActivityDetails(Map<String, String> activity) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(
-          activity['name'] ?? '',
-          style: GoogleFonts.poppins(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (activity['type'] == 'incident') ...[
-              Text(
-                'Type: ${activity['description']?.split('\n')[0].replaceAll('Type: ', '') ?? ''}',
-                style: GoogleFonts.poppins(),
-              ),
-              SizedBox(height: 8),
-              Text(
-                'Severity: ${activity['description']?.split('\n')[1].replaceAll('Severity: ', '') ?? ''}',
-                style: GoogleFonts.poppins(),
-              ),
-            ] else ...[
-              Text(
-                'Phone: ${activity['description']?.split('\n')[0].replaceAll('Phone: ', '') ?? ''}',
-                style: GoogleFonts.poppins(),
-              ),
-              SizedBox(height: 8),
-              Text(
-                'Email: ${activity['description']?.split('\n')[1].replaceAll('Email: ', '') ?? ''}',
-                style: GoogleFonts.poppins(),
+      builder:
+          (context) => AlertDialog(
+            title: Text(
+              activity['name'] ?? '',
+              style: GoogleFonts.poppins(fontWeight: FontWeight.bold),
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (activity['type'] == 'incident') ...[
+                  Text(
+                    'Type: ${activity['description']?.split('\n')[0].replaceAll('Type: ', '') ?? ''}',
+                    style: GoogleFonts.poppins(),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    'Severity: ${activity['description']?.split('\n')[1].replaceAll('Severity: ', '') ?? ''}',
+                    style: GoogleFonts.poppins(),
+                  ),
+                ] else ...[
+                  Text(
+                    'Phone: ${activity['description']?.split('\n')[0].replaceAll('Phone: ', '') ?? ''}',
+                    style: GoogleFonts.poppins(),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    'Email: ${activity['description']?.split('\n')[1].replaceAll('Email: ', '') ?? ''}',
+                    style: GoogleFonts.poppins(),
+                  ),
+                ],
+                SizedBox(height: 16),
+                Text(
+                  'Reported ${_formatTimestamp(activity['timestamp'] ?? '')}',
+                  style: GoogleFonts.poppins(
+                    color: Colors.grey[600],
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text(
+                  'Close',
+                  style: GoogleFonts.poppins(color: Color(0xFF65558F)),
+                ),
               ),
             ],
-            SizedBox(height: 16),
-            Text(
-              'Reported ${_formatTimestamp(activity['timestamp'] ?? '')}',
-              style: GoogleFonts.poppins(
-                color: Colors.grey[600],
-                fontSize: 12,
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              'Close',
-              style: GoogleFonts.poppins(
-                color: Color(0xFF65558F),
-              ),
-            ),
           ),
-        ],
-      ),
     );
   }
 
@@ -436,7 +480,10 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget buildRecentActivities() {
-    final activitiesToShow = showAllActivities ? recentActivities : recentActivities.take(3).toList();
+    final activitiesToShow =
+        showAllActivities
+            ? recentActivities
+            : recentActivities.take(3).toList();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -485,11 +532,7 @@ class _HomePageState extends State<HomePage> {
             child: Center(
               child: Column(
                 children: [
-                  Icon(
-                    Icons.history,
-                    size: 48,
-                    color: Colors.grey[400],
-                  ),
+                  Icon(Icons.history, size: 48, color: Colors.grey[400]),
                   SizedBox(height: 8),
                   Text(
                     "No recent activities",
@@ -530,18 +573,27 @@ class _HomePageState extends State<HomePage> {
                       ],
                     ),
                     child: ListTile(
-                      contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
                       leading: Container(
                         padding: EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: activity['type'] == 'contact' 
-                              ? Colors.green.withOpacity(0.1)
-                              : Colors.red.withOpacity(0.1),
+                          color:
+                              activity['type'] == 'contact'
+                                  ? Colors.green.withOpacity(0.1)
+                                  : Colors.red.withOpacity(0.1),
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
-                          activity['type'] == 'contact' ? Icons.person_add : Icons.warning,
-                          color: activity['type'] == 'contact' ? Colors.green : Colors.red,
+                          activity['type'] == 'contact'
+                              ? Icons.person_add
+                              : Icons.warning,
+                          color:
+                              activity['type'] == 'contact'
+                                  ? Colors.green
+                                  : Colors.red,
                         ),
                       ),
                       title: Text(
@@ -572,18 +624,27 @@ class _HomePageState extends State<HomePage> {
                         ],
                       ),
                       trailing: Container(
-                        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
-                          color: activity['type'] == 'contact' 
-                              ? Colors.green.withOpacity(0.1)
-                              : Colors.red.withOpacity(0.1),
+                          color:
+                              activity['type'] == 'contact'
+                                  ? Colors.green.withOpacity(0.1)
+                                  : Colors.red.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
-                          activity['type'] == 'contact' ? 'Contact' : 'Incident',
+                          activity['type'] == 'contact'
+                              ? 'Contact'
+                              : 'Incident',
                           style: GoogleFonts.poppins(
                             fontSize: 12,
-                            color: activity['type'] == 'contact' ? Colors.green : Colors.red,
+                            color:
+                                activity['type'] == 'contact'
+                                    ? Colors.green
+                                    : Colors.red,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -897,7 +958,7 @@ class _HomePageState extends State<HomePage> {
                       MaterialPageRoute(
                         builder:
                             (context) => MapPage(
-                             /* contacts: widget.initialContacts,
+                              /* contacts: widget.initialContacts,
                               onContactsUpdated: widget.onContactsUpdated,*/
                             ),
                       ),
@@ -948,114 +1009,126 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget buildTrustedContacts() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return BlocBuilder<ContactListBloc, ContactListState>(
+      builder: (context, state) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              "Trusted Contacts",
-              style: GoogleFonts.poppins(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            IconButton(
-              icon: const Icon(Icons.add_circle_outline),
-              onPressed: openManageContactsSheet,
-              tooltip: "Add Contact",
-            ),
-          ],
-        ),
-        const SizedBox(height: 10),
-        if (contacts.isEmpty)
-          Center(
-            child: Column(
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Icon(
-                  Icons.people_outline,
-                  size: 36,
-                  color: Colors.grey,
-                ),
-                const SizedBox(height: 10),
                 Text(
-                  "No contacts added yet",
+                  "Trusted Contacts",
                   style: GoogleFonts.poppins(
-                    color: Colors.grey[600],
-                    fontSize: 16,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 10),
-                ElevatedButton(
+                IconButton(
+                  icon: const Icon(Icons.add_circle_outline),
                   onPressed: openManageContactsSheet,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepPurple,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  child: Text(
-                    "Add Contact",
-                    style: GoogleFonts.poppins(color: Colors.white),
-                  ),
+                  tooltip: "Add Contact",
                 ),
               ],
             ),
-          )
-        else
-          Column(
-            children: contacts.map((contact) => Container(
-              padding: EdgeInsets.all(12.0),
-              margin: EdgeInsets.only(bottom: 8),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.1),
-                    spreadRadius: 1,
-                    blurRadius: 4,
-                    offset: Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            const SizedBox(height: 10),
+            if (state is ContactListLoaded)
+              Column(
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        contact['name'] ?? '',
-                        style: GoogleFonts.poppins(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 16,
+                  Container(
+                    padding: EdgeInsets.all(12.0),
+                    margin: EdgeInsets.only(bottom: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey,
+                          spreadRadius: 1,
+                          blurRadius: 4,
+                          offset: Offset(0, 2),
                         ),
-                      ),
-                      Text(
-                        contact['phone'] ?? '',
-                        style: GoogleFonts.poppins(
-                          fontSize: 14,
-                          color: Colors.grey[700],
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              state.contacts.name,
+                              style: GoogleFonts.poppins(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 16,
+                                color: Colors.black,
+                              ),
+                            ),
+                            Text(
+                              state.contacts.phoneNumber,
+                              style: GoogleFonts.poppins(
+                                fontSize: 14,
+                                color: Colors.grey[700],
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                    ],
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.delete, color: Colors.red),
-                    onPressed: () {
-                      setState(() {
-                        contacts.remove(contact);
-                        widget.onContactsUpdated(contacts);
-                      });
-                    },
+
+                        IconButton(
+                          icon: Icon(Icons.delete, color: Colors.red),
+                          onPressed: () {},
+                        ),
+                      ],
+                    ),
                   ),
                 ],
+              )
+            else
+              Center(
+                child: Column(
+                  children: [
+                    const Icon(
+                      Icons.people_outline,
+                      size: 36,
+                      color: Colors.grey,
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      "No contacts added yet",
+                      style: GoogleFonts.poppins(
+                        color: Colors.grey[600],
+                        fontSize: 16,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    ElevatedButton(
+                      onPressed: () {
+                        openManageContactsSheet();
+                        context.read<ContactListBloc>().addContact(
+                          contact: {
+                            'name': 'John Doe',
+                            'phoneNumber': '1234567890',
+                            'email': 'john.doe@example.com',
+                          },
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.deepPurple,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: Text(
+                        "Add Contact",
+                        style: GoogleFonts.poppins(color: Colors.white),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            )).toList(),
-          ),
-      ],
+          ],
+        );
+      },
     );
   }
 }
