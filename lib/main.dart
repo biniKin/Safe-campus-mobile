@@ -2,6 +2,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:safe_campus/features/auth/data/services/auth_service.dart';
 import 'package:safe_campus/features/contacts/data/contact_list_datasource/contact_list_datasource.dart';
 import 'package:safe_campus/features/contacts/data/repository/contact_list_repositoryimpl.dart';
 import 'package:safe_campus/features/contacts/domain/usecases/add_contacts.dart';
@@ -82,6 +83,7 @@ class MyApp extends StatelessWidget {
                     contactListDataSource: ContactListDatasourceImpl(
                       sharedPreferences: prefs,
                       prefs: prefs,
+                      authService: AuthService(prefs),
                     ),
                   ),
                 ),
@@ -90,6 +92,7 @@ class MyApp extends StatelessWidget {
                     contactListDataSource: ContactListDatasourceImpl(
                       sharedPreferences: prefs,
                       prefs: prefs,
+                      authService: AuthService(prefs),
                     ),
                   ),
                 ),
@@ -98,6 +101,7 @@ class MyApp extends StatelessWidget {
                     contactListDataSource: ContactListDatasourceImpl(
                       sharedPreferences: prefs,
                       prefs: prefs,
+                      authService: AuthService(prefs),
                     ),
                   ),
                 ),
@@ -106,6 +110,7 @@ class MyApp extends StatelessWidget {
                     contactListDataSource: ContactListDatasourceImpl(
                       prefs: prefs,
                       sharedPreferences: prefs,
+                      authService: AuthService(prefs),
                     ),
                   ),
                 ),
@@ -138,7 +143,7 @@ class MyApp extends StatelessWidget {
               //   case 'security':
               //     return const SecurityDashboard();
               //   default:
-                  return const Home();
+              return const Home();
               //}
             }
             return const IntroPage();

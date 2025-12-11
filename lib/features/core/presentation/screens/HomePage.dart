@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -9,11 +11,7 @@ import 'package:safe_campus/features/core/presentation/screens/sos_cubit/sos_cub
 import 'package:safe_campus/features/report/presentation/bloc/report_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'components/contact_form_bottom_sheet.dart';
-import 'package:safe_campus/features/core/presentation/screens/mapPage.dart';
 import 'dart:async';
-import 'admin_page.dart';
-import 'security_page.dart';
-import 'adm_sec_login_page.dart';
 import 'package:safe_campus/features/core/presentation/bloc/NavigationCubit.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:developer' as console show log;
@@ -61,7 +59,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-
+    console.log('The home page widget has been intiaisted ');
     context.read<ContactListBloc>().add(FetchContactListEvent());
     // Initialize recent activities with both incidents and contacts
     recentActivities = [
@@ -343,26 +341,27 @@ class _HomePageState extends State<HomePage> {
   }
 
   void openManageContactsSheet() async {
-    final result = await showModalBottomSheet<Map<String, String>>(
+    await showModalBottomSheet<Map<String, String>>(
       context: context,
       isScrollControlled: true,
       builder:
           (context) => ContactFormBottomSheet(
             onSave: (name, phone, email) {
+              console.log('Save contact button is clicked');
+
               context.read<ContactListBloc>().add(
                 AddContactEvent(
                   contact: {'name': name, 'phoneNumber': phone, 'email': email},
                 ),
               );
-              Navigator.of(context).pop({
-                'name': name,
-                'description': 'Phone: $phone\nEmail: $email',
-                'type': 'contact',
-                'timestamp': DateTime.now().toString(),
-              });
+
+              Navigator.pop(context); // close the sheet
             },
           ),
-    );
+    ).then((_) {
+      // Bottom sheet has been closed; refresh contacts now
+      context.read<ContactListBloc>().add(FetchContactListEvent());
+    });
   }
 
   void deleteContact(int index) {
@@ -385,86 +384,84 @@ class _HomePageState extends State<HomePage> {
   void _showActivityDetails(Map<String, String> activity) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(
-          activity['name'] ?? '',
-          style: GoogleFonts.poppins(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (activity['type'] == 'incident') ...[
-              Text(
-                'Type: ${activity['description']?.split('\n')[0].replaceAll('Type: ', '') ?? ''}',
-                style: GoogleFonts.poppins(),
-              ),
-              SizedBox(height: 8),
-              Text(
-                'Severity: ${activity['description']?.split('\n')[1].replaceAll('Severity: ', '') ?? ''}',
-                style: GoogleFonts.poppins(),
-              ),
-            ] else ...[
-              Text(
-                'Phone: ${activity['description']?.split('\n')[0].replaceAll('Phone: ', '') ?? ''}',
-                style: GoogleFonts.poppins(),
-              ),
-              SizedBox(height: 8),
-              Text(
-                'Email: ${activity['description']?.split('\n')[1].replaceAll('Email: ', '') ?? ''}',
-                style: GoogleFonts.poppins(),
-              ),
-            ],
-            SizedBox(height: 16),
-            Text(
-              'Reported ${formatTimestamp(activity['timestamp'] ?? '')}',
-              style: GoogleFonts.poppins(
-                color: Colors.grey[600],
-                fontSize: 12,
-              ),
+      builder:
+          (context) => AlertDialog(
+            title: Text(
+              activity['name'] ?? '',
+              style: GoogleFonts.poppins(fontWeight: FontWeight.bold),
             ),
-            // content: Column(
-            //   mainAxisSize: MainAxisSize.min,
-            //   crossAxisAlignment: CrossAxisAlignment.start,
-            //   children: [
-            //     if (activity['type'] == 'incident') ...[
-            //       Text(
-            //         'Type: ${activity['description']?.split('\n')[0].replaceAll('Type: ', '') ?? ''}',
-            //         style: GoogleFonts.poppins(),
-            //       ),
-            //       SizedBox(height: 8),
-            //       Text(
-            //         'Severity: ${activity['description']?.split('\n')[1].replaceAll('Severity: ', '') ?? ''}',
-            //         style: GoogleFonts.poppins(),
-            //       ),
-            //     ] else ...[
-            //       Text(
-            //         'Phone: ${activity['description']?.split('\n')[0].replaceAll('Phone: ', '') ?? ''}',
-            //         style: GoogleFonts.poppins(),
-            //       ),
-            //       SizedBox(height: 8),
-            //       Text(
-            //         'Email: ${activity['description']?.split('\n')[1].replaceAll('Email: ', '') ?? ''}',
-            //         style: GoogleFonts.poppins(),
-            //       ),
-            //     ],
-            //     SizedBox(height: 16),
-            //     Text(
-            //       'Reported ${_formatTimestamp(activity['timestamp'] ?? '')}',
-            //       style: GoogleFonts.poppins(
-            //         color: Colors.grey[600],
-            //         fontSize: 12,
-            //       ),
-            //     ),
-            //   ],
-            // ),
-            
-            ],
-            
-          ),
-          actions: [
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (activity['type'] == 'incident') ...[
+                  Text(
+                    'Type: ${activity['description']?.split('\n')[0].replaceAll('Type: ', '') ?? ''}',
+                    style: GoogleFonts.poppins(),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    'Severity: ${activity['description']?.split('\n')[1].replaceAll('Severity: ', '') ?? ''}',
+                    style: GoogleFonts.poppins(),
+                  ),
+                ] else ...[
+                  Text(
+                    'Phone: ${activity['description']?.split('\n')[0].replaceAll('Phone: ', '') ?? ''}',
+                    style: GoogleFonts.poppins(),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    'Email: ${activity['description']?.split('\n')[1].replaceAll('Email: ', '') ?? ''}',
+                    style: GoogleFonts.poppins(),
+                  ),
+                ],
+                SizedBox(height: 16),
+                Text(
+                  'Reported ${formatTimestamp(activity['timestamp'] ?? '')}',
+                  style: GoogleFonts.poppins(
+                    color: Colors.grey[600],
+                    fontSize: 12,
+                  ),
+                ),
+
+                // content: Column(
+                //   mainAxisSize: MainAxisSize.min,
+                //   crossAxisAlignment: CrossAxisAlignment.start,
+                //   children: [
+                //     if (activity['type'] == 'incident') ...[
+                //       Text(
+                //         'Type: ${activity['description']?.split('\n')[0].replaceAll('Type: ', '') ?? ''}',
+                //         style: GoogleFonts.poppins(),
+                //       ),
+                //       SizedBox(height: 8),
+                //       Text(
+                //         'Severity: ${activity['description']?.split('\n')[1].replaceAll('Severity: ', '') ?? ''}',
+                //         style: GoogleFonts.poppins(),
+                //       ),
+                //     ] else ...[
+                //       Text(
+                //         'Phone: ${activity['description']?.split('\n')[0].replaceAll('Phone: ', '') ?? ''}',
+                //         style: GoogleFonts.poppins(),
+                //       ),
+                //       SizedBox(height: 8),
+                //       Text(
+                //         'Email: ${activity['description']?.split('\n')[1].replaceAll('Email: ', '') ?? ''}',
+                //         style: GoogleFonts.poppins(),
+                //       ),
+                //     ],
+                //     SizedBox(height: 16),
+                //     Text(
+                //       'Reported ${_formatTimestamp(activity['timestamp'] ?? '')}',
+                //       style: GoogleFonts.poppins(
+                //         color: Colors.grey[600],
+                //         fontSize: 12,
+                //       ),
+                //     ),
+                //   ],
+                // ),
+              ],
+            ),
+            actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
                 child: Text(
@@ -473,7 +470,7 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ],
-        )
+          ),
     );
   }
 
@@ -698,47 +695,38 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<SosCubit, SosState>(
       builder: (context, state) {
         return Scaffold(
-          
           appBar: AppBar(
             backgroundColor: Colors.white,
             surfaceTintColor: Colors.transparent,
             title: Text(
-                "SafeCampus",
-                style: Theme.of(
-                  context,
-                ).textTheme.headlineSmall?.copyWith(
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                ),
-              
+              "SafeCampus",
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-           
+
             actions: [
               Image.asset(
-                    'assets/images/ICON.PNG',
-                    width: 40,
-                    height: 40,
-                    fit: BoxFit.cover,
-                  ),
-                
+                'assets/images/ICON.PNG',
+                width: 40,
+                height: 40,
+                fit: BoxFit.cover,
+              ),
             ],
           ),
           backgroundColor: Colors.white,
           body: SafeArea(
             child: ListView(
               children: [
-                
                 SingleChildScrollView(
                   child: Column(
                     children: [
-                      
-  
                       const SizedBox(height: 10),
                       SingleChildScrollView(
                         padding: const EdgeInsets.fromLTRB(20, 0, 20, 30),
@@ -840,164 +828,76 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 // if (state.isEmergencyMode)
-                  // Positioned.fill(
-                  //   child: Container(
-                  //     color: Colors.red.withOpacity(0.1),
-                  //     child: Center(
-                  //       child: Column(
-                  //         mainAxisAlignment: MainAxisAlignment.center,
-                  //         children: [
-                  //           TweenAnimationBuilder<double>(
-                  //             tween: Tween(begin: 1.0, end: 1.5),
-                  //             duration: const Duration(milliseconds: 1000),
-                  //             builder: (context, value, child) {
-                  //               return Transform.scale(
-                  //                 scale: value,
-                  //                 child: Container(
-                  //                   padding: const EdgeInsets.all(20),
-                  //                   decoration: BoxDecoration(
-                  //                     color: Colors.red,
-                  //                     shape: BoxShape.circle,
-                  //                   ),
-                  //                   child: Text(
-                  //                     "SOS",
-                  //                     style: GoogleFonts.poppins(
-                  //                       color: Colors.white,
-                  //                       fontSize: 32,
-                  //                       fontWeight: FontWeight.bold,
-                  //                     ),
-                  //                   ),
-                  //                 ),
-                  //               );
-                  //             },
-                  //           ),
-                  //           const SizedBox(height: 20),
-                  //           ElevatedButton(
-                  //             onPressed: _stopSOSMode,
-                  //             style: ElevatedButton.styleFrom(
-                  //               backgroundColor: Colors.white,
-                  //               shape: RoundedRectangleBorder(
-                  //                 borderRadius: BorderRadius.circular(10),
-                  //               ),
-                  //             ),
-                  //             child: Text(
-                  //               "Cancel Emergency",
-                  //               style: GoogleFonts.poppins(
-                  //                 color: Colors.red,
-                  //                 fontWeight: FontWeight.bold,
-                  //               ),
-                  //             ),
-                  //           ),
-                  //         ],
-                  //       ),
-                  //     ),
-                  //   ),
-                  // ),
+                // Positioned.fill(
+                //   child: Container(
+                //     color: Colors.red.withOpacity(0.1),
+                //     child: Center(
+                //       child: Column(
+                //         mainAxisAlignment: MainAxisAlignment.center,
+                //         children: [
+                //           TweenAnimationBuilder<double>(
+                //             tween: Tween(begin: 1.0, end: 1.5),
+                //             duration: const Duration(milliseconds: 1000),
+                //             builder: (context, value, child) {
+                //               return Transform.scale(
+                //                 scale: value,
+                //                 child: Container(
+                //                   padding: const EdgeInsets.all(20),
+                //                   decoration: BoxDecoration(
+                //                     color: Colors.red,
+                //                     shape: BoxShape.circle,
+                //                   ),
+                //                   child: Text(
+                //                     "SOS",
+                //                     style: GoogleFonts.poppins(
+                //                       color: Colors.white,
+                //                       fontSize: 32,
+                //                       fontWeight: FontWeight.bold,
+                //                     ),
+                //                   ),
+                //                 ),
+                //               );
+                //             },
+                //           ),
+                //           const SizedBox(height: 20),
+                //           ElevatedButton(
+                //             onPressed: _stopSOSMode,
+                //             style: ElevatedButton.styleFrom(
+                //               backgroundColor: Colors.white,
+                //               shape: RoundedRectangleBorder(
+                //                 borderRadius: BorderRadius.circular(10),
+                //               ),
+                //             ),
+                //             child: Text(
+                //               "Cancel Emergency",
+                //               style: GoogleFonts.poppins(
+                //                 color: Colors.red,
+                //                 fontWeight: FontWeight.bold,
+                //               ),
+                //             ),
+                //           ),
+                //         ],
+                //       ),
+                //     ),
+                //   ),
+                // ),
               ],
             ),
           ),
-
-          // drawer: Drawer(
-          //   child: ListView(
-          //     padding: EdgeInsets.zero,
-          //     children: [
-          //       DrawerHeader(
-          //         decoration: BoxDecoration(color: Colors.blue),
-          //         child: Column(
-          //           crossAxisAlignment: CrossAxisAlignment.start,
-          //           children: [
-          //             CircleAvatar(
-          //               radius: 30,
-          //               backgroundImage: AssetImage(
-          //                 'assets/images/profile.png',
-          //               ),
-          //             ),
-          //             SizedBox(height: 10),
-          //             Text(
-          //               'Welcome, User',
-          //               style: GoogleFonts.poppins(
-          //                 color: Colors.white,
-          //                 fontSize: 18,
-          //               ),
-          //             ),
-          //           ],
-          //         ),
-          //       ),
-          //       ListTile(
-          //         leading: Icon(Icons.home),
-          //         title: Text('Home'),
-          //         onTap: () {
-          //           Navigator.pop(context);
-          //         },
-          //       ),
-          //       ListTile(
-          //         leading: Icon(Icons.map),
-          //         title: Text('Safety Map'),
-          //         onTap: () {
-          //           Navigator.pop(context);
-          //           Navigator.push(
-          //             context,
-          //             MaterialPageRoute(
-          //               builder:
-          //                   (context) => MapPage(
-          //                     /* contacts: widget.initialContacts,
-          //                     onContactsUpdated: widget.onContactsUpdated,*/
-          //                   ),
-          //             ),
-          //           );
-          //         },
-          //       ),
-          //       ListTile(
-          //         leading: Icon(Icons.security),
-          //         title: Text('Security Dashboard'),
-          //         onTap: () {
-          //           Navigator.pop(context);
-          //           _navigateToSecurityPage();
-          //         },
-          //       ),
-          //       ListTile(
-          //         leading: Icon(Icons.admin_panel_settings),
-          //         title: Text('Admin Dashboard'),
-          //         onTap: () {
-          //           Navigator.pop(context);
-          //           _navigateToAdminPage();
-          //         },
-          //       ),
-          //       ListTile(
-          //         leading: Icon(Icons.settings),
-          //         title: Text('Settings'),
-          //         onTap: () {
-          //           Navigator.pop(context);
-          //           // Add settings navigation here
-          //         },
-          //       ),
-          //       ListTile(
-          //         leading: Icon(Icons.login),
-          //         title: Text('Login'),
-          //         onTap: () {
-          //           Navigator.pop(context);
-          //           Navigator.push(
-          //             context,
-          //             MaterialPageRoute(builder: (context) => LoginPage()),
-          //           );
-          //         },
-          //       ),
-          //     ],
-          //   ),
-          // ),
         );
       },
     );
   }
 
-  // trusted contacts
   Widget buildTrustedContacts() {
     return BlocBuilder<ContactListBloc, ContactListState>(
       builder: (context, state) {
         console.log('state of the app is $state');
+
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // HEADER
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -1015,108 +915,124 @@ class _HomePageState extends State<HomePage> {
                 ),
               ],
             ),
-            const SizedBox(height: 10),
-            if (state is ContactListLoaded)
-              ListView.builder(
-                itemCount: state.contacts.length,
-                itemBuilder:
-                    (context, index) => Column(
-                      children: [
-                        Container(
-                          padding: EdgeInsets.all(12.0),
-                          margin: EdgeInsets.only(bottom: 8),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey,
-                                spreadRadius: 1,
-                                blurRadius: 4,
-                                offset: Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    state.contacts[index].name,
-                                    style: GoogleFonts.poppins(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 16,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                  Text(
-                                    state.contacts[index].phoneNumber,
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 14,
-                                      color: Colors.grey[700],
-                                    ),
-                                  ),
-                                ],
-                              ),
 
-                              IconButton(
-                                icon: Icon(Icons.delete, color: Colors.red),
-                                onPressed: () {},
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-              )
-            else
-              Center(
-                child: Column(
-                  children: [
-                    const Icon(
-                      Icons.people_outline,
-                      size: 36,
-                      color: Colors.grey,
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      "No contacts added yet",
-                      style: GoogleFonts.poppins(
-                        color: Colors.grey[600],
-                        fontSize: 16,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    ElevatedButton(
-                      onPressed: () {
-                        openManageContactsSheet();
-                        context.read<ContactListBloc>().addContact(
-                          contact: {
-                            'name': 'John Doe',
-                            'phoneNumber': '1234567890',
-                            'email': 'john.doe@example.com',
-                          },
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.deepPurple,
-                        shape: RoundedRectangleBorder(
+            const SizedBox(height: 10),
+
+            // ==============================
+            //     STATE - LOADING
+            // ==============================
+            if (state is ContactListLoading)
+              const Center(child: CircularProgressIndicator()),
+
+            // ==============================
+            //     STATE - LOADED
+            // ==============================
+            if (state is ContactListLoaded)
+              state.contacts.isEmpty
+                  ? _buildEmptyState()
+                  : ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: state.contacts.length,
+                    itemBuilder: (context, index) {
+                      final contact = state.contacts[index];
+                      return Container(
+                        padding: const EdgeInsets.all(12.0),
+                        margin: const EdgeInsets.only(bottom: 8),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
                           borderRadius: BorderRadius.circular(10),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Colors.grey,
+                              spreadRadius: 1,
+                              blurRadius: 4,
+                              offset: Offset(0, 2),
+                            ),
+                          ],
                         ),
-                      ),
-                      child: Text(
-                        "Add Contact",
-                        style: GoogleFonts.poppins(color: Colors.white),
-                      ),
-                    ),
-                  ],
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  contact.name,
+                                  style: GoogleFonts.poppins(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 16,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                                Text(
+                                  contact.phoneNumber,
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 14,
+                                    color: Colors.grey[700],
+                                  ),
+                                ),
+                              ],
+                            ),
+
+                            IconButton(
+                              icon: const Icon(Icons.delete, color: Colors.red),
+                              onPressed: () {
+                                // implement delete here
+                              },
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+
+            // ==============================
+            //     STATE - ERROR
+            // ==============================
+            if (state is ContactListError)
+              Center(
+                child: Text(
+                  "Failed to load contacts",
+                  style: GoogleFonts.poppins(color: Colors.red),
                 ),
               ),
           ],
         );
       },
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        children: [
+          const Icon(Icons.people_outline, size: 36, color: Colors.grey),
+          const SizedBox(height: 10),
+          Text(
+            "No contacts added yet",
+            style: GoogleFonts.poppins(color: Colors.grey[600], fontSize: 16),
+          ),
+          const SizedBox(height: 10),
+          ElevatedButton(
+            onPressed: () {
+              openManageContactsSheet();
+
+              console.log('Add contact button in empty state is clicked');
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.deepPurple,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            child: Text(
+              "Add Contact",
+              style: GoogleFonts.poppins(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
