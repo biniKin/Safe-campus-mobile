@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:safe_campus/features/core/presentation/bloc/auth/login_state.dart';
+import 'package:safe_campus/features/core/presentation/bloc/edit_profile_bloc/edit_profile_bloc.dart';
+import 'package:safe_campus/features/core/presentation/bloc/profile/profile_bloc.dart';
 import 'package:safe_campus/features/core/presentation/screens/admin/security_dashboard.dart';
 import 'package:safe_campus/features/core/presentation/screens/admin_page.dart' show AdminPage;
 import 'features/core/presentation/bloc/add_contacts_cubit/contact_cubit.dart';
@@ -47,6 +49,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
+        BlocProvider<ProfileBloc>(create: (_) => ProfileBloc()),
+        BlocProvider<EditProfileBloc>(create: (_) => EditProfileBloc()),
         BlocProvider(create: (_) => PanicAlertBloc()),
         BlocProvider(create: (_) => RegisterBloc()),
 
@@ -73,14 +77,14 @@ class MyApp extends StatelessWidget {
         home: BlocBuilder<LoginBloc, LoginState>(
           builder: (context, state) {
             if (state is LoginSuccess) {
-              switch (state.user.role) {
-                case 'admin':
-                  return const AdminPage();
-                case 'security':
-                  return const SecurityDashboard();
-                default:
+              // switch (state.user.role) {
+              //   case 'admin':
+              //     return const AdminPage();
+              //   case 'security':
+              //     return const SecurityDashboard();
+              //   default:
                   return const Home();
-              }
+              //}
             }
             return const IntroPage();
           },

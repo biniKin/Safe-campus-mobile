@@ -1,10 +1,14 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:safe_campus/features/core/presentation/bloc/edit_profile_bloc/edit_profile_bloc.dart';
+import 'package:safe_campus/features/core/presentation/bloc/edit_profile_bloc/edit_profile_event.dart';
+import 'package:safe_campus/features/core/presentation/bloc/edit_profile_bloc/edit_profile_state.dart';
 
 class Editprofile extends StatefulWidget {
   const Editprofile({super.key});
@@ -14,61 +18,61 @@ class Editprofile extends StatefulWidget {
 }
 
 class _EditprofileState extends State<Editprofile> {
-  File? _image;
-  final picker = ImagePicker();
+  // File? _image;
+  // final picker = ImagePicker();
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _studentIdController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+  // final TextEditingController _studentIdController = TextEditingController();
+  // final TextEditingController _passwordController = TextEditingController();
 
-  Future<void> getImage() async {
-    var status = await Permission.photos.status;
-    if (!status.isGranted) {
-      // Request permission if it's not granted
-      var permissionStatus = await Permission.photos.request();
-      if (!permissionStatus.isGranted) {
-        // Handle the case when the user denies permission
-        Fluttertoast.showToast(
-          msg: "Permission denied",
-          toastLength: Toast.LENGTH_LONG,
-          gravity: ToastGravity.BOTTOM,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.grey[700],
-          textColor: Colors.white,
-          fontSize: 16.0,
-        );
-        //openAppSettings();
-      }
-    }
+  // Future<void> getImage() async {
+  //   var status = await Permission.photos.status;
+  //   if (!status.isGranted) {
+  //     // Request permission if it's not granted
+  //     var permissionStatus = await Permission.photos.request();
+  //     if (!permissionStatus.isGranted) {
+  //       // Handle the case when the user denies permission
+  //       Fluttertoast.showToast(
+  //         msg: "Permission denied",
+  //         toastLength: Toast.LENGTH_LONG,
+  //         gravity: ToastGravity.BOTTOM,
+  //         timeInSecForIosWeb: 1,
+  //         backgroundColor: Colors.grey[700],
+  //         textColor: Colors.white,
+  //         fontSize: 16.0,
+  //       );
+  //       //openAppSettings();
+  //     }
+  //   }
 
-    try {
-      final pickedImage = await picker.pickImage(source: ImageSource.gallery);
-      if (pickedImage != null) {
-        _image = File(pickedImage.path);
-        setState(() {});
-      } else {
-        return;
-      }
-    } catch (e) {
-      Fluttertoast.showToast(
-        msg: "Error occurred",
-        toastLength: Toast.LENGTH_LONG,
-        gravity: ToastGravity.BOTTOM,
-        timeInSecForIosWeb: 1,
-        backgroundColor: Colors.grey[700],
-        textColor: Colors.white,
-        fontSize: 16.0,
-      );
-    }
-  }
+  //   try {
+  //     final pickedImage = await picker.pickImage(source: ImageSource.gallery);
+  //     if (pickedImage != null) {
+  //       _image = File(pickedImage.path);
+  //       setState(() {});
+  //     } else {
+  //       return;
+  //     }
+  //   } catch (e) {
+  //     Fluttertoast.showToast(
+  //       msg: "Error occurred",
+  //       toastLength: Toast.LENGTH_LONG,
+  //       gravity: ToastGravity.BOTTOM,
+  //       timeInSecForIosWeb: 1,
+  //       backgroundColor: Colors.grey[700],
+  //       textColor: Colors.white,
+  //       fontSize: 16.0,
+  //     );
+  //   }
+  // }
 
   @override
   void dispose() {
     _nameController.dispose();
     _emailController.dispose();
-    _studentIdController.dispose();
-    _passwordController.dispose();
+    // _studentIdController.dispose();
+    // _passwordController.dispose();
     super.dispose();
   }
 
@@ -119,39 +123,38 @@ class _EditprofileState extends State<Editprofile> {
                     child: CircleAvatar(
                       radius: 80,
                       backgroundColor: Colors.white,
-                      backgroundImage: _image != null ? FileImage(_image!) : null,
-                      child: _image == null
-                          ? Icon(
+                      backgroundImage: null,
+                      child:  Icon(
                               Icons.person_outline,
                               size: 80,
                               color: Color(0xFF65558F),
                             )
-                          : null,
+                         
                     ),
                   ),
-                  Positioned(
-                    bottom: -5,
-                    right: -5,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            spreadRadius: 2,
-                            blurRadius: 8,
-                            offset: Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: IconButton(
-                        onPressed: getImage,
-                        icon: Icon(Icons.camera_alt, color: Color(0xFF65558F)),
-                        padding: EdgeInsets.all(8),
-                      ),
-                    ),
-                  ),
+                  // Positioned(
+                  //   bottom: -5,
+                  //   right: -5,
+                  //   child: Container(
+                  //     decoration: BoxDecoration(
+                  //       color: Colors.white,
+                  //       shape: BoxShape.circle,
+                  //       boxShadow: [
+                  //         BoxShadow(
+                  //           color: Colors.black.withOpacity(0.1),
+                  //           spreadRadius: 2,
+                  //           blurRadius: 8,
+                  //           offset: Offset(0, 2),
+                  //         ),
+                  //       ],
+                  //     ),
+                  //     child: IconButton(
+                  //       onPressed: getImage,
+                  //       icon: Icon(Icons.camera_alt, color: Color(0xFF65558F)),
+                  //       padding: EdgeInsets.all(8),
+                  //     ),
+                  //   ),
+                  // ),
                 ],
               ),
               SizedBox(height: 40),
@@ -195,6 +198,7 @@ class _EditprofileState extends State<Editprofile> {
                     ),
                     SizedBox(height: 16),
                     TextFormField(
+                      
                       controller: _emailController,
                       decoration: InputDecoration(
                         labelText: 'Email',
@@ -217,52 +221,52 @@ class _EditprofileState extends State<Editprofile> {
                       ),
                     ),
                     SizedBox(height: 16),
-                    TextFormField(
-                      controller: _studentIdController,
-                      decoration: InputDecoration(
-                        labelText: 'Student ID',
-                        labelStyle: GoogleFonts.poppins(
-                          color: Color(0xFF65558F),
-                        ),
-                        prefixIcon: Icon(Icons.badge, color: Color(0xFF65558F)),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Color(0xFF65558F)),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Colors.grey.shade300),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Color(0xFF65558F)),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 16),
-                    TextFormField(
-                      controller: _passwordController,
-                      obscureText: true,
-                      decoration: InputDecoration(
-                        labelText: 'Password',
-                        labelStyle: GoogleFonts.poppins(
-                          color: Color(0xFF65558F),
-                        ),
-                        prefixIcon: Icon(Icons.lock, color: Color(0xFF65558F)),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Color(0xFF65558F)),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Colors.grey.shade300),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Color(0xFF65558F)),
-                        ),
-                      ),
-                    ),
+                    // TextFormField(
+                    //   controller: _studentIdController,
+                    //   decoration: InputDecoration(
+                    //     labelText: 'Student ID',
+                    //     labelStyle: GoogleFonts.poppins(
+                    //       color: Color(0xFF65558F),
+                    //     ),
+                    //     prefixIcon: Icon(Icons.badge, color: Color(0xFF65558F)),
+                    //     border: OutlineInputBorder(
+                    //       borderRadius: BorderRadius.circular(12),
+                    //       borderSide: BorderSide(color: Color(0xFF65558F)),
+                    //     ),
+                    //     enabledBorder: OutlineInputBorder(
+                    //       borderRadius: BorderRadius.circular(12),
+                    //       borderSide: BorderSide(color: Colors.grey.shade300),
+                    //     ),
+                    //     focusedBorder: OutlineInputBorder(
+                    //       borderRadius: BorderRadius.circular(12),
+                    //       borderSide: BorderSide(color: Color(0xFF65558F)),
+                    //     ),
+                    //   ),
+                    // ),
+                    // SizedBox(height: 16),
+                    // TextFormField(
+                    //   controller: _passwordController,
+                    //   obscureText: true,
+                    //   decoration: InputDecoration(
+                    //     labelText: 'Password',
+                    //     labelStyle: GoogleFonts.poppins(
+                    //       color: Color(0xFF65558F),
+                    //     ),
+                    //     prefixIcon: Icon(Icons.lock, color: Color(0xFF65558F)),
+                    //     border: OutlineInputBorder(
+                    //       borderRadius: BorderRadius.circular(12),
+                    //       borderSide: BorderSide(color: Color(0xFF65558F)),
+                    //     ),
+                    //     enabledBorder: OutlineInputBorder(
+                    //       borderRadius: BorderRadius.circular(12),
+                    //       borderSide: BorderSide(color: Colors.grey.shade300),
+                    //     ),
+                    //     focusedBorder: OutlineInputBorder(
+                    //       borderRadius: BorderRadius.circular(12),
+                    //       borderSide: BorderSide(color: Color(0xFF65558F)),
+                    //     ),
+                    //   ),
+                    // ),
                   ],
                 ),
               ),
@@ -297,16 +301,32 @@ class _EditprofileState extends State<Editprofile> {
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
                       // Save profile logic here
-                      Navigator.pop(context);
+                      if(_emailController.text.trim().isNotEmpty && _nameController.text.trim().isNotEmpty){
+                        context.read<EditProfileBloc>().add(EditProfile(fullName: _nameController.text.trim(), email: _emailController.text.trim()));
+                      // Navigator.pop(context);
+                      } else{
+                        Fluttertoast.showToast(msg: "Please provide necessary details.");
+                      }
+                      
                     }
                   },
-                  child: Text(
-                    'Save Changes',
-                    style: GoogleFonts.poppins(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
+                  child: BlocBuilder<EditProfileBloc, EditProfileState>(
+                    builder: (context, state) {
+                      if(state is ProfileEditing){
+                        return Center(
+                          child: CircularProgressIndicator()
+                        );
+                      }
+                      
+                      return Text(
+                        'Save Changes',
+                        style: GoogleFonts.poppins(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      );
+                    }
                   ),
                 ),
               ),

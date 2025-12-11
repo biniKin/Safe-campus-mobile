@@ -48,7 +48,7 @@ class _RegisterPageState extends State<RegisterPage> {
       listener: (context, state) {
         if (state is RegisterSuccess) {
           Fluttertoast.showToast(msg: state.message);
-          Navigator.of(context).pushReplacementNamed('/signin');
+          Navigator.of(context).pushReplacementNamed('/home');
         } else if (state is RegisterFailure) {
           Fluttertoast.showToast(msg: state.error);
         }

@@ -25,14 +25,14 @@ class User extends Equatable {
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
       id: json['_id'] ?? 'id',
-      name: json['name'] ?? '',
+      name: json['fullName'] ?? 'name',
       email: json['email'] ?? '',
       role: json['role'] ?? 'student',
-      studentId: json['studentId'],
+      studentId: json['studentId'] ?? 'ETS****/**',
       trustedContacts: json['trustedContacts'] != null
           ? List<Map<String, dynamic>>.from(json['trustedContacts'])
           : null,
-      location: json['location'],
+      location: json['location'] ,
       addressDescription: json['addressDescription'],
       token: json['token'] ?? '', // Ensure token is always a string
     );
@@ -41,7 +41,7 @@ class User extends Equatable {
   Map<String, dynamic> toJson() {
     return {
       '_id': id,
-      'name': name,
+      'fullName': name,
       'email': email,
       'role': role,
       'studentId': studentId,

@@ -28,7 +28,7 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
         event.email,
         event.password,
         event.fullName,
-      
+        event.studentId
       );
 
       if (result['success'] == true) {

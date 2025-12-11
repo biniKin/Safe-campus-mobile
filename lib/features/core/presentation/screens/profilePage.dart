@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:safe_campus/features/core/presentation/bloc/profile/profile_bloc.dart';
+import 'package:safe_campus/features/core/presentation/bloc/profile/profile_event.dart';
+import 'package:safe_campus/features/core/presentation/bloc/profile/profile_state.dart';
 import 'package:safe_campus/features/core/presentation/screens/editProfile.dart';
 import 'package:safe_campus/features/core/presentation/bloc/auth/login_bloc.dart';
 import 'package:safe_campus/features/core/presentation/bloc/auth/login_event.dart';
@@ -18,11 +22,19 @@ class _ProfilepageState extends State<Profilepage> {
   bool isPressedVibration = false;
 
   @override
+  void initState() {
+    context.read<ProfileBloc>().add(GetUser());
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return BlocListener<LoginBloc, LoginState>(
       listener: (context, state) {
-        if (state is LoginInitial) {
+        if (state is LogoutSuccess) {
           Navigator.pushReplacementNamed(context, '/signin');
+        } else if(state is LogoutFailure){
+          Fluttertoast.showToast(msg: state.msg);
         }
       },
       child: Scaffold(
@@ -92,31 +104,66 @@ class _ProfilepageState extends State<Profilepage> {
                       SizedBox(
                         width: 200,
                         height: 80,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Align(
-                              alignment: Alignment.centerLeft,
-                              child: Text(
-                                "Abel Mesfin",
-                                style: GoogleFonts.poppins(
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white,
+                        child: BlocBuilder<ProfileBloc, ProfileState>(
+                          builder: (context, state) {
+                            if (state is FetchedUserData){
+                              final user = state.user;
+                              return Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
+                                      user.name,
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                  Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
+                                      user.studentId ?? "ETS****/**",
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 16,
+                                        color: Colors.white.withOpacity(0.8),
+                                      ),
+                                    ),
+                                  ),
+
+                                ],
+                              );
+                            }
+                            return Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    "User name",
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.white,
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ),
-                            Align(
-                              alignment: Alignment.centerLeft,
-                              child: Text(
-                                'ETS 0304/16',
-                                style: GoogleFonts.poppins(
-                                  fontSize: 16,
-                                  color: Colors.white.withOpacity(0.8),
+                                Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    'ETS ****/**',
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 16,
+                                      color: Colors.white.withOpacity(0.8),
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ),
-                          ],
+                                
+                              ],
+                            );
+                          }
                         ),
                       ),
                     ],
@@ -251,18 +298,28 @@ class _ProfilepageState extends State<Profilepage> {
                       ),
                     ),
                     onPressed: () {
+                      print("log out pressed");
                       context.read<LoginBloc>().add(LogoutRequested());
                     },
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(
-                          'Sign Out',
-                          style: GoogleFonts.poppins(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
+                        BlocBuilder<ProfileBloc, ProfileState>(
+                          builder: (context,state) {
+                            if (state is LogoutLoading){
+                              return Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            }
+                            return Text(
+                              'Sign Out',
+                              style: GoogleFonts.poppins(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            );
+                          }
                         ),
                         SizedBox(width: 8),
                         Icon(Icons.logout, color: Colors.white, size: 20),

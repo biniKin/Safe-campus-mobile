@@ -47,10 +47,14 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     Emitter<LoginState> emit,
   ) async {
     try {
+      emit(LogoutLoading());
+      
       await _authService.logout();
-      emit(LoginInitial());
+      emit(LogoutSuccess());
+      print("suc");
     } catch (e) {
-      emit(LoginFailure('Error during logout: ${e.toString()}'));
+      print(e);
+      emit(LogoutFailure(msg: 'Error during logout: ${e.toString()}'));
     }
   }
 

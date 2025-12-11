@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -13,6 +14,8 @@ import 'package:safe_campus/features/core/presentation/screens/mapPage.dart';
 import 'package:safe_campus/features/core/presentation/screens/profilePage.dart';
 import 'package:safe_campus/features/core/presentation/screens/sos_cubit/sos_cubit.dart';
 import 'dart:developer' as developer;
+
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -88,14 +91,14 @@ class _HomeState extends State<Home> {
               ),
               ElevatedButton(
                 onPressed: () {
-                   Navigator.of(context).pop();
-                  developer.log('SOS button pressed');
+                  //  Navigator.of(context).pop();
+                  // developer.log('SOS button pressed');
               
-                  context.read<PanicAlertBloc>().add(TriggerPanicAlert(token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODE4Y2EyM2U1YjE2NDZkNzI5NTdkYzgiLCJyb2xlIjoic3R1ZGVudCIsImVtYWlsIjoiYWxleEBnbWFpbC5jb20iLCJpYXQiOjE3NDY0NTU5MzgsImV4cCI6MTc0NjU0MjMzOH0.seUmXPnTZFLuoRnh4EWN6pvpIlTABmDgiKoU_cytC-E'));
+                  context.read<PanicAlertBloc>().add(TriggerPanicAlert());
 
-                  _startSOSMode();
+                  // _startSOSMode();
                   // Notify trusted contacts and security
-                  Fluttertoast.showToast(msg: 'Emergency alert sent to trusted contacts and security personnel!', backgroundColor: Colors.red);
+                  // Fluttertoast.showToast(msg: 'Emergency alert sent to trusted contacts and security personnel!', backgroundColor: Colors.red);
                 
                 },
                 style: ElevatedButton.styleFrom(
