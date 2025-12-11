@@ -6,7 +6,7 @@ import 'package:safe_campus/features/contacts/data/model/contact_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 abstract class ContactListDataSource {
-  Future<ContactModel> fetchContacts();
+  Future<List<ContactModel>> fetchContacts();
   Future<void> addContact(Map<String, dynamic> contact);
   Future<void> deleteContact(String email);
   Future<void> updateContact(String email, Map<String, dynamic> updatedContact);
@@ -35,7 +35,7 @@ class ContactListDatasourceImpl implements ContactListDataSource {
   }
 
   @override
-  Future<ContactModel> fetchContacts() async {
+  Future<List<ContactModel>> fetchContacts() async {
     final uri = Uri.parse('$_baseUrl/get_contacts');
     final resp = await http.get(uri, headers: _authHeaders());
 
@@ -44,10 +44,14 @@ class ContactListDatasourceImpl implements ContactListDataSource {
     }
     final body = jsonDecode(resp.body);
     final data = body is Map<String, dynamic> ? body['data'] : body;
-    console.log(' Fetched contacts: $data');
+
     console.log('token: ${prefs.getString('token')}');
 
-    return ContactModel.fromMap(data as Map<String, dynamic>);
+    final contactlist =
+        (data as List).map((item) => ContactModel.fromMap(item)).toList();
+
+    console.log(' Fetched contacts - datasource: $contactlist');
+    return contactlist;
   }
 
   @override

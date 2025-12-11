@@ -7,7 +7,7 @@ class ContactModel extends Contact {
     required super.email,
   });
 
-  factory ContactModel.fromMap(Map<String, dynamic> map) {
+  factory ContactModel.fromMap(Map<dynamic, dynamic> map) {
     return ContactModel(
       name: map['name'] ?? '',
       phoneNumber: map['phoneNumber'] ?? '',
