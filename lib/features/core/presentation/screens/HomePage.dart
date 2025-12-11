@@ -4,6 +4,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:location/location.dart';
 import 'package:safe_campus/features/contacts/presentation/bloc/contact_list_bloc.dart';
+import 'package:safe_campus/features/core/functions/time_formater.dart';
 import 'package:safe_campus/features/core/presentation/screens/sos_cubit/sos_cubit.dart';
 import 'package:safe_campus/features/report/presentation/bloc/report_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -424,42 +425,46 @@ class _HomePageState extends State<HomePage> {
                 fontSize: 12,
               ),
             ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (activity['type'] == 'incident') ...[
-                  Text(
-                    'Type: ${activity['description']?.split('\n')[0].replaceAll('Type: ', '') ?? ''}',
-                    style: GoogleFonts.poppins(),
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    'Severity: ${activity['description']?.split('\n')[1].replaceAll('Severity: ', '') ?? ''}',
-                    style: GoogleFonts.poppins(),
-                  ),
-                ] else ...[
-                  Text(
-                    'Phone: ${activity['description']?.split('\n')[0].replaceAll('Phone: ', '') ?? ''}',
-                    style: GoogleFonts.poppins(),
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    'Email: ${activity['description']?.split('\n')[1].replaceAll('Email: ', '') ?? ''}',
-                    style: GoogleFonts.poppins(),
-                  ),
-                ],
-                SizedBox(height: 16),
-                Text(
-                  'Reported ${_formatTimestamp(activity['timestamp'] ?? '')}',
-                  style: GoogleFonts.poppins(
-                    color: Colors.grey[600],
-                    fontSize: 12,
-                  ),
-                ),
-              ],
-            ),
-            actions: [
+            // content: Column(
+            //   mainAxisSize: MainAxisSize.min,
+            //   crossAxisAlignment: CrossAxisAlignment.start,
+            //   children: [
+            //     if (activity['type'] == 'incident') ...[
+            //       Text(
+            //         'Type: ${activity['description']?.split('\n')[0].replaceAll('Type: ', '') ?? ''}',
+            //         style: GoogleFonts.poppins(),
+            //       ),
+            //       SizedBox(height: 8),
+            //       Text(
+            //         'Severity: ${activity['description']?.split('\n')[1].replaceAll('Severity: ', '') ?? ''}',
+            //         style: GoogleFonts.poppins(),
+            //       ),
+            //     ] else ...[
+            //       Text(
+            //         'Phone: ${activity['description']?.split('\n')[0].replaceAll('Phone: ', '') ?? ''}',
+            //         style: GoogleFonts.poppins(),
+            //       ),
+            //       SizedBox(height: 8),
+            //       Text(
+            //         'Email: ${activity['description']?.split('\n')[1].replaceAll('Email: ', '') ?? ''}',
+            //         style: GoogleFonts.poppins(),
+            //       ),
+            //     ],
+            //     SizedBox(height: 16),
+            //     Text(
+            //       'Reported ${_formatTimestamp(activity['timestamp'] ?? '')}',
+            //       style: GoogleFonts.poppins(
+            //         color: Colors.grey[600],
+            //         fontSize: 12,
+            //       ),
+            //     ),
+            //   ],
+            // ),
+            
+            ],
+            
+          ),
+          actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
                 child: Text(
@@ -468,7 +473,7 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ],
-          ),
+        )
     );
   }
 
@@ -892,94 +897,94 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
 
-          drawer: Drawer(
-            child: ListView(
-              padding: EdgeInsets.zero,
-              children: [
-                DrawerHeader(
-                  decoration: BoxDecoration(color: Colors.blue),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      CircleAvatar(
-                        radius: 30,
-                        backgroundImage: AssetImage(
-                          'assets/images/profile.png',
-                        ),
-                      ),
-                      SizedBox(height: 10),
-                      Text(
-                        'Welcome, User',
-                        style: GoogleFonts.poppins(
-                          color: Colors.white,
-                          fontSize: 18,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                ListTile(
-                  leading: Icon(Icons.home),
-                  title: Text('Home'),
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
-                ),
-                ListTile(
-                  leading: Icon(Icons.map),
-                  title: Text('Safety Map'),
-                  onTap: () {
-                    Navigator.pop(context);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder:
-                            (context) => MapPage(
-                              /* contacts: widget.initialContacts,
-                              onContactsUpdated: widget.onContactsUpdated,*/
-                            ),
-                      ),
-                    );
-                  },
-                ),
-                ListTile(
-                  leading: Icon(Icons.security),
-                  title: Text('Security Dashboard'),
-                  onTap: () {
-                    Navigator.pop(context);
-                    _navigateToSecurityPage();
-                  },
-                ),
-                ListTile(
-                  leading: Icon(Icons.admin_panel_settings),
-                  title: Text('Admin Dashboard'),
-                  onTap: () {
-                    Navigator.pop(context);
-                    _navigateToAdminPage();
-                  },
-                ),
-                ListTile(
-                  leading: Icon(Icons.settings),
-                  title: Text('Settings'),
-                  onTap: () {
-                    Navigator.pop(context);
-                    // Add settings navigation here
-                  },
-                ),
-                ListTile(
-                  leading: Icon(Icons.login),
-                  title: Text('Login'),
-                  onTap: () {
-                    Navigator.pop(context);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => LoginPage()),
-                    );
-                  },
-                ),
-              ],
-            ),
-          ),
+          // drawer: Drawer(
+          //   child: ListView(
+          //     padding: EdgeInsets.zero,
+          //     children: [
+          //       DrawerHeader(
+          //         decoration: BoxDecoration(color: Colors.blue),
+          //         child: Column(
+          //           crossAxisAlignment: CrossAxisAlignment.start,
+          //           children: [
+          //             CircleAvatar(
+          //               radius: 30,
+          //               backgroundImage: AssetImage(
+          //                 'assets/images/profile.png',
+          //               ),
+          //             ),
+          //             SizedBox(height: 10),
+          //             Text(
+          //               'Welcome, User',
+          //               style: GoogleFonts.poppins(
+          //                 color: Colors.white,
+          //                 fontSize: 18,
+          //               ),
+          //             ),
+          //           ],
+          //         ),
+          //       ),
+          //       ListTile(
+          //         leading: Icon(Icons.home),
+          //         title: Text('Home'),
+          //         onTap: () {
+          //           Navigator.pop(context);
+          //         },
+          //       ),
+          //       ListTile(
+          //         leading: Icon(Icons.map),
+          //         title: Text('Safety Map'),
+          //         onTap: () {
+          //           Navigator.pop(context);
+          //           Navigator.push(
+          //             context,
+          //             MaterialPageRoute(
+          //               builder:
+          //                   (context) => MapPage(
+          //                     /* contacts: widget.initialContacts,
+          //                     onContactsUpdated: widget.onContactsUpdated,*/
+          //                   ),
+          //             ),
+          //           );
+          //         },
+          //       ),
+          //       ListTile(
+          //         leading: Icon(Icons.security),
+          //         title: Text('Security Dashboard'),
+          //         onTap: () {
+          //           Navigator.pop(context);
+          //           _navigateToSecurityPage();
+          //         },
+          //       ),
+          //       ListTile(
+          //         leading: Icon(Icons.admin_panel_settings),
+          //         title: Text('Admin Dashboard'),
+          //         onTap: () {
+          //           Navigator.pop(context);
+          //           _navigateToAdminPage();
+          //         },
+          //       ),
+          //       ListTile(
+          //         leading: Icon(Icons.settings),
+          //         title: Text('Settings'),
+          //         onTap: () {
+          //           Navigator.pop(context);
+          //           // Add settings navigation here
+          //         },
+          //       ),
+          //       ListTile(
+          //         leading: Icon(Icons.login),
+          //         title: Text('Login'),
+          //         onTap: () {
+          //           Navigator.pop(context);
+          //           Navigator.push(
+          //             context,
+          //             MaterialPageRoute(builder: (context) => LoginPage()),
+          //           );
+          //         },
+          //       ),
+          //     ],
+          //   ),
+          // ),
         );
       },
     );
