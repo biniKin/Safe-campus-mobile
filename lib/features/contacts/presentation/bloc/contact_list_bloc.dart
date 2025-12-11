@@ -6,7 +6,7 @@ import 'package:safe_campus/features/contacts/domain/usecases/add_contacts.dart'
 import 'package:safe_campus/features/contacts/domain/usecases/delete_contacts.dart';
 import 'package:safe_campus/features/contacts/domain/usecases/fetch_contacts.dart';
 import 'package:safe_campus/features/contacts/domain/usecases/update_contacts.dart';
-
+import 'dart:developer' as console show log;
 part 'contact_list_event.dart';
 part 'contact_list_state.dart';
 
@@ -26,6 +26,7 @@ class ContactListBloc extends Bloc<ContactListEvent, ContactListState> {
       emit(ContactListLoading());
       try {
         final contacts = await fetchContacts.call();
+        console.log('Fetched contacts: $contacts');
         emit(ContactListLoaded(contacts: contacts));
       } catch (e) {
         emit(ContactListError(message: e.toString()));
