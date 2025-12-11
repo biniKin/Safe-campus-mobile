@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:safe_campus/features/contacts/presentation/bloc/contact_list_bloc.dart';
 
 class ContactFormBottomSheet extends StatefulWidget {
   final Function(String, String, String) onSave;
@@ -85,18 +86,26 @@ class _ContactFormBottomSheetState extends State<ContactFormBottomSheet> {
             width: double.infinity,
             child: ElevatedButton(
               onPressed: () {
-                if (nameController.text.isNotEmpty &&
-                    phoneController.text.isNotEmpty &&
-                    emailController.text.isNotEmpty) {
-                  Navigator.pop(context);
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Please fill in all fields'),
-                      backgroundColor: Colors.red,
-                    ),
-                  );
+                final name = nameController.text.trim();
+                final phone = phoneController.text.trim();
+                final email = emailController.text.trim();
+
+                if (name.isEmpty || phone.isEmpty || email.isEmpty) {
+                  // optional: show a validation message
+                  return;
                 }
+
+                context.read<ContactListBloc>().add(
+                  AddContactEvent(
+                    contact: {
+                      'name': name,
+                      'phoneNumber': phone,
+                      'email': email,
+                    },
+                  ),
+                );
+
+                Navigator.pop(context); // close the bottom sheet after dispatch
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.deepPurple,

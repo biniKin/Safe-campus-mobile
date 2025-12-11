@@ -34,7 +34,7 @@ class _ProfilepageState extends State<Profilepage> {
       listener: (context, state) {
         if (state is LogoutSuccess) {
           Navigator.pushReplacementNamed(context, '/signin');
-        } else if(state is LogoutFailure){
+        } else if (state is LogoutFailure) {
           Fluttertoast.showToast(msg: state.msg);
         }
       },
@@ -111,7 +111,7 @@ class _ProfilepageState extends State<Profilepage> {
                         height: 80,
                         child: BlocBuilder<ProfileBloc, ProfileState>(
                           builder: (context, state) {
-                            if (state is FetchedUserData){
+                            if (state is FetchedUserData) {
                               final user = state.user;
                               return Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -137,7 +137,6 @@ class _ProfilepageState extends State<Profilepage> {
                                       ),
                                     ),
                                   ),
-
                                 ],
                               );
                             }
@@ -165,10 +164,9 @@ class _ProfilepageState extends State<Profilepage> {
                                     ),
                                   ),
                                 ),
-                                
                               ],
                             );
-                          }
+                          },
                         ),
                       ),
                     ],
@@ -302,7 +300,7 @@ class _ProfilepageState extends State<Profilepage> {
                         borderRadius: BorderRadius.circular(28),
                       ),
                     ),
-                    onPressed: () async{
+                    onPressed: () async {
                       print("log out pressed");
                       context.read<LoginBloc>().add(LogoutRequested());
                       // final prefs = await SharedPreferences.getInstance();
@@ -313,11 +311,9 @@ class _ProfilepageState extends State<Profilepage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         BlocBuilder<ProfileBloc, ProfileState>(
-                          builder: (context,state) {
-                            if (state is LogoutLoading){
-                              return Center(
-                                child: CircularProgressIndicator(),
-                              );
+                          builder: (context, state) {
+                            if (state is LogoutLoading) {
+                              return Center(child: CircularProgressIndicator());
                             }
                             return Text(
                               'Sign Out',
@@ -327,7 +323,7 @@ class _ProfilepageState extends State<Profilepage> {
                                 fontWeight: FontWeight.w600,
                               ),
                             );
-                          }
+                          },
                         ),
                         SizedBox(width: 8),
                         Icon(Icons.logout, color: Colors.white, size: 20),

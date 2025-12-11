@@ -4,7 +4,7 @@ import 'package:safe_campus/features/contacts/domain/repository/contact_list_rep
 class FetchContacts {
   ContactListRepository repository;
   FetchContacts({required this.repository});
-  Future<Contact> call() async {
+  Future<List<Contact>> call() async {
     return await repository.fetchContacts();
   }
 }

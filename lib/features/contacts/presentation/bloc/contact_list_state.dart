@@ -12,7 +12,8 @@ final class ContactListInitial extends ContactListState {}
 final class ContactListLoading extends ContactListState {}
 
 final class ContactListLoaded extends ContactListState {
-  final Contact contacts;
+  final List<Contact> contacts;
+
   const ContactListLoaded({required this.contacts});
 
   @override

@@ -1,6 +1,7 @@
 import 'package:safe_campus/features/contacts/data/contact_list_datasource/contact_list_datasource.dart';
 import 'package:safe_campus/features/contacts/domain/entities/contact.dart';
 import 'package:safe_campus/features/contacts/domain/repository/contact_list_repository.dart';
+import 'dart:developer' as console show log;
 
 class ContactListRepositoryImpl implements ContactListRepository {
   ContactListDataSource contactListDataSource;
@@ -24,9 +25,10 @@ class ContactListRepositoryImpl implements ContactListRepository {
   }
 
   @override
-  Future<Contact> fetchContacts() async {
+  Future<List<Contact>> fetchContacts() async {
     try {
       final contactsList = await contactListDataSource.fetchContacts();
+      console.log('Fetched contacts - repository: ${contactsList[0].name}');
       return contactsList;
     } catch (e) {
       throw Exception('Failed to fetch contacts: $e');
