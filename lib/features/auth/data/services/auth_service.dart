@@ -13,10 +13,7 @@ class AuthService {
 
   AuthService(SharedPreferences prefs) {
     _prefs = prefs;
-    _dataSource = AuthRemoteDataSourceImpl(
-      client: http.Client(),
-      prefs: prefs,
-    );
+    _dataSource = AuthRemoteDataSourceImpl(client: http.Client(), prefs: prefs);
     _setupTokenRefresh();
   }
 
@@ -26,15 +23,13 @@ class AuthService {
       if (userToken != null) {
         try {
           await http.post(
-            Uri.parse('https://safe-campus-backend.onrender.com/api/auth/update_token'),
+            Uri.parse('http://localhost:5000/api/auth/update_token'),
             headers: {
               'Content-Type': 'application/json',
               'Accept': 'application/json',
               'Authorization': 'Bearer $userToken',
             },
-            body: jsonEncode({
-              'deviceToken': newToken,
-            }),
+            body: jsonEncode({'deviceToken': newToken}),
           );
         } catch (e) {
           developer.log('Failed to update device token: $e');

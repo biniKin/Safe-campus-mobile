@@ -8,6 +8,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:safe_campus/features/auth/domain/entities/user.dart';
 import 'auth_remote_data_source.dart';
 import 'dart:developer' as developer;
+
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   final http.Client client;
   final SharedPreferences prefs;
@@ -87,92 +88,99 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         print("Refresh token: ${prefs.getString("ref_token").toString()}");
 
 
+          return {'success': true, 'data': data};
+        } else {
+          return {
+            'success': false,
+            'error': 'Token or user data missing in server response',
+          };
+        }
+      } else if (response.statusCode == 400) {
         return {
-          'success': true,
-          'data': data,
+          'success': false,
+          'error': responseBody['message'] ?? 'Invalid email or password',
         };
+      } else if (response.statusCode == 401) {
+        return {'success': false, 'error': 'Invalid credentials'};
+      } else if (response.statusCode == 404) {
+        return {'success': false, 'error': 'User not found'};
       } else {
         return {
           'success': false,
-          'error': 'Token or user data missing in server response',
+          'error': responseBody['message'] ?? 'Login failed',
         };
       }
-    } else if (response.statusCode == 400) {
+    } catch (e, stack) {
+      developer.log('Unexpected error during login: $e', stackTrace: stack);
       return {
         'success': false,
-        'error': responseBody['message'] ?? 'Invalid email or password',
-      };
-    } else if (response.statusCode == 401) {
-      return {
-        'success': false,
-        'error': 'Invalid credentials',
-      };
-    } else if (response.statusCode == 404) {
-      return {
-        'success': false,
-        'error': 'User not found',
-      };
-    } else {
-      return {
-        'success': false,
-        'error': responseBody['message'] ?? 'Login failed',
+        'error': 'An error occurred during login: ${e.toString()}',
       };
     }
-  } catch (e, stack) {
-    debugPrint('Unexpected error during login: $e');
-    return {
-      'success': false,
-      'error': 'An error occurred during login: ${e.toString()}',
-    };
   }
-}
 
-
-
-@override
-Future<Map<String, dynamic>> register(String email, String password, String name, String studentId) async {
-  try {
-    // Log input
-    
-
-    // Send request
-    final response = await client.post(
-      Uri.parse('$baseUrl/auth/register'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      },
-      body: jsonEncode({
-        'email': email,
-        'password': password,
-        'fullName': name,
-        'studentId': studentId
-      }),
-    );
-
-    print('Status Code: ${response.statusCode}');
-    print('Response Body: ${response.body}');
-
-    late final Map<String, dynamic> data;
+  @override
+  Future<Map<String, dynamic>> register(
+    String email,
+    String password,
+    String name,
+  ) async {
     try {
-      data = jsonDecode(response.body);
-    } catch (e) {
-      debugPrint('JSON decode error: $e' + name + 'Register');
-      return {
-        'success': false,
-        'error': 'Invalid response format from server: ${response.body}',
-      };
-    }
+      // Log input
+      developer.log(
+        'Attempting to register user',
+        name: 'Register',
+        error: {'email': email, 'name': name},
+      );
+      print('Attempting to register user: email=$email, name=$name');
 
-    if (response.statusCode == 201) {
-      return {
-        'success': true,
-        'data': data,
-      };
-    } else {
+      // Send request
+      final response = await client.post(
+        Uri.parse('$baseUrl/auth/register'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: jsonEncode({'email': email, 'password': password, 'name': name}),
+      );
+
+      developer.log('Status Code: ${response.statusCode}', name: 'Register');
+      developer.log('Response Body: ${response.body}', name: 'Register');
+      print('Status Code: ${response.statusCode}');
+      print('Response Body: ${response.body}');
+
+      late final Map<String, dynamic> data;
+      try {
+        data = jsonDecode(response.body);
+      } catch (e) {
+        developer.log('JSON decode error: $e', name: 'Register');
+        return {
+          'success': false,
+          'error': 'Invalid response format from server: ${response.body}',
+        };
+      }
+
+      if (response.statusCode == 201) {
+        return {'success': true, 'data': data};
+      } else {
+        return {
+          'success': false,
+          'error': data['message'] ?? 'Registration failed',
+        };
+      }
+    } catch (e, stack) {
+      developer.log(
+        'Unexpected error during registration: $e',
+        name: 'Register',
+        stackTrace: stack,
+      );
+      print(
+        "An unexpected error occurred during registration: ${e.toString()}",
+      );
       return {
         'success': false,
-        'error': data['message'] ?? 'Registration failed',
+        'error':
+            'An unexpected error occurred during registration: ${e.toString()}',
       };
     }
   } catch (e, stack) {
@@ -182,7 +190,6 @@ Future<Map<String, dynamic>> register(String email, String password, String name
       'error': 'An unexpected error occurred during registration: ${e.toString()}',
     };
   }
-}
 
   @override
   Future<void> logout() async {
