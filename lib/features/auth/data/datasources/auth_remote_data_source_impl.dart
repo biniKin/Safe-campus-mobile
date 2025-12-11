@@ -125,12 +125,14 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   ) async {
     try {
       // Log input
-      developer.log(
-        'Attempting to register user',
-        name: 'Register',
-        error: {'email': email, 'name': name},
-      );
-      print('Attempting to register user: email=$email, name=$name');
+      // developer.log(
+      //   'Attempting to register user',
+      //   name: 'Register',
+      //   error: {'email': email, 'name': name},
+      // );
+      print('Attempting to register user: email=$email');
+      print("Name: $name");
+      print("Id: $studentId");
 
       // Send request
       final response = await client.post(
@@ -139,13 +141,17 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
-        body: jsonEncode({'email': email, 'password': password, 'name': name}),
+        body: jsonEncode({
+          'email': email, 
+          'password': password, 
+          'fullName': name,
+          'studentId':studentId
+        }),
       );
 
-      developer.log('Status Code: ${response.statusCode}', name: 'Register');
-      developer.log('Response Body: ${response.body}', name: 'Register');
-      print('Status Code: ${response.statusCode}');
-      print('Response Body: ${response.body}');
+      
+      print('Status Code for rigester: ${response.statusCode}');
+      print('Response for rigester Body: ${response.body}');
 
       late final Map<String, dynamic> data;
       try {
@@ -228,7 +234,42 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Future<User?> getUser() async {
     final userJson = prefs.getString('user');
     if (userJson != null) {
-      print(User.fromJson(jsonDecode(userJson)));
+      /*
+        from service: User(
+        693ac7aa94b724e6443fd634, 
+        name, 
+        alehegne23@gmail.com, 
+        student, 
+        ETS****, 
+        [] 
+        null, 
+        null, 
+        eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.
+        eyJ1c2VySWQiOiI2OTNhYzdhYTk0YjcyNGU2NDQzZmQ2MzQiLCJy
+        b2xlIjoic3R1ZGVudCIsImVtYWlsIjoiYWxlaGVnbmUyM0BnbWFp
+        bC5jb20iLCJpYXQiOjE3NjU0NjAwODksImV4cCI6MTc2NTQ2MDE0
+        OX0.m3VBaAD4_jmZJdlDtiLf9FCB8teP8tKatQfV-IMvmAM)
+
+        User(
+        693ac7aa94b724e6443fd634, 
+        name, 
+        alehegne23@gmail.com, 
+        student, 
+        ETS****, 
+        [], 
+        null, 
+        null, 
+        eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.
+        eyJ1c2VySWQiOiI2OTNhYzdhYTk0YjcyNGU2
+        NDQzZmQ2MzQiLCJyb2xlIjoic3R1ZGVudCIs
+        ImVtYWlsIjoiYWxlaGVnbmUyM0BnbWFpbC5j
+        
+        b20iLCJpYXQiOjE3NjU0NjAwODksImV4cCI6
+        MTc2NTQ2MDE0OX0.m3VBaAD4_jmZJdlDtiLf
+        9FCB8teP8tKatQfV-IMvmAM)
+
+      */
+      print("from service: ${User.fromJson(jsonDecode(userJson))}");
       return User.fromJson(jsonDecode(userJson));
     }
     return null;
@@ -287,6 +328,8 @@ Future<void> updateUser(String fullName, String email) async {
     
     if (response.statusCode == 200) {
       Fluttertoast.showToast(msg: "User updated successfully.");
+      final userJson = jsonDecode(response.body);
+      await prefs.setString('user', jsonEncode(userJson));
       return;
     }
 

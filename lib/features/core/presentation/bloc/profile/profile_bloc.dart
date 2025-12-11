@@ -16,7 +16,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState>{
         final user = await _authService.getUser();
         if(user == null) return;
         emit(FetchedUserData(user: user));
-        print(user);
+        print("user from get bloc............$user");
       }catch(e){
         print("Error on fetching user data: $e");
       }
