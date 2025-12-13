@@ -74,7 +74,7 @@ class SocketService {
     }
 
     _socket = IO.io(
-      'http://10.2.75.1:5000/location_updates',
+      'http://192.168.1.5:5000/location_updates',
       IO.OptionBuilder()
           .setTransports(['websocket'])
           .enableReconnection()               // <-- important for mobile networks

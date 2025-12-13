@@ -14,7 +14,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   final SharedPreferences prefs;
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
   // 'https://safe-campus-backend.onrender.com/api';
-  static const String baseUrl = 'http://10.2.75.1:5000/api';
+  static const String baseUrl = 'http://192.168.1.5:5000/api';
 
   AuthRemoteDataSourceImpl({required this.client, required this.prefs});
 
