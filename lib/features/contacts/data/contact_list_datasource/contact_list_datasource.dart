@@ -15,7 +15,7 @@ abstract class ContactListDataSource {
 }
 
 class ContactListDatasourceImpl implements ContactListDataSource {
-  static const _baseUrl = 'http://10.2.75.1:5000/api/auth';
+  static const _baseUrl = 'http://192.168.1.5:5000/api/auth';
 
   final SharedPreferences prefs;
   final AuthService authService;

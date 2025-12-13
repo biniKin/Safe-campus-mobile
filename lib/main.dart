@@ -8,7 +8,10 @@ import 'package:hive/hive.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:safe_campus/features/auth/data/services/auth_service.dart';
 import 'package:safe_campus/features/contacts/data/contact_list_datasource/contact_list_datasource.dart';
+import 'package:safe_campus/features/contacts/data/contact_list_datasource/contact_list_local_datasource.dart';
 import 'package:safe_campus/features/contacts/data/model/contact_model_hive.dart';
+import 'package:safe_campus/features/contacts/data/repository/contact_list_local_imp.dart';
+import 'package:safe_campus/features/contacts/data/repository/contact_repo_imp.dart';
 
 import 'package:safe_campus/features/contacts/domain/repository/contact_list_repository.dart';
 import 'package:safe_campus/features/contacts/domain/usecases/add_contacts.dart';
@@ -69,10 +72,64 @@ void main() async {
   Hive.registerAdapter(ContactModelHiveAdapter());
 
   // open hive box
-  await Hive.openBox<ContactModelHive>("contactsList");
+  final box = await Hive.openBox<ContactModelHive>("contactsList");
+
+
+  // Concrete datasources
+  final local = ContactLocalDataSourceImpl(box);
+  final remote = ContactListDatasourceImpl(
+    prefs: prefs,
+    authService: AuthService(prefs), // your actual AuthService
+  );
+
+  // Repository
+  final contactRepo = ContactRepositoryImpl(remote: remote, local: local);
   
 
-  runApp(MyApp(prefs: prefs));
+  runApp(
+    RepositoryProvider<ContactListRepository>(
+      create: (_) =>  contactRepo,
+      child: MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (_) => AlertsBloc()),
+        BlocProvider(create: (_) => AnnouncementBloc()),
+        BlocProvider<ProfileBloc>(create: (_) => ProfileBloc()),
+        BlocProvider<EditProfileBloc>(create: (_) => EditProfileBloc()),
+        BlocProvider(create: (_) => PanicAlertBloc()),
+        BlocProvider(create: (_) => RegisterBloc()),
+
+        BlocProvider(create: (_) => LoginBloc()),
+
+        BlocProvider(
+          create: (context) => NavigationCubit(),
+          child: Container(),
+        ),
+        BlocProvider(create: (_) => SocketBloc()),
+        BlocProvider(create: (BuildContext context) => SosCubit()),
+
+        BlocProvider<ContactListBloc>(
+          create: (context) => ContactListBloc(
+            repository: RepositoryProvider.of<ContactListRepository>(context)
+            )..add(LoadContactsEvent()
+          )
+        ),
+        
+        BlocProvider(
+          create:
+              (_) => ReportBloc(
+                sendReport: SendReport(
+                  reportRepositryImpl: ReportRepositryImpl(
+                    reportDatasource: ReportDataSourceImpl(),
+                  ),
+                ),
+              ),
+        ),
+      ],
+
+      child: MyApp(prefs: prefs)
+      )
+    )
+  );
 }
 
 class MyApp extends StatefulWidget {
@@ -148,43 +205,8 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider(create: (_) => AlertsBloc()),
-        BlocProvider(create: (_) => AnnouncementBloc()),
-        BlocProvider<ProfileBloc>(create: (_) => ProfileBloc()),
-        BlocProvider<EditProfileBloc>(create: (_) => EditProfileBloc()),
-        BlocProvider(create: (_) => PanicAlertBloc()),
-        BlocProvider(create: (_) => RegisterBloc()),
-
-        BlocProvider(create: (_) => LoginBloc()),
-
-        BlocProvider(
-          create: (context) => NavigationCubit(),
-          child: Container(),
-        ),
-        BlocProvider(create: (_) => SocketBloc()),
-        BlocProvider(create: (BuildContext context) => SosCubit()),
-
-        BlocProvider(
-          create: (context) => ContactListBloc(
-            repository: RepositoryProvider.of<ContactListRepository>(context)
-            )..add(LoadContactsEvent()
-          )
-        ),
-        
-        BlocProvider(
-          create:
-              (_) => ReportBloc(
-                sendReport: SendReport(
-                  reportRepositryImpl: ReportRepositryImpl(
-                    reportDatasource: ReportDataSourceImpl(),
-                  ),
-                ),
-              ),
-        ),
-      ],
-      child: MaterialApp(
+    
+    return MaterialApp(
         navigatorKey: navigatorKey,
         debugShowCheckedModeBanner: false,
         title: 'SafeCampus',
@@ -215,7 +237,8 @@ class _MyAppState extends State<MyApp> {
           '/home': (context) => const Home(),
           '/mapPage': (context) => const MapPage(),
         },
-      ),
+      
+    
     );
   }
 }

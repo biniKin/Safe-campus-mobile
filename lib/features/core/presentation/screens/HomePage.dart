@@ -239,35 +239,7 @@ class _HomePageState extends State<HomePage> {
                                 ),
                               ),
                             ),
-                            // ElevatedButton.icon(
-                            //   onPressed: () async {
-                                
-                            //   },
-                            //   icon: Icon(
-                            //     Icons.attach_file,
-                            //     color: Colors.white,
-                            //   ),
-                            //   label: Text(
-                            //     "Attach Media",
-                            //     style: TextStyle(color: Colors.white),
-                            //   ),
-                            //   style: ElevatedButton.styleFrom(
-                            //     backgroundColor: Color(0xFF65558F),
-                            //     shape: RoundedRectangleBorder(
-                            //       borderRadius: BorderRadius.circular(12),
-                            //     ),
-                            //   ),
-                            // ),
-                            // if (selectedMedia != null)
-                            //   Padding(
-                            //     padding: const EdgeInsets.only(bottom: 16),
-                            //     child: Text(
-                            //       "Media selected: ${selectedMedia!.name}",
-                            //       style: GoogleFonts.poppins(
-                            //         color: Colors.green,
-                            //       ),
-                            //     ),
-                            //   ),
+                            
                             SizedBox(height: 20),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -479,41 +451,6 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
 
-                // content: Column(
-                //   mainAxisSize: MainAxisSize.min,
-                //   crossAxisAlignment: CrossAxisAlignment.start,
-                //   children: [
-                //     if (activity['type'] == 'incident') ...[
-                //       Text(
-                //         'Type: ${activity['description']?.split('\n')[0].replaceAll('Type: ', '') ?? ''}',
-                //         style: GoogleFonts.poppins(),
-                //       ),
-                //       SizedBox(height: 8),
-                //       Text(
-                //         'Severity: ${activity['description']?.split('\n')[1].replaceAll('Severity: ', '') ?? ''}',
-                //         style: GoogleFonts.poppins(),
-                //       ),
-                //     ] else ...[
-                //       Text(
-                //         'Phone: ${activity['description']?.split('\n')[0].replaceAll('Phone: ', '') ?? ''}',
-                //         style: GoogleFonts.poppins(),
-                //       ),
-                //       SizedBox(height: 8),
-                //       Text(
-                //         'Email: ${activity['description']?.split('\n')[1].replaceAll('Email: ', '') ?? ''}',
-                //         style: GoogleFonts.poppins(),
-                //       ),
-                //     ],
-                //     SizedBox(height: 16),
-                //     Text(
-                //       'Reported ${_formatTimestamp(activity['timestamp'] ?? '')}',
-                //       style: GoogleFonts.poppins(
-                //         color: Colors.grey[600],
-                //         fontSize: 12,
-                //       ),
-                //     ),
-                //   ],
-                // ),
               ],
             ),
             actions: [
@@ -529,46 +466,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // Widget buildRoundedIconButton({
-  //   required IconData icon,
-  //   required String label,
-  //   required VoidCallback onPressed,
-  // }) {
-  //   return GestureDetector(
-  //     onTap: onPressed,
-  //     child: Container(
-  //       width: 150,
-  //       height: 100,
-  //       decoration: BoxDecoration(
-  //         borderRadius: BorderRadius.circular(20),
-  //         gradient: const LinearGradient(
-  //           colors: [Color(0xFFF6F2FF), Color(0xFFEDE7F6)],
-  //           begin: Alignment.topLeft,
-  //           end: Alignment.bottomRight,
-  //         ),
-  //         boxShadow: [
-  //           BoxShadow(
-  //             color: Colors.black12,
-  //             blurRadius: 4,
-  //             offset: Offset(2, 4),
-  //           ),
-  //         ],
-  //       ),
-  //       child: Column(
-  //         mainAxisAlignment: MainAxisAlignment.center,
-  //         children: [
-  //           Icon(icon, size: 32, color: Colors.black),
-  //           const SizedBox(height: 8),
-  //           Text(
-  //             label,
-  //             textAlign: TextAlign.center,
-  //             style: GoogleFonts.poppins(fontSize: 14, color: Colors.black),
-  //           ),
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
 
   Widget buildRecentActivities() {
     final activitiesToShow =
@@ -1061,7 +958,7 @@ class _HomePageState extends State<HomePage> {
             if (state is ContactListError)
               Center(
                 child: Text(
-                  "No contacts added",
+                  "Low internet connect.",
                   style: GoogleFonts.poppins(color: Colors.grey),
                 ),
               ),
