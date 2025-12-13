@@ -5,12 +5,16 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:location/location.dart';
-import 'package:safe_campus/features/contacts/presentation/bloc/contact_list_bloc.dart';
-import 'package:safe_campus/features/contacts/presentation/bloc/contact_list_event.dart';
-import 'package:safe_campus/features/contacts/presentation/bloc/contact_list_state.dart';
+import 'package:safe_campus/features/core/presentation/bloc/contacts_bloc/contact_list_bloc.dart';
+import 'package:safe_campus/features/core/presentation/bloc/contacts_bloc/contact_list_event.dart';
+import 'package:safe_campus/features/core/presentation/bloc/contacts_bloc/contact_list_state.dart';
 import 'package:safe_campus/features/core/functions/time_formater.dart';
+import 'package:safe_campus/features/core/presentation/bloc/recent_activity_bloc/recent_activity_bloc.dart';
+import 'package:safe_campus/features/core/presentation/bloc/recent_activity_bloc/recent_activity_event.dart';
+import 'package:safe_campus/features/core/presentation/bloc/recent_activity_bloc/recent_activity_state.dart';
 import 'package:safe_campus/features/core/presentation/screens/panic_bottom_sheet.dart';
 import 'package:safe_campus/features/core/presentation/screens/sos_cubit/sos_cubit.dart';
+import 'package:safe_campus/features/core/presentation/screens/sos_home_container.dart';
 import 'package:safe_campus/features/report/presentation/bloc/report_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'components/contact_form_bottom_sheet.dart';
@@ -36,25 +40,25 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   LocationData? _currentLocation;
-  List<Map<String, String>> recentActivities = [];
+  // List<Map<String, String>> recentActivities = [];
   //List<Map<String, String>> contacts = [];
 
-  List<Map<String, String>> incidents = [
-    {
-      'name': 'Low visibility area',
-      'description':
-          'Poor lighting near the main gate\nType: general\nSeverity: medium',
-      'type': 'incident',
-      'timestamp': DateTime.now().subtract(Duration(hours: 2)).toString(),
-    },
-    {
-      'name': 'Construction work',
-      'description':
-          'Ongoing construction near Block A\nType: construction\nSeverity: low',
-      'type': 'incident',
-      'timestamp': DateTime.now().subtract(Duration(hours: 5)).toString(),
-    },
-  ];
+  // List<Map<String, String>> incidents = [
+  //   {
+  //     'name': 'Low visibility area',
+  //     'description':
+  //         'Poor lighting near the main gate\nType: general\nSeverity: medium',
+  //     'type': 'incident',
+  //     'timestamp': DateTime.now().subtract(Duration(hours: 2)).toString(),
+  //   },
+  //   {
+  //     'name': 'Construction work',
+  //     'description':
+  //         'Ongoing construction near Block A\nType: construction\nSeverity: low',
+  //     'type': 'incident',
+  //     'timestamp': DateTime.now().subtract(Duration(hours: 5)).toString(),
+  //   },
+  // ];
   bool showAllActivities = false;
 
   Timer? _sosPulseTimer;
@@ -65,17 +69,17 @@ class _HomePageState extends State<HomePage> {
     console.log('The home page widget has been intiaisted ');
     //context.read<ContactListBloc>().add(FetchContactListEvent());
     // Initialize recent activities with both incidents and contacts
-    recentActivities = [
-      ...incidents.map(
-        (incident) => {
-          'name': incident['name'] ?? '',
-          'description':
-              'Type: ${incident['description']?.split('\n')[0]}\nSeverity: ${incident['description']?.split('\n')[1]}',
-          'type': 'incident',
-          'timestamp': incident['timestamp'] ?? DateTime.now().toString(),
-        },
-      ),
-    ];
+    // recentActivities = [
+    //   ...incidents.map(
+    //     (incident) => {
+    //       'name': incident['name'] ?? '',
+    //       'description':
+    //           'Type: ${incident['description']?.split('\n')[0]}\nSeverity: ${incident['description']?.split('\n')[1]}',
+    //       'type': 'incident',
+    //       'timestamp': incident['timestamp'] ?? DateTime.now().toString(),
+    //     },
+    //   ),
+    // ];
   }
 
   @override
@@ -466,186 +470,69 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-
-  Widget buildRecentActivities() {
-    final activitiesToShow =
-        showAllActivities
-            ? recentActivities
-            : recentActivities.take(3).toList();
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              "Recent Activities",
-              style: GoogleFonts.poppins(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.deepPurple,
-              ),
-            ),
-            if (recentActivities.length > 3)
-              TextButton.icon(
-                onPressed: () {
-                  setState(() {
-                    showAllActivities = !showAllActivities;
-                  });
-                },
-                icon: Icon(
-                  showAllActivities ? Icons.expand_less : Icons.expand_more,
-                  color: Colors.deepPurple,
-                ),
-                label: Text(
-                  showAllActivities ? "Show Less" : "Show More",
-                  style: GoogleFonts.poppins(
-                    color: Colors.deepPurple,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-          ],
-        ),
-        const SizedBox(height: 16),
-        if (recentActivities.isEmpty)
-          Container(
-            padding: EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.grey[100],
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Center(
-              child: Column(
-                children: [
-                  Icon(Icons.history, size: 48, color: Colors.grey[400]),
-                  SizedBox(height: 8),
-                  Text(
-                    "No recent activities",
-                    style: GoogleFonts.poppins(
-                      color: Colors.grey[600],
-                      fontSize: 16,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          )
-        else
-          Container(
-            constraints: BoxConstraints(
-              maxHeight: showAllActivities ? double.infinity : 300,
-            ),
-            child: ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: activitiesToShow.length,
-              itemBuilder: (context, index) {
-                final activity = activitiesToShow[index];
-                return GestureDetector(
-                  onTap: () => _showActivityDetails(activity),
-                  child: Container(
-                    margin: const EdgeInsets.only(bottom: 12),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.1),
-                          spreadRadius: 1,
-                          blurRadius: 4,
-                          offset: Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: ListTile(
-                      contentPadding: EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
-                      ),
-                      leading: Container(
-                        padding: EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color:
-                              activity['type'] == 'contact'
-                                  ? Colors.green.withOpacity(0.1)
-                                  : Colors.red.withOpacity(0.1),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          activity['type'] == 'contact'
-                              ? Icons.person_add
-                              : Icons.warning,
-                          color:
-                              activity['type'] == 'contact'
-                                  ? Colors.green
-                                  : Colors.red,
-                        ),
-                      ),
-                      title: Text(
-                        activity['name'] ?? '',
-                        style: GoogleFonts.poppins(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 16,
-                        ),
-                      ),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            activity['description'] ?? '',
-                            style: GoogleFonts.poppins(
-                              fontSize: 14,
-                              color: Colors.grey[700],
-                            ),
-                          ),
-                          SizedBox(height: 4),
-                          Text(
-                            formatTimestamp(activity['timestamp'] ?? ''),
-                            style: GoogleFonts.poppins(
-                              fontSize: 12,
-                              color: Colors.grey[500],
-                            ),
-                          ),
-                        ],
-                      ),
-                      trailing: Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color:
-                              activity['type'] == 'contact'
-                                  ? Colors.green.withOpacity(0.1)
-                                  : Colors.red.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          activity['type'] == 'contact'
-                              ? 'Contact'
-                              : 'Incident',
-                          style: GoogleFonts.poppins(
-                            fontSize: 12,
-                            color:
-                                activity['type'] == 'contact'
-                                    ? Colors.green
-                                    : Colors.red,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              },
+Widget buildRecentActivities() {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      // Always show this
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            "Recent Activities",
+            style: GoogleFonts.poppins(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.deepPurple,
             ),
           ),
-      ],
-    );
-  }
+        ],
+      ),
+      const SizedBox(height: 16),
+
+      // Activity list depends on state
+      BlocBuilder<RecentActivityBloc, RecentActivityState>(
+        builder: (context, state) {
+          if (state is RecentActivitiesLoaded) {
+            final activities = state.activities;
+            final showCount = activities.length > 3 ? 3 : activities.length;
+            final activitiesToShow = activities.take(showCount).toList();
+
+            if (activitiesToShow.isEmpty) {
+              return const Text("NO RECENT ACTIVITY");
+            }
+
+            return Column(
+              children: [
+                ...activitiesToShow.map((activity) {
+                  return SosHomeContainer(
+                    time: DateTime.parse(activity.time.toString()), // convert string to DateTime
+                    title: "SOS Alert",
+                    onDelete: (){
+                      context.read<RecentActivityBloc>().add(DeleteActivityEvent(id: activity.id));
+                    },
+                  );
+                }).toList(),
+
+                if (activities.length > 3)
+                  TextButton(
+                    onPressed: () {
+                      // TODO: open full activities page or sheet
+                    },
+                    child: const Text("See more"),
+                  ),
+              ],
+            );
+          }
+
+          // Loading or other states
+          return const SizedBox.shrink();
+        },
+      ),
+    ],
+  );
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -898,8 +785,15 @@ class _HomePageState extends State<HomePage> {
                   : ListView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    itemCount: state.contacts.length,
+                    itemCount: state.contacts.length + 1,
                     itemBuilder: (context, index) {
+                      
+                      if(index == state.contacts.length ){
+                        return TextButton(onPressed: (){
+                          // print(state.message);
+                          // openManageContactsSheet();
+                        }, child: Text("See more"));
+                      }
                       final contact = state.contacts[index];
                       return Container(
                         padding: const EdgeInsets.all(12.0),
@@ -931,7 +825,7 @@ class _HomePageState extends State<HomePage> {
                                   ),
                                 ),
                                 Text(
-                                  contact.phoneNumber,
+                                  contact.email,
                                   style: GoogleFonts.poppins(
                                     fontSize: 14,
                                     color: Colors.grey[700],
@@ -944,6 +838,7 @@ class _HomePageState extends State<HomePage> {
                               icon: const Icon(Icons.delete, color: Colors.red),
                               onPressed: () {
                                 // implement delete here
+                                context.read<ContactListBloc>().add(DeleteContactEvent(contact.email));
                               },
                             ),
                           ],
@@ -957,9 +852,17 @@ class _HomePageState extends State<HomePage> {
             // ==============================
             if (state is ContactListError)
               Center(
-                child: Text(
-                  "Low internet connect.",
-                  style: GoogleFonts.poppins(color: Colors.grey),
+                child: Column(
+                  children: [
+                    Text(
+                      "Low internet connect.",
+                      style: GoogleFonts.poppins(color: Colors.grey),
+                    ),
+                    IconButton(onPressed: (){
+                      print(state.message);
+                      openManageContactsSheet();
+                    }, icon: Icon(Icons.add))
+                  ],
                 ),
               ),
           ],

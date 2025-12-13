@@ -9,6 +9,7 @@ import 'package:hive_flutter/adapters.dart';
 import 'package:safe_campus/features/auth/data/services/auth_service.dart';
 import 'package:safe_campus/features/contacts/data/contact_list_datasource/contact_list_datasource.dart';
 import 'package:safe_campus/features/contacts/data/contact_list_datasource/contact_list_local_datasource.dart';
+import 'package:safe_campus/features/contacts/data/model/activity_model_hive.dart';
 import 'package:safe_campus/features/contacts/data/model/contact_model_hive.dart';
 import 'package:safe_campus/features/contacts/data/repository/contact_list_local_imp.dart';
 import 'package:safe_campus/features/contacts/data/repository/contact_repo_imp.dart';
@@ -18,13 +19,15 @@ import 'package:safe_campus/features/contacts/domain/usecases/add_contacts.dart'
 import 'package:safe_campus/features/contacts/domain/usecases/delete_contacts.dart';
 import 'package:safe_campus/features/contacts/domain/usecases/fetch_contacts.dart';
 import 'package:safe_campus/features/contacts/domain/usecases/update_contacts.dart';
-import 'package:safe_campus/features/contacts/presentation/bloc/contact_list_bloc.dart';
-import 'package:safe_campus/features/contacts/presentation/bloc/contact_list_event.dart';
+import 'package:safe_campus/features/core/presentation/bloc/contacts_bloc/contact_list_bloc.dart';
+import 'package:safe_campus/features/core/presentation/bloc/contacts_bloc/contact_list_event.dart';
 import 'package:safe_campus/features/core/presentation/bloc/alerts_bloc/alerts_bloc.dart';
 import 'package:safe_campus/features/core/presentation/bloc/announcement_bloc/announcement_bloc.dart';
 import 'package:safe_campus/features/core/presentation/bloc/auth/login_state.dart';
 import 'package:safe_campus/features/core/presentation/bloc/edit_profile_bloc/edit_profile_bloc.dart';
 import 'package:safe_campus/features/core/presentation/bloc/profile/profile_bloc.dart';
+import 'package:safe_campus/features/core/presentation/bloc/recent_activity_bloc/recent_activity_bloc.dart';
+import 'package:safe_campus/features/core/presentation/bloc/recent_activity_bloc/recent_activity_event.dart';
 import 'package:safe_campus/features/core/presentation/screens/admin/security_dashboard.dart';
 import 'package:safe_campus/features/core/presentation/screens/admin_page.dart'
     show AdminPage;
@@ -70,9 +73,11 @@ void main() async {
   // hive
   await Hive.initFlutter();
   Hive.registerAdapter(ContactModelHiveAdapter());
+  Hive.registerAdapter(ActivityModelHiveAdapter());
 
   // open hive box
   final box = await Hive.openBox<ContactModelHive>("contactsList");
+  await Hive.openBox<ActivityModelHive>("recent_activities");
 
 
   // Concrete datasources
@@ -97,6 +102,7 @@ void main() async {
         BlocProvider<EditProfileBloc>(create: (_) => EditProfileBloc()),
         BlocProvider(create: (_) => PanicAlertBloc()),
         BlocProvider(create: (_) => RegisterBloc()),
+        BlocProvider(create: (_) => RecentActivityBloc()..add(LoadActivitiesEvent())),
 
         BlocProvider(create: (_) => LoginBloc()),
 

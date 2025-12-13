@@ -38,7 +38,7 @@
 
 
 import 'package:equatable/equatable.dart';
-import '../../domain/entities/contact.dart';
+import '../../../../contacts/domain/entities/contact.dart';
 
 abstract class ContactListState extends Equatable {
   const ContactListState();

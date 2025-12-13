@@ -21,14 +21,16 @@ class ContactRepositoryImpl implements ContactListRepository {
   Future<List<Contact>> fetchContacts() async {
     final localContacts = local.getContacts();
 
-    if (localContacts.isNotEmpty) {
-      _syncInBackground();
+    //if (localContacts.isNotEmpty) {
+      // print("Loacl storage for contacts is not empty");
+      //_syncInBackground();
+      //print(localContacts[0]);
       return localContacts;
-    }
+    //}
 
-    final remoteContacts = await remote.fetchContacts();
-    await local.saveContacts(remoteContacts);
-    return remoteContacts;
+    //final remoteContacts = await remote.fetchContacts();
+    //await local.saveContacts(remoteContacts);
+    //return remoteContacts;
   }
 
   // ---------------- ADD (optimistic) ----------------
@@ -56,7 +58,7 @@ class ContactRepositoryImpl implements ContactListRepository {
 
     // 2. delete remotely
     try {
-      await remote.deleteContact(email);
+      //await remote.deleteContact(email);
     } catch (e) {
       throw Exception('Failed to sync delete contact: $e');
     }
@@ -95,10 +97,13 @@ class ContactRepositoryImpl implements ContactListRepository {
   // ---------------- BACKGROUND SYNC ----------------
   Future<void> _syncInBackground() async {
     try {
-      final remoteContacts = await remote.fetchContacts();
-      await local.saveContacts(remoteContacts);
-    } catch (_) {
+      //final remoteContacts = await remote.fetchContacts();
+      print("on sync contacts");
+      //await local.saveContacts(remoteContacts);
+    } catch (e) {
       // silent fail (offline, server down)
+      print("error on sync contacts: $e");
+      return;
     }
   }
 

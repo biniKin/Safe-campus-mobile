@@ -75,7 +75,7 @@ import 'package:safe_campus/features/contacts/data/model/contact_model_hive.dart
 import 'package:safe_campus/features/contacts/data/repository/contact_repo_imp.dart';
 import 'package:safe_campus/features/contacts/domain/repository/contact_list_repository.dart';
 
-import '../../domain/entities/contact.dart';
+import '../../../../contacts/domain/entities/contact.dart';
 
 
 import 'contact_list_event.dart';
@@ -91,6 +91,10 @@ class ContactListBloc extends Bloc<ContactListEvent, ContactListState> {
     on<LoadContactsEvent>(_onLoadContacts);
     on<AddContactEvent>(_onAddContact);
     on<DeleteContactEvent>(_onDeleteContact);
+    on<ContactsUpdatedFromHive>((event, emit) {
+      emit(ContactListLoaded(event.contacts));
+    });
+
     
 
     _listenToHive();
@@ -117,9 +121,12 @@ class ContactListBloc extends Bloc<ContactListEvent, ContactListState> {
     emit(ContactListLoading());
 
     try {
-      await repository.fetchContacts();
+      final contacts = await repository.fetchContacts();
+      print(contacts.length);
       // Hive listener will emit loaded state
+      emit(ContactListLoaded(contacts));
     } catch (e) {
+      print("error on loading contacts: $e");
       emit(ContactListError(e.toString()));
     }
   }

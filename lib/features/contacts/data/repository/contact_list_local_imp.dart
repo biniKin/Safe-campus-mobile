@@ -12,6 +12,8 @@ class ContactLocalDataSourceImpl implements ContactLocalDataSource {
 
   @override
   List<ContactModel> getContacts() {
+    print("on getting contacts.......");
+    
     return box.values
         .map((hiveContact) => hiveContact.toContactModel())
         .toList();
