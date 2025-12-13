@@ -10,7 +10,7 @@ import 'package:safe_campus/features/core/presentation/bloc/panic_alert/panic_al
 import 'package:safe_campus/features/core/presentation/bloc/panic_alert/panic_alert_event.dart';
 import 'package:safe_campus/features/core/presentation/screens/HomePage.dart';
 import 'package:safe_campus/features/core/presentation/screens/alertPage.dart';
-import 'package:safe_campus/features/core/presentation/screens/mapPage.dart';
+import 'package:safe_campus/features/map_marking/presentation/page/map_page.dart';
 import 'package:safe_campus/features/core/presentation/screens/profilePage.dart';
 import 'package:safe_campus/features/core/presentation/screens/sos_cubit/sos_cubit.dart';
 import 'dart:developer' as developer;
@@ -43,7 +43,7 @@ class _HomeState extends State<Home> {
         initialContacts: contacts,
       ),
       MapPage(
-      /*  contacts: contacts,
+        /*  contacts: contacts,
         onContactsUpdated: (updatedContacts) {
           setState(() {
             contacts = updatedContacts;
@@ -71,7 +71,6 @@ class _HomeState extends State<Home> {
             content: SizedBox(
               height: 340,
               child: Column(
-                
                 children: [
                   Image.asset('assets/images/alert1.png'),
                   const SizedBox(height: 10),
@@ -93,13 +92,12 @@ class _HomeState extends State<Home> {
                 onPressed: () {
                   //  Navigator.of(context).pop();
                   // developer.log('SOS button pressed');
-              
+
                   context.read<PanicAlertBloc>().add(TriggerPanicAlert());
 
                   // _startSOSMode();
                   // Notify trusted contacts and security
                   // Fluttertoast.showToast(msg: 'Emergency alert sent to trusted contacts and security personnel!', backgroundColor: Colors.red);
-                
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red,
@@ -116,10 +114,10 @@ class _HomeState extends State<Home> {
           ),
     );
   }
+
   Timer? _sosPulseTimer;
 
   void _startSOSMode() {
- 
     context.read<SosCubit>().onEmergencyMode();
     _sosPulseTimer = Timer.periodic(const Duration(milliseconds: 1000), (
       timer,
@@ -131,67 +129,68 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<NavigationCubit, int>(
-        builder: (context, selectedIndex) {
-          return BlocBuilder<SosCubit, SosState>(
-            builder: (context, state) {
-              return Scaffold(
-    
-                body: pages[selectedIndex],
-                floatingActionButtonLocation:
-                    FloatingActionButtonLocation.centerDocked,
-                floatingActionButton: FloatingActionButton(
-                  onPressed: openDialogeBox,
-                  backgroundColor: state.isEmergencyMode ? Colors.red: Colors.deepPurpleAccent,
-                  foregroundColor: Colors.white,
-                  shape: const CircleBorder(),
-                  child: const Text("SOS"),
+      builder: (context, selectedIndex) {
+        return BlocBuilder<SosCubit, SosState>(
+          builder: (context, state) {
+            return Scaffold(
+              body: pages[selectedIndex],
+              floatingActionButtonLocation:
+                  FloatingActionButtonLocation.centerDocked,
+              floatingActionButton: FloatingActionButton(
+                onPressed: openDialogeBox,
+                backgroundColor:
+                    state.isEmergencyMode
+                        ? Colors.red
+                        : Colors.deepPurpleAccent,
+                foregroundColor: Colors.white,
+                shape: const CircleBorder(),
+                child: const Text("SOS"),
+              ),
+              bottomNavigationBar: BottomAppBar(
+                notchMargin: 5,
+                color: const Color.fromARGB(255, 223, 222, 236),
+                height: 80,
+                shape: const CircularNotchedRectangle(),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    navItem(
+                      context,
+                      icon: Icons.home,
+                      label: "Home",
+                      index: 0,
+                      selected: selectedIndex,
+                    ),
+                    navItem(
+                      context,
+                      icon: Icons.map,
+                      label: "Map",
+                      index: 1,
+                      selected: selectedIndex,
+                    ),
+                    const SizedBox(width: 40),
+                    navItem(
+                      context,
+                      icon: Icons.notifications,
+                      label: "Alerts",
+                      index: 2,
+                      selected: selectedIndex,
+                    ),
+                    navItem(
+                      context,
+                      icon: Icons.person,
+                      label: "Profile",
+                      index: 3,
+                      selected: selectedIndex,
+                    ),
+                  ],
                 ),
-                bottomNavigationBar: BottomAppBar(
-                  notchMargin: 5,
-                  color: const Color.fromARGB(255, 223, 222, 236),
-                  height: 80,
-                  shape: const CircularNotchedRectangle(),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      navItem(
-                        context,
-                        icon: Icons.home,
-                        label: "Home",
-                        index: 0,
-                        selected: selectedIndex,
-                      ),
-                      navItem(
-                        context,
-                        icon: Icons.map,
-                        label: "Map",
-                        index: 1,
-                        selected: selectedIndex,
-                      ),
-                      const SizedBox(width: 40),
-                      navItem(
-                        context,
-                        icon: Icons.notifications,
-                        label: "Alerts",
-                        index: 2,
-                        selected: selectedIndex,
-                      ),
-                      navItem(
-                        context,
-                        icon: Icons.person,
-                        label: "Profile",
-                        index: 3,
-                        selected: selectedIndex,
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          );
-        },
-      );
- 
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 }
 
@@ -226,5 +225,3 @@ Widget navItem(
     ),
   );
 }
-
-

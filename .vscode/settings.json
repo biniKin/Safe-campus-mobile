@@ -1,4 +1,4 @@
 {
-    "cmake.sourceDirectory": "D:/Flutter Projects/flutter_hackathon/GDG-Hackathon_G8/linux",
-    "java.configuration.updateBuildConfiguration": "interactive"
+  "cmake.sourceDirectory": "/home/alexoo/Documents/Github/cloned/safeFrontend/Safe-campus-mobile/linux",
+  "java.configuration.updateBuildConfiguration": "interactive"
 }

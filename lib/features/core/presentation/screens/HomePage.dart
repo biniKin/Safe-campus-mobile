@@ -34,6 +34,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   LocationData? _currentLocation;
   List<Map<String, String>> recentActivities = [];
+  bool isSelected = false;
   //List<Map<String, String>> contacts = [];
 
   List<Map<String, String>> incidents = [
@@ -335,9 +336,125 @@ class _HomePageState extends State<HomePage> {
   }
 
   void openShareRouteSheet() {
-    context.read<NavigationCubit>().updateIndex(
-      1,
-    ); // Navigate to map page (index 1)
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return BlocBuilder<ContactListBloc, ContactListState>(
+          builder: (context, state) {
+            if (state is ContactListLoaded) {
+              final contacts = state.contacts;
+              // track selection per contact
+              List<bool> selected = List.generate(
+                contacts.length,
+                (_) => false,
+              );
+
+              // Use StatefulBuilder so checkboxes update locally
+              return StatefulBuilder(
+                builder: (
+                  BuildContext context,
+                  void Function(void Function()) setState,
+                ) {
+                  return Container(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    constraints: BoxConstraints(
+                      maxHeight: MediaQuery.of(context).size.height * 0.6,
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Text(
+                            "Share Your Location",
+                            style: GoogleFonts.poppins(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        Flexible(
+                          child: ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: contacts.length,
+                            itemBuilder: (context, index) {
+                              return ListTile(
+                                onTap: () {
+                                  setState(() {
+                                    selected[index] = !selected[index];
+                                  });
+                                },
+                                leading: Checkbox(
+                                  value: selected[index],
+                                  onChanged: (value) {
+                                    setState(() {
+                                      selected[index] = value ?? false;
+                                    });
+                                  },
+                                ),
+                                title: Text(contacts[index].name),
+                                subtitle: Text(contacts[index].phoneNumber),
+                              );
+                            },
+                          ),
+                        ),
+
+                        SizedBox(
+                          width: double.infinity,
+
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Color(0xFF65558F),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              padding: EdgeInsets.symmetric(
+                                vertical: 15,
+                                horizontal: 32,
+                              ),
+                            ),
+                            onPressed: () {
+                              // Gather selected contacts
+                              List<Map<String, String>> selectedContacts = [];
+                              for (int i = 0; i < contacts.length; i++) {
+                                if (selected[i]) {
+                                  selectedContacts.add({
+                                    'name': contacts[i].name,
+                                    'phoneNumber': contacts[i].phoneNumber,
+                                    'email': contacts[i].email,
+                                  });
+                                }
+                              }
+
+                              // For now, just log the selected contacts
+                              console.log(
+                                'Sharing location with: $selectedContacts',
+                              );
+
+                              Navigator.pop(context);
+                            },
+                            child: Text(
+                              "Share",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              );
+            } else {
+              return const Center(child: CircularProgressIndicator());
+            }
+          },
+        );
+      },
+    );
   }
 
   void openManageContactsSheet() async {
@@ -764,7 +881,7 @@ class _HomePageState extends State<HomePage> {
                                           Icon(Icons.share, size: 40),
                                           SizedBox(height: 8),
                                           Text(
-                                            "Share my routes",
+                                            "Share my location",
                                             style: TextStyle(fontSize: 14),
                                           ),
                                         ],

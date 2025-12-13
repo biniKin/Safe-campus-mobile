@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -16,6 +18,10 @@ import 'package:safe_campus/features/core/presentation/bloc/profile/profile_bloc
 import 'package:safe_campus/features/core/presentation/screens/admin/security_dashboard.dart';
 import 'package:safe_campus/features/core/presentation/screens/admin_page.dart'
     show AdminPage;
+import 'package:safe_campus/features/map_marking/data/data_source/map_remote_datasource.dart';
+import 'package:safe_campus/features/map_marking/data/repository/map_repository_impl.dart';
+import 'package:safe_campus/features/map_marking/domain/usecase/get_danger_areas.dart';
+import 'package:safe_campus/features/map_marking/presentation/bloc/map_bloc.dart';
 import 'package:safe_campus/features/report/data/report_data_source.dart';
 import 'package:safe_campus/features/report/data/report_repositry._impl.dart';
 import 'package:safe_campus/features/report/presentation/bloc/report_bloc.dart';
@@ -122,6 +128,17 @@ class MyApp extends StatelessWidget {
                 sendReport: SendReport(
                   repository: ReportRepositryImpl(
                     reportDatasource: ReportDataSourceImpl(),
+                  ),
+                ),
+              ),
+        ),
+
+        BlocProvider(
+          create:
+              (context) => MapBloc(
+                getDangerAreas: GetDangerAreas(
+                  MapRepositoryImpl(
+                    MapRemoteDataSourceImpl(HttpClient(), prefs: prefs),
                   ),
                 ),
               ),
