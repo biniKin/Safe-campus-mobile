@@ -14,6 +14,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   final SharedPreferences prefs;
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
   // 'https://safe-campus-backend.onrender.com/api';
+//   static const String baseUrl = 'http://10.2.66.138:8000/api';
+
+  //static const String baseUrl = 'http://192.168.1.10:8000/api';
   static const String baseUrl = 'http://192.168.1.5:5000/api';
 
   AuthRemoteDataSourceImpl({required this.client, required this.prefs});
@@ -135,14 +138,13 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           'Accept': 'application/json',
         },
         body: jsonEncode({
-          'email': email, 
-          'password': password, 
+          'email': email,
+          'password': password,
           'fullName': name,
-          'studentId':studentId
+          'studentId': studentId,
         }),
       );
 
-      
       print('Status Code for rigester: ${response.statusCode}');
       print('Response for rigester Body: ${response.body}');
 
@@ -300,33 +302,25 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Future<void> updateUser(String fullName, String email) async {
     final endPoint = "$baseUrl/profile";
 
-  try {
-    final userToken = prefs.getString('token') ?? '';
-    final refreshToken = prefs.getString('ref_token') ?? '';
+    try {
+      final userToken = prefs.getString('token') ?? '';
+      final refreshToken = prefs.getString('ref_token') ?? '';
 
-    
-    var response = await http.put(
-      Uri.parse(endPoint),
-      headers: {
-        'Authorization': 'Bearer $userToken',
-      },
-      body: {
-        'fullName': fullName,
-        'email': email,
-      },
-    );
+      var response = await http.put(
+        Uri.parse(endPoint),
+        headers: {'Authorization': 'Bearer $userToken'},
+        body: {'fullName': fullName, 'email': email},
+      );
 
-    
-    if (response.statusCode == 200) {
-      Fluttertoast.showToast(msg: "User updated successfully.");
-      final userJson = jsonDecode(response.body);
-      await prefs.setString('user', jsonEncode(userJson));
-      return;
-    }
+      if (response.statusCode == 200) {
+        Fluttertoast.showToast(msg: "User updated successfully.");
+        final userJson = jsonDecode(response.body);
+        await prefs.setString('user', jsonEncode(userJson));
+        return;
+      }
 
-  
-    if (response.statusCode == 401) {
-      print("Token expired. Attempting refresh...");
+      if (response.statusCode == 401) {
+        print("Token expired. Attempting refresh...");
 
         final authService = AuthService(prefs);
         final bool refreshSuccess = await authService.refreshToken(

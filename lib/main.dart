@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:convert';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -31,6 +32,10 @@ import 'package:safe_campus/features/core/presentation/bloc/recent_activity_bloc
 import 'package:safe_campus/features/core/presentation/screens/admin/security_dashboard.dart';
 import 'package:safe_campus/features/core/presentation/screens/admin_page.dart'
     show AdminPage;
+import 'package:safe_campus/features/map_marking/data/data_source/map_remote_datasource.dart';
+import 'package:safe_campus/features/map_marking/data/repository/map_repository_impl.dart';
+import 'package:safe_campus/features/map_marking/domain/usecase/get_danger_areas.dart';
+import 'package:safe_campus/features/map_marking/presentation/bloc/map_bloc.dart';
 import 'package:safe_campus/features/core/presentation/screens/mapPage.dart';
 import 'package:safe_campus/features/report/data/report_data_source.dart';
 import 'package:safe_campus/features/report/data/report_repositry._impl.dart';
@@ -126,6 +131,17 @@ void main() async {
                 sendReport: SendReport(
                   reportRepositryImpl: ReportRepositryImpl(
                     reportDatasource: ReportDataSourceImpl(),
+                  ),
+                ),
+              ),
+        ),
+
+        BlocProvider(
+          create:
+              (context) => MapBloc(
+                getDangerAreas: GetDangerAreas(
+                  MapRepositoryImpl(
+                    MapRemoteDataSourceImpl(HttpClient(), prefs: prefs),
                   ),
                 ),
               ),

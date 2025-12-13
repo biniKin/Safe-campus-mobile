@@ -297,7 +297,7 @@ class _ProfilepageState extends State<Profilepage> {
                       backgroundColor: Colors.transparent,
                       shadowColor: Colors.transparent,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(28),
+                        borderRadius: BorderRadius.circular(12),
                       ),
                     ),
                     onPressed: () async {
