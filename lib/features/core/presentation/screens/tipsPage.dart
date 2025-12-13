@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:google_fonts/google_fonts.dart';
+import 'package:safe_campus/features/core/presentation/screens/tipcontainer.dart';
 
 class Tipspage extends StatelessWidget {
   Tipspage({super.key});
@@ -17,39 +18,42 @@ class Tipspage extends StatelessWidget {
   ];
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: Column(
-        children: [
-          //title
-          Padding(
+Widget build(BuildContext context) {
+  return Scaffold(
+    backgroundColor: Colors.white,
+    body: CustomScrollView(
+      slivers: [
+        SliverToBoxAdapter(
+          child: Padding(
             padding: const EdgeInsets.only(left: 14.0, top: 5),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                "Usefull security tips",
-                style: GoogleFonts.poppins(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                ),
+            child: Text(
+              "Useful security tips",
+              style: GoogleFonts.poppins(
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
               ),
             ),
           ),
-          SizedBox(height: 10),
-          Expanded(
-            child: ListView.builder(
-              itemCount: tips.length,
-              itemBuilder: (context, index) {
-                String tip = tips[index];
-                return ListTile(
-                 
-                  title: Text("${index + 1}. $tip"));
-              },
-            ),
+        ),
+
+        SliverList.builder(
+          itemCount: tips.length,
+          itemBuilder: (context, index) {
+            final tip = tips[index];
+            return Tipcontainer(
+              content: "${index + 1}. $tip",
+            );
+          },
+        ),
+        SliverToBoxAdapter(
+          child: Container(
+            height: 60,        
+            color: Colors.white,
           ),
-        ],
-      ),
-    );
-  }
+        ),
+
+      ],
+    ),
+  );
+}
 }

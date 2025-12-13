@@ -6,7 +6,10 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:location/location.dart';
 import 'package:safe_campus/features/contacts/presentation/bloc/contact_list_bloc.dart';
+import 'package:safe_campus/features/contacts/presentation/bloc/contact_list_event.dart';
+import 'package:safe_campus/features/contacts/presentation/bloc/contact_list_state.dart';
 import 'package:safe_campus/features/core/functions/time_formater.dart';
+import 'package:safe_campus/features/core/presentation/screens/panic_bottom_sheet.dart';
 import 'package:safe_campus/features/core/presentation/screens/sos_cubit/sos_cubit.dart';
 import 'package:safe_campus/features/report/presentation/bloc/report_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -60,7 +63,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     console.log('The home page widget has been intiaisted ');
-    context.read<ContactListBloc>().add(FetchContactListEvent());
+    //context.read<ContactListBloc>().add(FetchContactListEvent());
     // Initialize recent activities with both incidents and contacts
     recentActivities = [
       ...incidents.map(
@@ -198,8 +201,8 @@ class _HomePageState extends State<HomePage> {
                               },
                             ),
                             SizedBox(height: 16),
-                            ElevatedButton.icon(
-                              onPressed: () async {
+                            GestureDetector(
+                              onTap: ()async{
                                 final result = await picker.pickImage(
                                   source: ImageSource.gallery,
                                 );
@@ -209,32 +212,63 @@ class _HomePageState extends State<HomePage> {
                                   });
                                 }
                               },
-                              icon: Icon(
-                                Icons.attach_file,
-                                color: Colors.white,
-                              ),
-                              label: Text(
-                                "Attach Media",
-                                style: TextStyle(color: Colors.white),
-                              ),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Color(0xFF65558F),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
+                              child: Container(
+                                height: 50,
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                  color: Colors.transparent,
+                                  border: Border.all(
+                                    color: Colors.black,
+                                    width: 0.5
+                                  ),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                alignment: Alignment.centerLeft,
+                                padding: EdgeInsets.only(left: 10, right: 10),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Icon(Icons.image),
+                                        Text(selectedMedia != null ? selectedMedia?.name ?? 'File Attached' : "Attach Media"),
+                                      ],
+                                    ),
+                                    selectedMedia != null ? Icon(Icons.done_all_rounded, color: Colors.green,) : SizedBox.shrink()
+                                  ],
                                 ),
                               ),
                             ),
-                            if (selectedMedia != null)
-                              Padding(
-                                padding: const EdgeInsets.only(bottom: 16),
-                                child: Text(
-                                  "Media selected: ${selectedMedia!.name}",
-                                  style: GoogleFonts.poppins(
-                                    color: Colors.green,
-                                  ),
-                                ),
-                              ),
-                            SizedBox(height: 16),
+                            // ElevatedButton.icon(
+                            //   onPressed: () async {
+                                
+                            //   },
+                            //   icon: Icon(
+                            //     Icons.attach_file,
+                            //     color: Colors.white,
+                            //   ),
+                            //   label: Text(
+                            //     "Attach Media",
+                            //     style: TextStyle(color: Colors.white),
+                            //   ),
+                            //   style: ElevatedButton.styleFrom(
+                            //     backgroundColor: Color(0xFF65558F),
+                            //     shape: RoundedRectangleBorder(
+                            //       borderRadius: BorderRadius.circular(12),
+                            //     ),
+                            //   ),
+                            // ),
+                            // if (selectedMedia != null)
+                            //   Padding(
+                            //     padding: const EdgeInsets.only(bottom: 16),
+                            //     child: Text(
+                            //       "Media selected: ${selectedMedia!.name}",
+                            //       style: GoogleFonts.poppins(
+                            //         color: Colors.green,
+                            //       ),
+                            //     ),
+                            //   ),
+                            SizedBox(height: 20),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -268,25 +302,31 @@ class _HomePageState extends State<HomePage> {
                                       final token =
                                           prefs.getString('token') ?? '';
 
-                                      console.log('The token is $token');
-                                      Navigator.pop(context);
+                                      print('The token is $token');
+                                      // Navigator.pop(context);
 
                                       context.read<ReportBloc>().add(
-                                        SendReportEvent(
+                                         SendReportEvent(
                                           description:
                                               descriptionController.text,
                                           tags:
                                               '$selectedType, $selectedSeverity',
                                           image: selectedMedia?.path ?? '',
                                           location: {
-                                            'latitude':
-                                                _currentLocation?.latitude
-                                                    .toString() ??
-                                                '',
-                                            'longitude':
-                                                _currentLocation?.longitude
-                                                    .toString() ??
-                                                '',
+                                            "type":"Point",
+                                            'coordinates': [
+                                              _currentLocation?.latitude.toString() ?? 0.0,
+
+                                              _currentLocation?.latitude ?? 0.0
+                                            ],
+                                            // 'latitude':
+                                            //     _currentLocation?.latitude
+                                            //         .toString() ??
+                                            //     '',
+                                            // 'longitude':
+                                            //     _currentLocation?.longitude
+                                            //         .toString() ??
+                                            //     '',
                                           },
                                           token: token,
                                         ),
@@ -302,6 +342,8 @@ class _HomePageState extends State<HomePage> {
                                           textColor: Colors.white,
                                         );
                                       }
+
+                                      print("${selectedMedia?.path}");
                                     },
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: Color(0xFF65558F),
@@ -312,12 +354,25 @@ class _HomePageState extends State<HomePage> {
                                         vertical: 15,
                                       ),
                                     ),
-                                    child: Text(
-                                      "Submit",
-                                      style: GoogleFonts.poppins(
-                                        fontSize: 16,
-                                        color: Colors.white,
-                                      ),
+                                    child: BlocBuilder<ReportBloc, ReportState>(
+                                      builder: (context, state) {
+                                        if(state is ReportLoading){
+                                          return SizedBox(
+                                            height: 15,
+                                            width: 15,
+                                            child: CircularProgressIndicator(color: Colors.black,),);
+                                        } else if(state is ReportSuccess){
+                                          Fluttertoast.showToast(msg: state.message);
+                                          Navigator.pop(context);
+                                        }
+                                        return Text(
+                                          "Submit",
+                                          style: GoogleFonts.poppins(
+                                            fontSize: 16,
+                                            color: Colors.white,
+                                          ),
+                                        );
+                                      }
                                     ),
                                   ),
                                 ),
@@ -360,7 +415,7 @@ class _HomePageState extends State<HomePage> {
           ),
     ).then((_) {
       // Bottom sheet has been closed; refresh contacts now
-      context.read<ContactListBloc>().add(FetchContactListEvent());
+      //context.read<ContactListBloc>().add(FetchContactListEvent());
     });
   }
 
@@ -712,6 +767,7 @@ class _HomePageState extends State<HomePage> {
             ),
 
             actions: [
+             
               Image.asset(
                 'assets/images/ICON.PNG',
                 width: 40,
@@ -827,6 +883,18 @@ class _HomePageState extends State<HomePage> {
                     ],
                   ),
                 ),
+                BlocListener<SosCubit, SosState>(
+                  listener: (context, state){
+                    if(state.isEmergencyMode){
+                      showSOSBottomSheet(context: context, onCancel: (){
+                        // context.read<SosCubit>().offEmergencyMode();
+                        Navigator.pop(context);
+                      });
+                    }
+                  },
+                  child: SizedBox.shrink()
+                ),
+                  
                 // if (state.isEmergencyMode)
                 // Positioned.fill(
                 //   child: Container(
@@ -898,23 +966,23 @@ class _HomePageState extends State<HomePage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // HEADER
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "Trusted Contacts",
-                  style: GoogleFonts.poppins(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.add_circle_outline),
-                  onPressed: openManageContactsSheet,
-                  tooltip: "Add Contact",
-                ),
-              ],
-            ),
+            // Row(
+            //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //   children: [
+            //     Text(
+            //       "Trusted Contacts",
+            //       style: GoogleFonts.poppins(
+            //         fontSize: 18,
+            //         fontWeight: FontWeight.bold,
+            //       ),
+            //     ),
+            //     IconButton(
+            //       icon: const Icon(Icons.add_circle_outline),
+            //       onPressed: openManageContactsSheet,
+            //       tooltip: "Add Contact",
+            //     ),
+            //   ],
+            // ),
 
             const SizedBox(height: 10),
 
@@ -993,8 +1061,8 @@ class _HomePageState extends State<HomePage> {
             if (state is ContactListError)
               Center(
                 child: Text(
-                  "Failed to load contacts",
-                  style: GoogleFonts.poppins(color: Colors.red),
+                  "No contacts added",
+                  style: GoogleFonts.poppins(color: Colors.grey),
                 ),
               ),
           ],

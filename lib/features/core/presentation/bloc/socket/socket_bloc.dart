@@ -10,8 +10,8 @@ class SocketBloc extends Bloc<SocketEvent, SocketState> {
   SocketBloc() : super(SocketInitial()) {
     on<ConnectSocket>((event, emit) {
       try {
-        socketService.connect(event.userId, event.token);
-        socketService.socket.on('register_online', (data) {
+        socketService.connect(token: event.token);
+        socketService.socket?.on('register_online', (data) {
           add(SocketDataReceived(data));
         });
         emit(SocketConnected());

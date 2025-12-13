@@ -6,4 +6,5 @@ class Contact {
   final String email;
 
   Contact({required this.name, required this.phoneNumber, required this.email});
+
 }

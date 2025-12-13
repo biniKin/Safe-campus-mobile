@@ -11,27 +11,30 @@ abstract class ContactListDataSource {
   Future<void> addContact(Map<String, dynamic> contact);
   Future<void> deleteContact(String email);
   Future<void> updateContact(String email, Map<String, dynamic> updatedContact);
+  
 }
 
 class ContactListDatasourceImpl implements ContactListDataSource {
-  static const _baseUrl = 'http://10.0.2.2:8000/api/auth';
+  static const _baseUrl = 'http://10.2.75.1:5000/api/auth';
+
   final SharedPreferences prefs;
   final AuthService authService;
 
   ContactListDatasourceImpl({
     required this.prefs,
-    required SharedPreferences sharedPreferences,
-    required this.authService,
+    required this.authService, 
+   
   });
+
   List<ContactModel> parseContacts(dynamic body) {
     final list =
         (body is Map && body['trustedContacts'] is List)
             ? body['trustedContacts'] as List
             : (body is Map &&
-                body['data'] is Map &&
-                (body['data'] as Map)['trustedContacts'] is List)
-            ? (body['data'] as Map)['trustedContacts'] as List
-            : const <dynamic>[];
+                    body['data'] is Map &&
+                    (body['data'] as Map)['trustedContacts'] is List)
+                ? (body['data'] as Map)['trustedContacts'] as List
+                : const <dynamic>[];
 
     return list
         .whereType<Map<String, dynamic>>()
@@ -39,130 +42,116 @@ class ContactListDatasourceImpl implements ContactListDataSource {
         .toList();
   }
 
-  Future<bool> refreshAuthToken() async {
-    final refreshToken = prefs.getString('ref_token');
-    if (refreshToken == null) return false;
-
-    final url = Uri.parse('$_baseUrl/refresh');
-
-    final response = await http.post(
-      url,
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'refreshToken': refreshToken}),
-    );
-
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-
-      // store new access token
-      prefs.setString('token', data['data']['token']);
-      return true;
-    }
-
-    return false;
-  }
-
-  Future<http.Response> sendAuthorizedRequest(
-    Future<http.Response> Function(String? accessToken) requestFn,
-  ) async {
-    final token = prefs.getString('token');
-
-    // TRY #1 — use current access token
-    var response = await requestFn(token);
-
-    // If token expired → backend returns 401
-    if (response.statusCode == 401) {
-      final refreshed = await refreshAuthToken();
-
-      if (!refreshed) {
-        throw Exception("Session expired. Please login again.");
-      }
-
-      // retry using new access token
-      final newToken = prefs.getString('token');
-      response = await requestFn(newToken);
-    }
-
-    return response;
-  }
-
-  Map<String, String> _authHeaders({bool json = false}) {
-    final token = prefs.getString('token');
-
-    if (token == null || token.isEmpty) {
-      console.log('missing auth token');
-      throw Exception('Missing auth token');
-    }
-    return {
-      if (json) 'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      'Authorization': 'Bearer $token',
-    };
-  }
-
   @override
   Future<List<ContactModel>> fetchContacts() async {
     final uri = Uri.parse('$_baseUrl/get_contacts');
 
-    final response = await sendAuthorizedRequest((token) {
-      return http.get(
-        uri,
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Accept': 'application/json',
-        },
-      );
-    });
+    String token = prefs.getString("token") ?? "";
+    String refreshToken = prefs.getString("ref_token") ?? "";
 
-    if (response.statusCode != 200) {
-      throw Exception('Failed to load contacts');
+    Future<http.Response> _request(String tok) {
+      return http.get(uri, headers: {
+        "Authorization": "Bearer $tok",
+        "Accept": "application/json",
+      });
     }
 
-    return parseContacts(jsonDecode(response.body));
+    var resp = await _request(token);
+
+    if (resp.statusCode == 401) {
+      print("Token expired → refreshing...");
+
+      final refreshed = await authService.refreshToken(refToken: refreshToken);
+      if (!refreshed) throw Exception("Session expired. Login again.");
+
+      token = prefs.getString("token") ?? "";
+      resp = await _request(token); // retry
+    }
+
+    if (resp.statusCode == 200) {
+      print(jsonDecode(resp.body));
+      return parseContacts(jsonDecode(resp.body));
+    }
+
+    throw Exception("Failed to fetch contacts (${resp.statusCode})");
   }
 
+  // ---------------------------------------------------------------------------
+  // ADD CONTACT (with manual 401 refresh)
+  // ---------------------------------------------------------------------------
   @override
   Future<void> addContact(Map<String, dynamic> contact) async {
     final uri = Uri.parse('$_baseUrl/add_contacts');
 
-    final response = await sendAuthorizedRequest((token) {
+    String token = prefs.getString("token") ?? "";
+    String refreshToken = prefs.getString("ref_token") ?? "";
+
+    Future<http.Response> _request(String tok) {
       return http.post(
         uri,
         headers: {
-          'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
+          "Authorization": "Bearer $tok",
+          "Content-Type": "application/json",
+          "Accept": "application/json",
         },
         body: jsonEncode(contact),
       );
-    });
-
-    if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw Exception('Failed to add contact (${response.statusCode})');
     }
 
-    console.log('Contact added: $contact');
+    var resp = await _request(token);
+
+    if (resp.statusCode == 401) {
+      print("Refreshing token…");
+
+      final refreshed = await authService.refreshToken(refToken: refreshToken);
+      if (!refreshed) throw Exception("Session expired. Login again.");
+
+      token = prefs.getString("token") ?? "";
+      resp = await _request(token);
+    }
+
+    if (resp.statusCode < 200 || resp.statusCode >= 300) {
+      throw Exception("Failed to add contact (${resp.statusCode})");
+    }
   }
 
+  // ---------------------------------------------------------------------------
+  // DELETE CONTACT (manual 401 handling)
+  // ---------------------------------------------------------------------------
   @override
   Future<void> deleteContact(String email) async {
     final uri = Uri.parse('$_baseUrl/delete_contacts/$email');
 
-    final response = await sendAuthorizedRequest((token) {
-      return http.delete(
-        uri,
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Accept': 'application/json',
-        },
-      );
-    });
+    String token = prefs.getString("token") ?? "";
+    String refreshToken = prefs.getString("ref_token") ?? "";
 
-    if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw Exception('Failed to delete contact (${response.statusCode})');
+    Future<http.Response> _request(String tok) {
+      return http.delete(uri, headers: {
+        "Authorization": "Bearer $tok",
+        "Accept": "application/json",
+      });
+    }
+
+    var resp = await _request(token);
+
+    if (resp.statusCode == 401) {
+      print("Refreshing token…");
+
+      final refreshed = await authService.refreshToken(refToken: refreshToken);
+      if (!refreshed) throw Exception("Session expired. Login again.");
+
+      token = prefs.getString("token") ?? "";
+      resp = await _request(token);
+    }
+
+    if (resp.statusCode < 200 || resp.statusCode >= 300) {
+      throw Exception("Failed to delete contact (${resp.statusCode})");
     }
   }
 
+  // ---------------------------------------------------------------------------
+  // UPDATE CONTACT (manual 401 handling)
+  // ---------------------------------------------------------------------------
   @override
   Future<void> updateContact(
     String email,
@@ -170,20 +159,35 @@ class ContactListDatasourceImpl implements ContactListDataSource {
   ) async {
     final uri = Uri.parse('$_baseUrl/update_contacts');
 
-    final response = await sendAuthorizedRequest((token) {
+    String token = prefs.getString("token") ?? "";
+    String refreshToken = prefs.getString("ref_token") ?? "";
+
+    Future<http.Response> _request(String tok) {
       return http.put(
         uri,
         headers: {
-          'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
+          "Authorization": "Bearer $tok",
+          "Content-Type": "application/json",
+          "Accept": "application/json",
         },
         body: jsonEncode(updatedContact),
       );
-    });
+    }
 
-    if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw Exception('Failed to update contact (${response.statusCode})');
+    var resp = await _request(token);
+
+    if (resp.statusCode == 401) {
+      print("Refreshing token…");
+
+      final refreshed = await authService.refreshToken(refToken: refreshToken);
+      if (!refreshed) throw Exception("Session expired. Login again.");
+
+      token = prefs.getString("token") ?? "";
+      resp = await _request(token);
+    }
+
+    if (resp.statusCode < 200 || resp.statusCode >= 300) {
+      throw Exception("Failed to update contact (${resp.statusCode})");
     }
   }
 }

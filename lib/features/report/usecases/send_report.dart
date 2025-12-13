@@ -1,17 +1,19 @@
+import 'package:safe_campus/features/report/data/report_data_source.dart';
+import 'package:safe_campus/features/report/data/report_repositry._impl.dart';
 import 'package:safe_campus/features/report/domain/report_repositry.dart';
 
 class SendReport {
-  ReportRepository repository;
+  ReportRepositryImpl reportRepositryImpl;
 
-  SendReport({required this.repository});
-  Future<void> call({
+  SendReport({required this.reportRepositryImpl});
+  Future<ReportResponse> call({
     required String description,
     required String tags,
     required String image,
-    required Map<String, String> location,
+    required Map<dynamic, dynamic> location,
     required String token,
   }) async {
-    return await repository.sendReport(
+    return await reportRepositryImpl.sendReport(
       description: description,
       tags: tags,
       image: image,
