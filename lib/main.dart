@@ -36,7 +36,8 @@ import 'package:safe_campus/features/map_marking/data/data_source/map_remote_dat
 import 'package:safe_campus/features/map_marking/data/repository/map_repository_impl.dart';
 import 'package:safe_campus/features/map_marking/domain/usecase/get_danger_areas.dart';
 import 'package:safe_campus/features/map_marking/presentation/bloc/map_bloc.dart';
-import 'package:safe_campus/features/core/presentation/screens/mapPage.dart';
+import 'package:safe_campus/features/map_marking/presentation/page/map_page.dart';
+
 import 'package:safe_campus/features/report/data/report_data_source.dart';
 import 'package:safe_campus/features/report/data/report_repositry._impl.dart';
 import 'package:safe_campus/features/report/presentation/bloc/report_bloc.dart';
