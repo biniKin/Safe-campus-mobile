@@ -9,12 +9,14 @@ import 'package:hive_flutter/adapters.dart';
 import 'package:safe_campus/features/auth/data/services/auth_service.dart';
 import 'package:safe_campus/features/contacts/data/contact_list_datasource/contact_list_datasource.dart';
 import 'package:safe_campus/features/contacts/data/model/contact_model_hive.dart';
-import 'package:safe_campus/features/contacts/data/repository/contact_list_repositoryimpl.dart';
+
+import 'package:safe_campus/features/contacts/domain/repository/contact_list_repository.dart';
 import 'package:safe_campus/features/contacts/domain/usecases/add_contacts.dart';
 import 'package:safe_campus/features/contacts/domain/usecases/delete_contacts.dart';
 import 'package:safe_campus/features/contacts/domain/usecases/fetch_contacts.dart';
 import 'package:safe_campus/features/contacts/domain/usecases/update_contacts.dart';
 import 'package:safe_campus/features/contacts/presentation/bloc/contact_list_bloc.dart';
+import 'package:safe_campus/features/contacts/presentation/bloc/contact_list_event.dart';
 import 'package:safe_campus/features/core/presentation/bloc/alerts_bloc/alerts_bloc.dart';
 import 'package:safe_campus/features/core/presentation/bloc/announcement_bloc/announcement_bloc.dart';
 import 'package:safe_campus/features/core/presentation/bloc/auth/login_state.dart';
@@ -165,46 +167,12 @@ class _MyAppState extends State<MyApp> {
         BlocProvider(create: (BuildContext context) => SosCubit()),
 
         BlocProvider(
-          create:
-              (BuildContext context) => ContactListBloc(
-                addContact: AddContacts(
-                  repository: ContactListRepositoryImpl(
-                    contactListDataSource: ContactListDatasourceImpl(
-                      sharedPreferences: widget.prefs,
-                      prefs: widget.prefs,
-                      authService: AuthService(widget.prefs),
-                    ),
-                  ),
-                ),
-                fetchContacts: FetchContacts(
-                  repository: ContactListRepositoryImpl(
-                    contactListDataSource: ContactListDatasourceImpl(
-                      sharedPreferences: widget.prefs,
-                      prefs: widget.prefs,
-                      authService: AuthService(widget.prefs),
-                    ),
-                  ),
-                ),
-                updateContacts: UpdateContacts(
-                  repository: ContactListRepositoryImpl(
-                    contactListDataSource: ContactListDatasourceImpl(
-                      sharedPreferences: widget.prefs,
-                      prefs: widget.prefs,
-                      authService: AuthService(widget.prefs),
-                    ),
-                  ),
-                ),
-                deleteContacts: DeleteContacts(
-                  repository: ContactListRepositoryImpl(
-                    contactListDataSource: ContactListDatasourceImpl(
-                      prefs: widget.prefs,
-                      sharedPreferences: widget.prefs,
-                      authService: AuthService(widget.prefs),
-                    ),
-                  ),
-                ),
-              ),
+          create: (context) => ContactListBloc(
+            repository: RepositoryProvider.of<ContactListRepository>(context)
+            )..add(LoadContactsEvent()
+          )
         ),
+        
         BlocProvider(
           create:
               (_) => ReportBloc(
