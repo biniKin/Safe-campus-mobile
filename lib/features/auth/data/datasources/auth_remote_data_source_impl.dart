@@ -14,9 +14,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   final SharedPreferences prefs;
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
   // 'https://safe-campus-backend.onrender.com/api';
-  static const String baseUrl = 'http://10.2.66.138:8000/api';
+//   static const String baseUrl = 'http://10.2.66.138:8000/api';
 
   //static const String baseUrl = 'http://192.168.1.10:8000/api';
+  static const String baseUrl = 'http://192.168.1.5:5000/api';
 
   AuthRemoteDataSourceImpl({required this.client, required this.prefs});
 
@@ -359,24 +360,26 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<bool> refreshToken({required String refreshToken}) async {
     final endPoint = "$baseUrl/auth/refresh";
-    final refToken = prefs.getString('ref_token');
+    final token = prefs.getString('token');
+    print("token: $token");
     try {
+      print("ref token: $refreshToken");
       final res = await http.post(
         Uri.parse(endPoint),
-
-        body: {'refreshToken': refToken},
+       
+        body: {'refresh_token': refreshToken},
       );
 
       developer.log('Refresh token response status: ${res.body}');
       if (res.statusCode == 200) {
         final data = jsonDecode(res.body);
-        developer.log(data);
-        developer.log("new token: ${data['data']['token']}");
+        print(data);
+        print("new token: ${data['data']['token']}");
         await prefs.setString('token', data['data']['token']);
 
         return true;
       } else {
-        developer.log("on else bloc: ${res.statusCode}");
+        print("on else bloc: ${res.statusCode}");
         return false;
       }
     } catch (e) {
