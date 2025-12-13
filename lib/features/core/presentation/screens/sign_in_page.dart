@@ -41,14 +41,14 @@ class _SignInPageState extends State<SignInPage> {
       //   MaterialPageRoute(builder: (context) => const AdminPage()),
       // );
     } else if (user.role == 'security') {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const SecurityDashboard()),
-      );
+      // Navigator.pushReplacement(
+      //   context,
+      //   MaterialPageRoute(builder: (context) => const SecurityDashboard()),
+      // );
     } else {
-      Navigator.pushReplacement(
+      Navigator.pushReplacementNamed(
         context,
-        MaterialPageRoute(builder: (context) => const Home()),
+        '/home',
       );
     }
   }
@@ -63,12 +63,15 @@ class _SignInPageState extends State<SignInPage> {
             developer.log('token: ${state.user.token}',);
             developer.log('userId: ${state.user.id}',);
             if(state.user.token.isEmpty) {
-              Fluttertoast.showToast(msg: 'Token is empty');
+              //Fluttertoast.showToast(msg: 'Token is empty');
             } else {
-               context.read<SocketBloc>().add(ConnectSocket(state.user.id, state.user.token));
+              //context.read<SocketBloc>().add(ConnectSocket(state.user.id, state.user.token));
             }
           
-         _navigateToDashboard(state.user);
+           Navigator.pushReplacementNamed(
+            context,
+            '/home',
+          );
         }
       },
       builder: (context, state) {

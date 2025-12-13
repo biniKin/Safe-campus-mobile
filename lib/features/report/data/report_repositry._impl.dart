@@ -8,27 +8,30 @@ class ReportRepositryImpl implements ReportRepository {
   ReportRepositryImpl({required this.reportDatasource});
 
   @override
-  Future<void> sendReport({
+  Future<ReportResponse> sendReport({
     required String description,
     required String tags,
     required String image,
-    required Map<String, String> location,
+    required Map<dynamic, dynamic> location,
     required String token,
   }) async {
     try {
       console.log(
         'Sending report with description: $description, tags: $tags, image: $image, location: $location',
       );
-      await reportDatasource.sendReport(
+      final rep = await reportDatasource.sendReport(
         description: description,
         tag: tags,
         image: image,
         location: location,
         token: token,
       );
+      
       console.log('Report sent successfully');
+      return rep;
     } catch (e) {
       console.log('Error happening while sending report $e');
+      return ReportResponse(success: false, message: "Error occured");
     }
   }
 }

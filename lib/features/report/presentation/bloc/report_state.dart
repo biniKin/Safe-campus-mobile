@@ -18,3 +18,8 @@ final class ReportSuccess extends ReportState {
   @override
   List<Object> get props => [message];
 }
+
+final class ReportFailed extends ReportState{
+  final String msg;
+  const ReportFailed(this.msg);
+}

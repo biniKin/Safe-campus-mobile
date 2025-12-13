@@ -1,7 +1,9 @@
+
+
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:safe_campus/features/report/usecases/send_report.dart';
-import 'dart:developer' as console show log;
+
 part 'report_event.dart';
 part 'report_state.dart';
 
@@ -12,17 +14,23 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
     on<SendReportEvent>((event, emit) async {
       emit(ReportLoading());
       try {
-        console.log('ReportBloc: SendReportEvent received');
-        await sendReport.call(
+        print('ReportBloc: SendReportEvent received');
+        final response = await sendReport.call(
           description: event.description,
           tags: event.tags,
           image: event.image,
           location: event.location,
           token: event.token,
         );
-        emit(ReportSuccess(message: 'Report sent successfully'));
+        if(response.success){
+          emit(ReportSuccess(message: response.message));
+        } else{
+          emit(ReportFailed(response.message));
+        }
+        
       } catch (e) {
-        emit(ReportInitial()); // You might want to emit an error state here
+        print("Error on report block: $e");
+        emit(ReportFailed(e.toString())); // You might want to emit an error state here
       }
     });
   }

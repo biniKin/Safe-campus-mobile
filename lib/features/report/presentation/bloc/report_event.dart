@@ -11,7 +11,7 @@ class SendReportEvent extends ReportEvent {
   final String description;
   final String tags;
   final String image;
-  final Map<String, String> location;
+  final Map<dynamic, dynamic> location;
   final String token;
 
   const SendReportEvent({
