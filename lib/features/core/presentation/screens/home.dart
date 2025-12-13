@@ -15,7 +15,7 @@ import 'package:safe_campus/features/core/presentation/bloc/recent_activity_bloc
 import 'package:safe_campus/features/core/presentation/screens/HomePage.dart';
 import 'package:safe_campus/features/core/presentation/screens/alertPage.dart';
 import 'package:safe_campus/features/map_marking/presentation/page/map_page.dart';
-import 'package:safe_campus/features/core/presentation/screens/mapPage.dart';
+
 import 'package:safe_campus/features/core/presentation/screens/panic_bottom_sheet.dart';
 import 'package:safe_campus/features/core/presentation/screens/profilePage.dart';
 import 'package:safe_campus/features/core/presentation/screens/sos_cubit/sos_cubit.dart';
@@ -326,11 +326,11 @@ class _HomeState extends State<Home> {
                     ],
                   ),
                 ),
-              ),
-            );
-          },
-        );
-      },
+              );
+            }
+          );
+        }
+    
     );
   }
 }
