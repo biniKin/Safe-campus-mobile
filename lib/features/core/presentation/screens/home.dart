@@ -5,10 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:safe_campus/features/contacts/data/model/activity_model.dart';
 import 'package:safe_campus/features/core/presentation/bloc/NavigationCubit.dart';
 import 'package:safe_campus/features/core/presentation/bloc/panic_alert/panic_alert_bloc.dart';
 import 'package:safe_campus/features/core/presentation/bloc/panic_alert/panic_alert_event.dart';
 import 'package:safe_campus/features/core/presentation/bloc/panic_alert/panic_alert_state.dart';
+import 'package:safe_campus/features/core/presentation/bloc/recent_activity_bloc/recent_activity_bloc.dart';
+import 'package:safe_campus/features/core/presentation/bloc/recent_activity_bloc/recent_activity_event.dart';
 import 'package:safe_campus/features/core/presentation/screens/HomePage.dart';
 import 'package:safe_campus/features/core/presentation/screens/alertPage.dart';
 import 'package:safe_campus/features/core/presentation/screens/mapPage.dart';
@@ -18,6 +21,7 @@ import 'package:safe_campus/features/core/presentation/screens/sos_cubit/sos_cub
 import 'dart:developer' as developer;
 
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:uuid/uuid.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -133,6 +137,14 @@ class _HomeState extends State<Home> {
                     onPressed: (){
                       context.read<SosCubit>().offEmergencyMode();
                       context.read<PanicAlertBloc>().add(CancelPanicAlert());
+                      context.read<RecentActivityBloc>().add(
+                        SaveActivityEvent(
+                          activity: ActivityModel(
+                            id: Uuid().v4(), 
+                            time: DateTime.now(),
+                          ),
+                        ),
+                      );
                       
                       Navigator.of(context).pop();
                       Fluttertoast.showToast(msg: "Request solved.");

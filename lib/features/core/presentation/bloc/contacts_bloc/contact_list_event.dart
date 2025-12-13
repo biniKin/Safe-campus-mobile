@@ -39,7 +39,7 @@
 
 
 import 'package:equatable/equatable.dart';
-import '../../domain/entities/contact.dart';
+import '../../../../contacts/domain/entities/contact.dart';
 
 abstract class ContactListEvent extends Equatable {
   const ContactListEvent();

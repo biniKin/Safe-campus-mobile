@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:safe_campus/features/contacts/domain/usecases/add_contacts.dart';
-import 'package:safe_campus/features/contacts/presentation/bloc/contact_list_bloc.dart';
-import 'package:safe_campus/features/contacts/presentation/bloc/contact_list_event.dart';
+import 'package:safe_campus/features/core/presentation/bloc/contacts_bloc/contact_list_bloc.dart';
+import 'package:safe_campus/features/core/presentation/bloc/contacts_bloc/contact_list_event.dart';
 
 class ContactFormBottomSheet extends StatefulWidget {
   final Function(String, String, String) onSave;
