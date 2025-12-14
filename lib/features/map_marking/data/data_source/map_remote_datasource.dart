@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 import 'package:location/location.dart';
+import 'package:safe_campus/features/auth/data/services/auth_service.dart';
 import 'package:safe_campus/features/map_marking/data/model/map_marker_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:developer' as console show log;
@@ -28,32 +29,34 @@ class MapRemoteDataSourceImpl implements MapRemoteDataSource {
 
   MapRemoteDataSourceImpl(this.httpClient, {required this.prefs});
 
-  Future<bool> _refreshAuthToken() async {
-    final refreshToken = prefs.getString('ref_token');
-    if (refreshToken == null) return false;
+  // Future<bool> _refreshAuthToken() async {
+  //   final refreshToken = prefs.getString('ref_token');
+  //   if (refreshToken == null) return false;
 
-    final url = Uri.parse('$_authBase/refresh');
-    final req = await httpClient.postUrl(url);
-    req.headers.set(HttpHeaders.contentTypeHeader, 'application/json');
-    req.add(utf8.encode(jsonEncode({'refreshToken': refreshToken})));
+  //   final url = Uri.parse('$_authBase/refresh');
+  //   final req = await httpClient.postUrl(url);
+  //   req.headers.set(HttpHeaders.contentTypeHeader, 'application/json');
+  //   req.add(utf8.encode(jsonEncode({'refreshToken': refreshToken})));
 
-    final resp = await req.close();
-    final body = await resp.transform(utf8.decoder).join();
+  //   final resp = await req.close();
+  //   final body = await resp.transform(utf8.decoder).join();
 
-    if (resp.statusCode == 200) {
-      final data = jsonDecode(body);
-      final newToken =
-          (data is Map) ? (data['data']?['token'] as String?) : null;
-      if (newToken != null && newToken.isNotEmpty) {
-        await prefs.setString('token', newToken);
-        return true;
-      }
-    }
-    return false;
-  }
+  //   if (resp.statusCode == 200) {
+  //     final data = jsonDecode(body);
+  //     final newToken =
+  //         (data is Map) ? (data['data']?['token'] as String?) : null;
+  //     if (newToken != null && newToken.isNotEmpty) {
+  //       await prefs.setString('token', newToken);
+  //       return true;
+  //     }
+  //   }
+  //   return false;
+  // }
 
   Future<HttpClientResponse> _sendAuthorizedGet(Uri uri) async {
     final token = prefs.getString('token');
+    final ref_token = prefs.getString("ref_token") ?? '';
+    final authSerive = AuthService(prefs);
 
     // Try #1 — current token
     var request = await httpClient.getUrl(uri);
@@ -65,7 +68,8 @@ class MapRemoteDataSourceImpl implements MapRemoteDataSource {
 
     // If unauthorized, try refreshing and retry once
     if (response.statusCode == 401) {
-      final refreshed = await _refreshAuthToken();
+      
+      final refreshed = await authSerive.refreshToken(refToken: ref_token);
       if (!refreshed) {
         throw Exception('Session expired. Please login again.');
       }

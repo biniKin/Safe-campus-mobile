@@ -140,7 +140,54 @@ class PanicAlertBloc extends Bloc<PanicAlertEvent, PanicAlertState> {
     CancelPanicAlert event,
     Emitter<PanicAlertState> emit
   )async{
-    // disconnect to the socket
+    // disconnect to the 
+    final eventId = roomName;
+    final uri = Uri.parse( "http://10.2.78.92:5000/api/sos/update/$eventId");
+    final prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString('token') ?? '';
+    String refreshToken = prefs.getString("ref_token") ?? '';
+    
+    Future<http.Response> sendRequest(String accessToken) {
+        
+        return http.put(
+          uri,
+          headers: {
+            'Authorization': 'Bearer $accessToken',
+            'Content-Type': 'application/json',
+          },
+        );
+      }
+
+      http.Response response = await sendRequest(token);
+      if (response.statusCode == 401) {
+        print("Token expired → refreshing token...");
+        final authService = AuthService(prefs);
+        final refreshSuccess =
+            await authService.refreshToken(refToken: refreshToken);
+        if (refreshSuccess) {
+          final newToken = prefs.getString('token') ?? '';
+          print("Token refreshed successfully!");
+          // Retry the request with new token
+          response = await sendRequest(newToken);
+        } else {
+          emit(PanicError("Session expired. Please login again."));
+          print("error on refreshing token");
+          return;
+        }
+      }
+
+      
+      // FINAL RESPONSE HANDLING
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        print(jsonDecode(response.body));
+        
+        
+      } else {
+        print("Error: status ${response.statusCode}");
+        emit(PanicError("Failed with status code: ${response.statusCode}"));
+      }
+    
+
     _locationSub?.cancel();
     socketService.leaveChannel(roomName);
     socketService.disconnect();

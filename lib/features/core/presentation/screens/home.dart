@@ -15,6 +15,7 @@ import 'package:safe_campus/features/core/presentation/bloc/recent_activity_bloc
 import 'package:safe_campus/features/core/presentation/bloc/recent_activity_bloc/recent_activity_event.dart';
 import 'package:safe_campus/features/core/presentation/screens/HomePage.dart';
 import 'package:safe_campus/features/core/presentation/screens/alertPage.dart';
+import 'package:safe_campus/features/core/presentation/screens/sos_pulse_container.dart';
 import 'package:safe_campus/features/map_marking/presentation/page/map_page.dart';
 
 import 'package:safe_campus/features/core/presentation/screens/panic_bottom_sheet.dart';
@@ -68,7 +69,7 @@ class _HomeState extends State<Home> {
     showModalBottomSheet(
       context: context,
       isDismissible: true,
-      enableDrag: false,
+      enableDrag: true,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -79,12 +80,12 @@ class _HomeState extends State<Home> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Align(
-                alignment: Alignment.centerRight,
-                child: IconButton(onPressed: (){
-                  Navigator.of(context).pop();
-                }, icon: Icon(Icons.cancel_outlined)),
-              ),
+              // Align(
+              //   alignment: Alignment.centerRight,
+              //   child: IconButton(onPressed: (){
+              //     Navigator.of(context).pop();
+              //   }, icon: Icon(Icons.cancel_outlined)),
+              // ),
               Icon(Icons.check_circle, color: Colors.red, size: 60),
 
               SizedBox(height: 15),
@@ -110,71 +111,34 @@ class _HomeState extends State<Home> {
 
               SizedBox(height: 25),
 
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  ElevatedButton(
-                    onPressed: (){
-                      context.read<PanicAlertBloc>().add(CancelPanicAlert());
-                      context.read<SosCubit>().offEmergencyMode();
-                      context.read<RecentActivityBloc>().add(
-                        SaveActivityEvent(
-                          activity: ActivityModel(
-                            id: Uuid().v4(), 
-                            time: DateTime.now(),
-                          ),
-                        ),
-                      );
-                      Navigator.of(context).pop();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
-                    ),
-                    child: Text(
-                      "Cancel SOS",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
+              ElevatedButton(
+                onPressed: (){
+                  context.read<PanicAlertBloc>().add(CancelPanicAlert());
+                  context.read<SosCubit>().offEmergencyMode();
+                  context.read<RecentActivityBloc>().add(
+                    SaveActivityEvent(
+                      activity: ActivityModel(
+                        id: Uuid().v4(), 
+                        time: DateTime.now(),
                       ),
                     ),
+                  );
+                  Navigator.of(context).pop();
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
                   ),
-
-                  // ElevatedButton(
-                  //   onPressed: (){
-                  //     context.read<SosCubit>().offEmergencyMode();
-                  //     context.read<PanicAlertBloc>().add(CancelPanicAlert());
-                  //     context.read<RecentActivityBloc>().add(
-                  //       SaveActivityEvent(
-                  //         activity: ActivityModel(
-                  //           id: Uuid().v4(), 
-                  //           time: DateTime.now(),
-                  //         ),
-                  //       ),
-                  //     );
-                      
-                  //     Navigator.of(context).pop();
-                  //     Fluttertoast.showToast(msg: "Request solved.");
-                  //   },
-                  //   style: ElevatedButton.styleFrom(
-                  //     backgroundColor: Colors.deepPurpleAccent,
-                  //     shape: RoundedRectangleBorder(
-                  //       borderRadius: BorderRadius.circular(10),
-                  //     ),
-                  //     padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
-                  //   ),
-                  //   child: Text(
-                  //     "Mark as Solved",
-                  //     style: TextStyle(
-                  //       color: Colors.white,
-                  //       fontSize: 16,
-                  //     ),
-                  //   ),
-                  // ),
-                ],
+                  padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                ),
+                child: Text(
+                  "Cancel SOS",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                  ),
+                ),
               )
             ],
           ),
@@ -241,7 +205,7 @@ class _HomeState extends State<Home> {
                   listener: (context, state) {
                     if (state is PanicSuccess) {
                       Navigator.of(context).pop(); // close dialog
-                      showSOSBottomSheet(context: context, onCancel: (){Navigator.of(context).pop();});
+                      // showSOSBottomSheet(context: context, onCancel: (){Navigator.of(context).pop();});
                       _startSOSMode();             // turn SOS ON
                     }
                   },
@@ -290,42 +254,51 @@ class _HomeState extends State<Home> {
                 body: pages[selectedIndex],
                 floatingActionButtonLocation:
                     FloatingActionButtonLocation.centerDocked,
-                floatingActionButton: FloatingActionButton(
+                 floatingActionButton: SosPulseButton(
+                  isEmergency: state.isEmergencyMode,
                   onPressed: state.isEmergencyMode
                       ? showSOSActivity
                       : openDialogeBox,
-                  backgroundColor: Colors.transparent,
-                  elevation: 6,
-                  shape: const CircleBorder(),
-                  child: Container(
-                    width: 56,
-                    height: 56,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: state.isEmergencyMode
-                          ? Colors.redAccent
-                          : null,
-                      gradient: state.isEmergencyMode
-                          ? null
-                          : const LinearGradient(
-                              colors: [
-                                Color.fromARGB(255, 118, 120, 230),
-                                Color.fromARGB(255, 69, 70, 99),
-                              ],
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                            ),
-                    ),
-                    child: const Text(
-                      "SOS",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
                 ),
+
+                //FloatingActionButton(
+                //   onPressed: state.isEmergencyMode
+                //       ? showSOSActivity
+                //       : openDialogeBox,
+                //   backgroundColor: Colors.transparent,
+                //   elevation: 6,
+                //   shape: const CircleBorder(),
+                  
+                  // child: AnimatedContainer(
+                  //   duration: Duration(milliseconds: 1),
+                  //   width: 56,
+                  //   height: 56,
+                  //   alignment: Alignment.center,
+                  //   decoration: BoxDecoration(
+                  //     shape: BoxShape.circle,
+                  //     color: state.isEmergencyMode
+                  //         ? Colors.redAccent
+                  //         : null,
+                  //     gradient: state.isEmergencyMode
+                  //         ? null
+                  //         : const LinearGradient(
+                  //             colors: [
+                  //               Color.fromARGB(255, 118, 120, 230),
+                  //               Color.fromARGB(255, 69, 70, 99),
+                  //             ],
+                  //             begin: Alignment.topCenter,
+                  //             end: Alignment.bottomCenter,
+                  //           ),
+                  //   ),
+                  //   child: const Text(
+                  //     "SOS",
+                  //     style: TextStyle(
+                  //       color: Colors.white,
+                  //       fontWeight: FontWeight.bold,
+                  //     ),
+                  //   ),
+                  // ),
+                
 
                 bottomNavigationBar: BottomAppBar(
                   notchMargin: 7,

@@ -9,7 +9,7 @@ class AnnouncementModel {
   factory AnnouncementModel.fromJson(Map<String, dynamic> json){
     return AnnouncementModel(
       title: json['title'] ?? "Untitled", 
-      description: json['description'] ?? "Description unavailable", 
+      description: json['content'] ?? "Description unavailable", 
       time: DateTime.parse(json['time']) ?? DateTime.now(),
       status: json['status'] ?? ''
     );

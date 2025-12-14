@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:safe_campus/features/auth/data/services/alert_service.dart';
 import 'package:safe_campus/features/auth/data/services/auth_service.dart';
 import 'package:safe_campus/features/core/data/models/alerts_model.dart';
@@ -55,7 +56,7 @@ class _AlertsState extends State<Alerts> {
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
                       final alert = state.alerts[index];
-                      return AlertContainer(alertsModel: alert);
+                      return AlertContainer(alertsModel: alert, icon: Icon(Icons.report_problem_rounded, color: const Color.fromARGB(255, 255, 65, 7),));
                     },
                     childCount: state.alerts.length,
                   )
@@ -73,6 +74,7 @@ class _AlertsState extends State<Alerts> {
                 delegate: SliverChildBuilderDelegate(
                   (context, index) {
                     return AlertContainer(
+                      icon: Icon(Icons.report_problem_rounded),
                       alertsModel: AlertsModel(
                         title: "Title",
                         content: "content content content ...",
@@ -85,6 +87,9 @@ class _AlertsState extends State<Alerts> {
                 ),
               );
             }
+          ),
+          SliverToBoxAdapter(
+            child: SizedBox(height: 40,),
           )
         ]
           
