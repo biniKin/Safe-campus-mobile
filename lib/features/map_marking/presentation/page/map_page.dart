@@ -149,7 +149,11 @@ class _MapPageState extends State<MapPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("AASTU Campus Map")),
+      backgroundColor: Color(0xFFF3F3F3),
+      appBar: AppBar(
+        backgroundColor: Color(0xFFF3F3F3),
+        title: const Text("AASTU Campus Map", style: TextStyle(fontWeight: FontWeight.bold),),
+      ),
       body: BlocBuilder<MapBloc, MapState>(
         builder: (context, state) {
           if (state is MapLoading) {

@@ -32,7 +32,7 @@ class PanicAlertBloc extends Bloc<PanicAlertEvent, PanicAlertState> {
 
       // 1. check for location permission
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      if (!serviceEnabled) throw Exception("Location services are disabled");
+      //if (!serviceEnabled) throw Exception("Location services are disabled");
 
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
@@ -51,7 +51,7 @@ class PanicAlertBloc extends Bloc<PanicAlertEvent, PanicAlertState> {
       final position = await Geolocator.getCurrentPosition();
 
       Future<http.Response> sendRequest(String accessToken) {
-        final uri = Uri.parse('http://192.168.1.5:5000/api/sos/trigger');
+        final uri = Uri.parse('http://10.2.78.92:5000/api/sos/trigger');
         return http.post(
           uri,
           headers: {

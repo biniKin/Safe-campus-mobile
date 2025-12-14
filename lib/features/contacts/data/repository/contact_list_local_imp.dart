@@ -34,7 +34,8 @@ class ContactLocalDataSourceImpl implements ContactLocalDataSource {
 
   @override
   Future<void> deleteContact(String email) async {
-    await box.delete(email);
+    print("on delete locally");
+    await box.delete(email.trim());
   }
   
   @override

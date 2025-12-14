@@ -12,6 +12,7 @@ import 'package:safe_campus/features/core/functions/time_formater.dart';
 import 'package:safe_campus/features/core/presentation/bloc/recent_activity_bloc/recent_activity_bloc.dart';
 import 'package:safe_campus/features/core/presentation/bloc/recent_activity_bloc/recent_activity_event.dart';
 import 'package:safe_campus/features/core/presentation/bloc/recent_activity_bloc/recent_activity_state.dart';
+import 'package:safe_campus/features/core/presentation/screens/home_trusted_contact_continer.dart';
 import 'package:safe_campus/features/core/presentation/screens/panic_bottom_sheet.dart';
 import 'package:safe_campus/features/core/presentation/screens/sos_cubit/sos_cubit.dart';
 import 'package:safe_campus/features/core/presentation/screens/sos_home_container.dart';
@@ -121,10 +122,28 @@ class _HomePageState extends State<HomePage> {
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
+                            Container(
+                              height: 4,
+                              width: 60,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                gradient: const LinearGradient(
+                                  colors: [
+                                    Color(0xFF7E7FB9),
+                                    Color(0xFF36374E),
+                                  ],
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 20,),
+                            Icon(Icons.report, size: 70),
+                            SizedBox(height: 10,),
                             Text(
                               "Report Incident",
                               style: GoogleFonts.poppins(
-                                fontSize: 20,
+                                fontSize: 18,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -273,86 +292,196 @@ class _HomePageState extends State<HomePage> {
                                 ),
                                 SizedBox(width: 10),
                                 Expanded(
-                                  child: ElevatedButton(
-                                    onPressed: () async {
-                                      final prefs =
-                                          await SharedPreferences.getInstance();
-                                      final token =
-                                          prefs.getString('token') ?? '';
-
-                                      print('The token is $token');
-                                      // Navigator.pop(context);
-
-                                      context.read<ReportBloc>().add(
-                                         SendReportEvent(
-                                          description:
-                                              descriptionController.text,
-                                          tags:
-                                              '$selectedType, $selectedSeverity',
-                                          image: selectedMedia?.path ?? '',
-                                          location: {
-                                            "type":"Point",
-                                            'coordinates': [
-                                              _currentLocation?.latitude.toString() ?? 0.0,
-
-                                              _currentLocation?.latitude ?? 0.0
-                                            ],
-                                            // 'latitude':
-                                            //     _currentLocation?.latitude
-                                            //         .toString() ??
-                                            //     '',
-                                            // 'longitude':
-                                            //     _currentLocation?.longitude
-                                            //         .toString() ??
-                                            //     '',
-                                          },
-                                          token: token,
+                                  // child: Container(
+                                  //   decoration: BoxDecoration(
+                                  //     gradient: const LinearGradient(
+                                  //       colors: [
+                                  //         Color(0xFF7E7FB9),
+                                  //         Color(0xFF36374E),
+                                  //       ],
+                                  //       begin: Alignment.topCenter,
+                                  //       end: Alignment.bottomCenter 
+                                  //     ),
+                                  //     borderRadius: BorderRadius.circular(10),
+                                  //     boxShadow: [
+                                  //       BoxShadow(
+                                  //         color: Colors.grey.withOpacity(0.2),
+                                  //         spreadRadius: 1,
+                                  //         blurRadius: 4,
+                                  //         offset: Offset(0, 2),
+                                  //       ),
+                                  //     ],
+                                  //   ),
+                                  //   child: ElevatedButton(
+                                  //     onPressed: () async {
+                                  //       final prefs =
+                                  //           await SharedPreferences.getInstance();
+                                  //       final token =
+                                  //           prefs.getString('token') ?? '';
+                                    
+                                  //       print('The token is $token');
+                                  //       // Navigator.pop(context);
+                                    
+                                  //       context.read<ReportBloc>().add(
+                                  //          SendReportEvent(
+                                  //           description:
+                                  //               descriptionController.text,
+                                  //           tags:
+                                  //               '$selectedType, $selectedSeverity',
+                                  //           image: selectedMedia?.path ?? '',
+                                  //           location: {
+                                  //             "type":"Point",
+                                  //             'coordinates': [
+                                  //               _currentLocation?.latitude.toString() ?? 0.0,
+                                    
+                                  //               _currentLocation?.latitude ?? 0.0
+                                  //             ],
+                                  //             // 'latitude':
+                                  //             //     _currentLocation?.latitude
+                                  //             //         .toString() ??
+                                  //             //     '',
+                                  //             // 'longitude':
+                                  //             //     _currentLocation?.longitude
+                                  //             //         .toString() ??
+                                  //             //     '',
+                                  //           },
+                                  //           token: token,
+                                  //         ),
+                                  //       );
+                                    
+                                  //       if (state is ReportSuccess) {
+                                  //         Fluttertoast.showToast(
+                                  //           msg: "Incident reported successfully",
+                                  //           toastLength: Toast.LENGTH_SHORT,
+                                  //           gravity: ToastGravity.BOTTOM,
+                                  //           timeInSecForIosWeb: 1,
+                                  //           backgroundColor: Colors.green,
+                                  //           textColor: Colors.white,
+                                  //         );
+                                  //       }
+                                    
+                                  //       print("${selectedMedia?.path}");
+                                  //     },
+                                      
+                                  //     child: BlocBuilder<ReportBloc, ReportState>(
+                                  //       builder: (context, state) {
+                                  //         if(state is ReportLoading){
+                                  //           return SizedBox(
+                                  //             height: 15,
+                                  //             width: 15,
+                                  //             child: CircularProgressIndicator(color: Colors.black,),);
+                                  //         } else if(state is ReportSuccess){
+                                  //           Fluttertoast.showToast(msg: state.message);
+                                  //           Navigator.pop(context);
+                                  //         }
+                                  //         return Text(
+                                  //           "Submit",
+                                  //           style: GoogleFonts.poppins(
+                                  //             fontSize: 16,
+                                  //             color: Colors.white,
+                                  //           ),
+                                  //         );
+                                  //       }
+                                  //     ),
+                                  //   ),
+                                  // ),
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      gradient: const LinearGradient(
+                                        colors: [
+                                          Color(0xFF7E7FB9),
+                                          Color(0xFF36374E),
+                                        ],
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter,
+                                      ),
+                                      borderRadius: BorderRadius.circular(10),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.2),
+                                          spreadRadius: 1,
+                                          blurRadius: 4,
+                                          offset: const Offset(0, 2),
                                         ),
-                                      );
-
-                                      if (state is ReportSuccess) {
-                                        Fluttertoast.showToast(
-                                          msg: "Incident reported successfully",
-                                          toastLength: Toast.LENGTH_SHORT,
-                                          gravity: ToastGravity.BOTTOM,
-                                          timeInSecForIosWeb: 1,
-                                          backgroundColor: Colors.green,
-                                          textColor: Colors.white,
-                                        );
-                                      }
-
-                                      print("${selectedMedia?.path}");
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Color(0xFF65558F),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      padding: EdgeInsets.symmetric(
-                                        vertical: 15,
-                                      ),
+                                      ],
                                     ),
-                                    child: BlocBuilder<ReportBloc, ReportState>(
-                                      builder: (context, state) {
-                                        if(state is ReportLoading){
-                                          return SizedBox(
-                                            height: 15,
-                                            width: 15,
-                                            child: CircularProgressIndicator(color: Colors.black,),);
-                                        } else if(state is ReportSuccess){
-                                          Fluttertoast.showToast(msg: state.message);
+                                    child: BlocConsumer<ReportBloc, ReportState>(
+                                      listener: (context, state) {
+                                        if (state is ReportSuccess) {
+                                          Fluttertoast.showToast(
+                                            msg: state.message,
+                                            backgroundColor: Colors.green,
+                                            textColor: Colors.white,
+                                          );
                                           Navigator.pop(context);
                                         }
-                                        return Text(
-                                          "Submit",
-                                          style: GoogleFonts.poppins(
-                                            fontSize: 16,
-                                            color: Colors.white,
+
+                                        if (state is ReportFailed) {
+                                          Fluttertoast.showToast(
+                                            msg: "Report failed. Please try again later.",
+                                            backgroundColor: Colors.red,
+                                            textColor: Colors.white,
+                                          );
+                                        }
+                                      },
+                                      builder: (context, state) {
+                                        final isLoading = state is ReportLoading;
+
+                                        return ElevatedButton(
+                                          onPressed: isLoading
+                                              ? null
+                                              : () async {
+                                                  final prefs = await SharedPreferences.getInstance();
+                                                  final token = prefs.getString('token') ?? '';
+
+                                                  context.read<ReportBloc>().add(
+                                                    SendReportEvent(
+                                                      description: descriptionController.text,
+                                                      tags: '$selectedType, $selectedSeverity',
+                                                      image: selectedMedia?.path ?? '',
+                                                      location: {
+                                                        "type": "Point",
+                                                        "coordinates": [
+                                                          _currentLocation?.latitude ?? 0.0,
+                                                          _currentLocation?.longitude ?? 0.0,
+                                                        ],
+                                                      },
+                                                      token: token,
+                                                    ),
+                                                  );
+                                                },
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: Colors.transparent,
+                                            shadowColor: Colors.transparent,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(10),
+                                            ),
+                                          ),
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(vertical: 14),
+                                            child: isLoading
+                                                ? const SizedBox(
+                                                    height: 18,
+                                                    width: 18,
+                                                    child: CircularProgressIndicator(
+                                                      strokeWidth: 2,
+                                                      color: Colors.white,
+                                                    ),
+                                                  )
+                                                : Text(
+                                                    "Submit",
+                                                    style: GoogleFonts.poppins(
+                                                      fontSize: 16,
+                                                      color: Colors.white,
+                                                      fontWeight: FontWeight.w600,
+                                                    ),
+                                                  ),
                                           ),
                                         );
-                                      }
+                                      },
                                     ),
                                   ),
+
                                 ),
                               ],
                             ),
@@ -596,12 +725,29 @@ Widget buildRecentActivities() {
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            "Recent Activities",
-            style: GoogleFonts.poppins(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.deepPurple,
+          Expanded(
+            child: Container(
+              height: 1,
+              
+              color: Colors.grey[400],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              "Recent Activities",
+              style: GoogleFonts.poppins(
+                fontSize: 17,
+                fontWeight: FontWeight.bold
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 5,
+            child: Container(
+              height: 1,
+              
+              color: Colors.grey[400],
             ),
           ),
         ],
@@ -617,7 +763,16 @@ Widget buildRecentActivities() {
             final activitiesToShow = activities.take(showCount).toList();
 
             if (activitiesToShow.isEmpty) {
-              return const Text("NO RECENT ACTIVITY");
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.hourglass_empty, size: 80, color: Colors.grey,),
+                    SizedBox(height: 20,),
+                    Text("NO RECENT ACTIVITY", style: TextStyle(color: Colors.grey),),
+                  ],
+                ),
+              );
             }
 
             return Column(
@@ -627,6 +782,7 @@ Widget buildRecentActivities() {
                     time: DateTime.parse(activity.time.toString()), // convert string to DateTime
                     title: "SOS Alert",
                     onDelete: (){
+                      print("on sos alert history deleting ");
                       context.read<RecentActivityBloc>().add(DeleteActivityEvent(id: activity.id));
                     },
                   );
@@ -658,8 +814,14 @@ Widget buildRecentActivities() {
       builder: (context, state) {
         return Scaffold(
           appBar: AppBar(
-            backgroundColor: Colors.white,
+            backgroundColor: Color(0xFFF3F3F3),
             surfaceTintColor: Colors.transparent,
+            // leading: Image.asset(
+            //     'assets/images/ICON.PNG',
+            //     width: 20,
+            //     height: 20,
+            //     fit: BoxFit.cover,
+            //   ),
             title: Text(
               "SafeCampus",
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
@@ -668,17 +830,9 @@ Widget buildRecentActivities() {
               ),
             ),
 
-            actions: [
-             
-              Image.asset(
-                'assets/images/ICON.PNG',
-                width: 40,
-                height: 40,
-                fit: BoxFit.cover,
-              ),
-            ],
+            
           ),
-          backgroundColor: Colors.white,
+          backgroundColor: Color(0xFFF3F3F3),
           body: SafeArea(
             child: ListView(
               children: [
@@ -699,11 +853,13 @@ Widget buildRecentActivities() {
                                     decoration: BoxDecoration(
                                       gradient: const LinearGradient(
                                         colors: [
-                                          Color(0xFFF1EBFF),
-                                          Color(0xFFEDEBFF),
+                                          Color(0xFF7E7FB9),
+                                          Color(0xFF36374E),
                                         ],
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter 
                                       ),
-                                      borderRadius: BorderRadius.circular(20),
+                                      borderRadius: BorderRadius.circular(10),
                                       boxShadow: const [
                                         BoxShadow(
                                           color: Colors.black12,
@@ -719,11 +875,11 @@ Widget buildRecentActivities() {
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
                                         children: const [
-                                          Icon(Icons.share, size: 40),
+                                          Icon(Icons.share, size: 40, color: Colors.white,),
                                           SizedBox(height: 8),
                                           Text(
-                                            "Share my location",
-                                            style: TextStyle(fontSize: 14),
+                                            "Share my route",
+                                            style: TextStyle(fontSize: 14, color: Colors.white, fontWeight: FontWeight.bold),
                                           ),
                                         ],
                                       ),
@@ -737,11 +893,13 @@ Widget buildRecentActivities() {
                                     decoration: BoxDecoration(
                                       gradient: const LinearGradient(
                                         colors: [
-                                          Color(0xFFF1EBFF),
-                                          Color(0xFFEDEBFF),
+                                          Color(0xFF7E7FB9),
+                                          Color(0xFF36374E),
                                         ],
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter 
                                       ),
-                                      borderRadius: BorderRadius.circular(20),
+                                      borderRadius: BorderRadius.circular(10),
                                       boxShadow: const [
                                         BoxShadow(
                                           color: Colors.black12,
@@ -757,11 +915,11 @@ Widget buildRecentActivities() {
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
                                         children: const [
-                                          Icon(Icons.assignment, size: 40),
+                                          Icon(Icons.assignment, size: 40, color: Colors.white,),
                                           SizedBox(height: 8),
                                           Text(
                                             "Report incidents",
-                                            style: TextStyle(fontSize: 14),
+                                            style: TextStyle(fontSize: 14, color: Colors.white, fontWeight: FontWeight.bold),
                                           ),
                                         ],
                                       ),
@@ -770,7 +928,7 @@ Widget buildRecentActivities() {
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 30),
+                            const SizedBox(height: 20),
 
                             // Trusted Contacts Section
                             buildTrustedContacts(),
@@ -868,25 +1026,33 @@ Widget buildRecentActivities() {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // HEADER
-            // Row(
-            //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            //   children: [
-            //     Text(
-            //       "Trusted Contacts",
-            //       style: GoogleFonts.poppins(
-            //         fontSize: 18,
-            //         fontWeight: FontWeight.bold,
-            //       ),
-            //     ),
-            //     IconButton(
-            //       icon: const Icon(Icons.add_circle_outline),
-            //       onPressed: openManageContactsSheet,
-            //       tooltip: "Add Contact",
-            //     ),
-            //   ],
-            // ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.grey[400],
+                    ), 
+                    height: 1,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    "Trusted Contacts",
+                    style: GoogleFonts.poppins(
+                      fontSize: 17,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                Expanded(flex: 5, child: Container(decoration: BoxDecoration(color: Colors.grey[400],), height: 1,)),
+                
+              ],
+            ),
 
-            const SizedBox(height: 10),
+            const SizedBox(height: 5),
 
             // ==============================
             //     STATE - LOADING
@@ -900,7 +1066,7 @@ Widget buildRecentActivities() {
             if (state is ContactListLoaded)
               state.contacts.isEmpty
                   ? _buildEmptyState()
-                  : ListView.builder(
+                  : GridView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: state.contacts.length + 1,
@@ -909,60 +1075,148 @@ Widget buildRecentActivities() {
                       if(index == state.contacts.length ){
                         return TextButton(onPressed: (){
                           // print(state.message);
-                          // openManageContactsSheet();
-                        }, child: Text("See more"));
+                          openManageContactsSheet();
+                        }, child: Text("Add more"));
                       }
                       final contact = state.contacts[index];
-                      return Container(
-                        padding: const EdgeInsets.all(12.0),
-                        margin: const EdgeInsets.only(bottom: 8),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Colors.grey,
-                              spreadRadius: 1,
-                              blurRadius: 4,
-                              offset: Offset(0, 2),
+                      return HomeTrustedContactContiner(
+                        name: contact.name,
+                        onDelete: (){
+                          // remove contact
+                          print("on delete trusted contacts");
+                          context.read<ContactListBloc>().add(DeleteContactEvent(contact.email));
+                        },
+                        onTap: () {
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.vertical(
+                                top: Radius.circular(20),
+                              ),
                             ),
-                          ],
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  contact.name,
-                                  style: GoogleFonts.poppins(
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 16,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                                Text(
-                                  contact.email,
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 14,
-                                    color: Colors.grey[700],
-                                  ),
-                                ),
-                              ],
-                            ),
+                            builder: (context) {
+                              return SafeArea(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(20),
+                                  child: SizedBox(
+                                    width: double.infinity,
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        /// Drag handle
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            const SizedBox(width: 40), // balance spacing
 
-                            IconButton(
-                              icon: const Icon(Icons.delete, color: Colors.red),
-                              onPressed: () {
-                                // implement delete here
-                                context.read<ContactListBloc>().add(DeleteContactEvent(contact.email));
-                              },
-                            ),
-                          ],
-                        ),
+                                            /// Drag handle
+                                            // Container(
+                                            //   height: 4,
+                                            //   width: 60,
+                                            //   decoration: BoxDecoration(
+                                            //     borderRadius: BorderRadius.circular(10),
+                                            //     gradient: const LinearGradient(
+                                            //       colors: [
+                                            //         Color(0xFF7E7FB9),
+                                            //         Color(0xFF36374E),
+                                            //       ],
+                                            //       begin: Alignment.topCenter,
+                                            //       end: Alignment.bottomCenter,
+                                            //     ),
+                                            //   ),
+                                            // ),
+
+                                            /// Popup menu
+                                            PopupMenuButton<String>(
+                                              icon: const Icon(Icons.more_vert),
+                                              onSelected: (value) {
+                                                if (value == 'delete') {
+                                                  // _showDeleteConfirmation(context);
+                                                }
+                                              },
+                                              itemBuilder: (context) => [
+                                                const PopupMenuItem<String>(
+                                                  value: 'delete',
+                                                  child: Row(
+                                                    children: [
+                                                      Icon(Icons.delete, color: Colors.red),
+                                                      SizedBox(width: 8),
+                                                      Text(
+                                                        'Delete',
+                                                        style: TextStyle(color: Colors.red),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+
+                                                          
+                                        const SizedBox(height: 20),
+                                                          
+                                        /// Person icon
+                                        Container(
+                                          padding: const EdgeInsets.all(16),
+                                          decoration: BoxDecoration(
+                                            color: const Color.fromARGB(255, 99, 94, 139).withOpacity(0.2),
+                                            borderRadius: BorderRadius.circular(10)
+                                          ),
+                                          child: const Icon(
+                                            Icons.person,
+                                            size: 40,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                                          
+                                        const SizedBox(height: 12),
+                                                          
+                                        /// Name
+                                        Text(
+                                          contact.name,
+                                          style: const TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                                          
+                                        const SizedBox(height: 6),
+                                                          
+                                        /// Email
+                                        Text(
+                                          contact.email,
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.grey.shade600,
+                                          ),
+                                        ),
+                                                          
+                                        const SizedBox(height: 6),
+                                                          
+                                        /// Phone
+                                        Text(
+                                          contact.phoneNumber,
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.grey.shade600,
+                                          ),
+                                        ),
+                                                          
+                                        const SizedBox(height: 20),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          );
+                        },
                       );
-                    },
+
+                    }, gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
                   ),
 
             // ==============================
@@ -993,28 +1247,48 @@ Widget buildRecentActivities() {
     return Center(
       child: Column(
         children: [
-          const Icon(Icons.people_outline, size: 36, color: Colors.grey),
+          const Icon(Icons.contact_page_outlined, size: 90, color: Colors.grey),
           const SizedBox(height: 10),
           Text(
             "No contacts added yet",
-            style: GoogleFonts.poppins(color: Colors.grey[600], fontSize: 16),
+            style: GoogleFonts.poppins(color: Colors.grey, fontSize: 16),
           ),
           const SizedBox(height: 10),
-          ElevatedButton(
-            onPressed: () {
-              openManageContactsSheet();
-
-              console.log('Add contact button in empty state is clicked');
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.deepPurple,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
+          Container(
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [
+                  Color(0xFF7E7FB9),
+                  Color(0xFF36374E),
+                ],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter 
               ),
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: const [
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 5,
+                  offset: Offset(2, 4),
+                ),
+              ],
             ),
-            child: Text(
-              "Add Contact",
-              style: GoogleFonts.poppins(color: Colors.white),
+            child: ElevatedButton(
+              onPressed: () {
+                openManageContactsSheet();
+            
+                console.log('Add contact button in empty state is clicked');
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.transparent,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              child: Text(
+                "Add Contact",
+                style: GoogleFonts.poppins(color: Colors.white),
+              ),
             ),
           ),
         ],

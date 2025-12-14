@@ -17,7 +17,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 //   static const String baseUrl = 'http://10.2.66.138:8000/api';
 
   //static const String baseUrl = 'http://192.168.1.10:8000/api';
-  static const String baseUrl = 'http://192.168.1.5:5000/api';
+  static const String baseUrl = 'http://10.2.78.92:5000/api';
 
   AuthRemoteDataSourceImpl({required this.client, required this.prefs});
 

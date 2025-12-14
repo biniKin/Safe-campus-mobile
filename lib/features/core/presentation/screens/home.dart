@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:safe_campus/features/contacts/data/model/activity_model.dart';
@@ -66,7 +67,7 @@ class _HomeState extends State<Home> {
   void showSOSActivity(){
     showModalBottomSheet(
       context: context,
-      isDismissible: false,
+      isDismissible: true,
       enableDrag: false,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -116,6 +117,14 @@ class _HomeState extends State<Home> {
                     onPressed: (){
                       context.read<PanicAlertBloc>().add(CancelPanicAlert());
                       context.read<SosCubit>().offEmergencyMode();
+                      context.read<RecentActivityBloc>().add(
+                        SaveActivityEvent(
+                          activity: ActivityModel(
+                            id: Uuid().v4(), 
+                            time: DateTime.now(),
+                          ),
+                        ),
+                      );
                       Navigator.of(context).pop();
                     },
                     style: ElevatedButton.styleFrom(
@@ -134,37 +143,37 @@ class _HomeState extends State<Home> {
                     ),
                   ),
 
-                  ElevatedButton(
-                    onPressed: (){
-                      context.read<SosCubit>().offEmergencyMode();
-                      context.read<PanicAlertBloc>().add(CancelPanicAlert());
-                      context.read<RecentActivityBloc>().add(
-                        SaveActivityEvent(
-                          activity: ActivityModel(
-                            id: Uuid().v4(), 
-                            time: DateTime.now(),
-                          ),
-                        ),
-                      );
+                  // ElevatedButton(
+                  //   onPressed: (){
+                  //     context.read<SosCubit>().offEmergencyMode();
+                  //     context.read<PanicAlertBloc>().add(CancelPanicAlert());
+                  //     context.read<RecentActivityBloc>().add(
+                  //       SaveActivityEvent(
+                  //         activity: ActivityModel(
+                  //           id: Uuid().v4(), 
+                  //           time: DateTime.now(),
+                  //         ),
+                  //       ),
+                  //     );
                       
-                      Navigator.of(context).pop();
-                      Fluttertoast.showToast(msg: "Request solved.");
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.deepPurpleAccent,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
-                    ),
-                    child: Text(
-                      "Mark as Solved",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                      ),
-                    ),
-                  ),
+                  //     Navigator.of(context).pop();
+                  //     Fluttertoast.showToast(msg: "Request solved.");
+                  //   },
+                  //   style: ElevatedButton.styleFrom(
+                  //     backgroundColor: Colors.deepPurpleAccent,
+                  //     shape: RoundedRectangleBorder(
+                  //       borderRadius: BorderRadius.circular(10),
+                  //     ),
+                  //     padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                  //   ),
+                  //   child: Text(
+                  //     "Mark as Solved",
+                  //     style: TextStyle(
+                  //       color: Colors.white,
+                  //       fontSize: 16,
+                  //     ),
+                  //   ),
+                  // ),
                 ],
               )
             ],
@@ -189,10 +198,12 @@ class _HomeState extends State<Home> {
               ),
             ),
             content: SizedBox(
-              height: 340,
+              //height: 340,
               child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Image.asset('assets/images/alert1.png'),
+                  // Image.asset('assets/images/alert1.png'),
+                  Icon(Icons.report_problem_rounded, size: 150,),
                   const SizedBox(height: 10),
                   Text(
                     "The alert will be sent to security personnel and trusted contacts with your location and personal information. Make sure you made the right request before sending alert!",
@@ -275,51 +286,82 @@ class _HomeState extends State<Home> {
           return BlocBuilder<SosCubit, SosState>(
             builder: (context, state) {
               return Scaffold(
-                
+                backgroundColor: Color(0xFFF3F3F3),
                 body: pages[selectedIndex],
                 floatingActionButtonLocation:
                     FloatingActionButtonLocation.centerDocked,
                 floatingActionButton: FloatingActionButton(
-                  onPressed: state.isEmergencyMode ? showSOSActivity : openDialogeBox,
-                  backgroundColor: state.isEmergencyMode ? Colors.redAccent : Colors.deepPurpleAccent,
-                  foregroundColor: Colors.white,
+                  onPressed: state.isEmergencyMode
+                      ? showSOSActivity
+                      : openDialogeBox,
+                  backgroundColor: Colors.transparent,
+                  elevation: 6,
                   shape: const CircleBorder(),
-                  child: const Text("SOS"),
+                  child: Container(
+                    width: 56,
+                    height: 56,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: state.isEmergencyMode
+                          ? Colors.redAccent
+                          : null,
+                      gradient: state.isEmergencyMode
+                          ? null
+                          : const LinearGradient(
+                              colors: [
+                                Color.fromARGB(255, 118, 120, 230),
+                                Color.fromARGB(255, 69, 70, 99),
+                              ],
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                            ),
+                    ),
+                    child: const Text(
+                      "SOS",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
                 ),
+
                 bottomNavigationBar: BottomAppBar(
-                  notchMargin: 5,
-                  color: const Color.fromARGB(255, 223, 222, 236),
-                  height: 80,
+                  notchMargin: 7,
+                  color: const Color.fromARGB(255, 218, 218, 227),
+                  height: 70,
                   shape: const CircularNotchedRectangle(),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       navItem(
                         context,
-                        icon: Icons.home,
-                        label: "Home",
+                        icon:  "assets/icons/home.svg",
+                        //icon: Icon(Icons.home),
+                        label: "",
                         index: 0,
                         selected: selectedIndex,
                       ),
                       navItem(
                         context,
-                        icon: Icons.map,
-                        label: "Map",
+                        icon: "assets/icons/map.svg",
+                        label: "",
                         index: 1,
                         selected: selectedIndex,
                       ),
                       const SizedBox(width: 40),
                       navItem(
                         context,
-                        icon: Icons.notifications,
-                        label: "Alerts",
+                        icon: "assets/icons/alert.svg",
+                        label: "",
                         index: 2,
                         selected: selectedIndex,
                       ),
                       navItem(
                         context,
-                        icon: Icons.person,
-                        label: "Profile",
+                        icon: "assets/icons/profile.svg",
+                        label: "",
                         index: 3,
                         selected: selectedIndex,
                       ),
@@ -338,7 +380,7 @@ class _HomeState extends State<Home> {
 
 Widget navItem(
   BuildContext context, {
-  required IconData icon,
+  required final icon,
   required String label,
   required int index,
   required int selected,
@@ -346,22 +388,22 @@ Widget navItem(
   final isSelected = selected == index;
   final color =
       isSelected
-          ? const Color(0xFF65558F)
+          ? Colors.black
           : const Color.fromARGB(255, 124, 124, 124);
 
   return InkWell(
     onTap: () => context.read<NavigationCubit>().updateIndex(index),
     child: Container(
       width: 60,
-      height: 80,
+      height: 60,
       decoration: const BoxDecoration(color: Colors.transparent),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, size: 25, color: color),
-          const SizedBox(height: 2),
-          Text(label, style: TextStyle(fontSize: 12, color: color)),
+          SvgPicture.asset(icon, color: color,),
+          //const SizedBox(height: 2),
+          //Text(label, style: TextStyle(fontSize: 12, color: color)),
         ],
       ),
     ),

@@ -15,7 +15,7 @@ abstract class ContactListDataSource {
 }
 
 class ContactListDatasourceImpl implements ContactListDataSource {
-  static const _baseUrl = 'http://192.168.1.5:5000/api/auth';
+  static const _baseUrl = 'http://10.2.78.92:5000/api/auth';
 
   final SharedPreferences prefs;
   final AuthService authService;
@@ -120,28 +120,37 @@ class ContactListDatasourceImpl implements ContactListDataSource {
   // ---------------------------------------------------------------------------
   @override
   Future<void> deleteContact(String email) async {
-    final uri = Uri.parse('$_baseUrl/delete_contacts/$email');
+    print("on delete endpoint");
+    final uri = Uri.parse('$_baseUrl/delete_contacts');
 
     String token = prefs.getString("token") ?? "";
     String refreshToken = prefs.getString("ref_token") ?? "";
 
     Future<http.Response> _request(String tok) {
-      return http.delete(uri, headers: {
-        "Authorization": "Bearer $tok",
-        "Accept": "application/json",
-      });
+      return http.delete(
+        uri, 
+        headers: {
+          "Authorization": "Bearer $tok",
+          "Accept": "application/json",
+        },
+        body: {
+          'email':email
+        }
+      );
     }
 
     var resp = await _request(token);
+    print(jsonDecode(resp.body));
 
     if (resp.statusCode == 401) {
-      print("Refreshing token…");
+      print("Refreshing token…....from endpoint");
 
       final refreshed = await authService.refreshToken(refToken: refreshToken);
       if (!refreshed) throw Exception("Session expired. Login again.");
 
       token = prefs.getString("token") ?? "";
       resp = await _request(token);
+      print(jsonDecode(resp.body));
     }
 
     if (resp.statusCode < 200 || resp.statusCode >= 300) {

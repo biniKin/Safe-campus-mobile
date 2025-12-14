@@ -30,23 +30,14 @@ class _ContactFormBottomSheetState extends State<ContactFormBottomSheet> {
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                "Add Trusted Contact",
-                style: GoogleFonts.poppins(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              IconButton(
-                icon: const Icon(Icons.close),
-                onPressed: () => Navigator.pop(context),
-              ),
-            ],
+          Text(
+            "Add Trusted Contact",
+            style: GoogleFonts.poppins(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           const SizedBox(height: 20),
           TextField(
@@ -84,7 +75,18 @@ class _ContactFormBottomSheetState extends State<ContactFormBottomSheet> {
             keyboardType: TextInputType.emailAddress,
           ),
           const SizedBox(height: 25),
-          SizedBox(
+          Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              gradient: const LinearGradient(
+                colors: [
+                  Color(0xFF7E7FB9),
+                  Color(0xFF36374E),
+                ],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
+            ),
             width: double.infinity,
             child: ElevatedButton(
               onPressed: () {
@@ -110,7 +112,8 @@ class _ContactFormBottomSheetState extends State<ContactFormBottomSheet> {
                 Navigator.pop(context); // close the bottom sheet after dispatch
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.deepPurple,
+                backgroundColor: Colors.transparent,
+
                 padding: const EdgeInsets.symmetric(vertical: 15),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
