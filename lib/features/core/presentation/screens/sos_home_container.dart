@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:hive_flutter/adapters.dart';
+import 'package:safe_campus/features/core/functions/time_ago.dart';
 import 'package:safe_campus/features/core/presentation/bloc/recent_activity_bloc/recent_activity_bloc.dart';
 import 'package:safe_campus/features/core/presentation/bloc/recent_activity_bloc/recent_activity_event.dart';
 class SosHomeContainer extends StatelessWidget {
@@ -39,10 +40,10 @@ class SosHomeContainer extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: const Color.fromARGB(255, 223, 204, 139).withOpacity(0.3),
+              color: Colors.red.withOpacity(0.2),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: SvgPicture.asset("assets/icons/alertIcon.svg", height: 20,)
+            child: Icon(Icons.report_problem_rounded, color: Colors.red,)
           ),
           const SizedBox(width: 12),
 
@@ -62,7 +63,7 @@ class SosHomeContainer extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  "${time.day}/${time.month}/${time.year} ${time.hour}:${time.minute.toString().padLeft(2,'0')}",
+                  timeAgo(time),
                   style: TextStyle(
                     fontSize: 14,
                     color: Colors.grey[600],

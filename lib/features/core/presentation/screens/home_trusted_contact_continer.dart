@@ -158,7 +158,7 @@ class HomeTrustedContactContiner extends StatelessWidget {
                     width: 8,
                     decoration: const BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Colors.red, // status indicator
+                      color: Colors.grey, // status indicator
                     ),
                   ),
                 ),

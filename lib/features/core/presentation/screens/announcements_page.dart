@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:safe_campus/features/core/data/models/announcement_model.dart';
 import 'package:safe_campus/features/core/presentation/bloc/announcement_bloc/announcement_bloc.dart';
 import 'package:safe_campus/features/core/presentation/bloc/announcement_bloc/announcement_event.dart';
@@ -45,7 +46,10 @@ class _AnnouncementsPageState extends State<AnnouncementsPage> {
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
                       final alert = state.announcements[index];
-                      return AnnouncementContainer(announcementModel: alert);
+                      return AnnouncementContainer(
+                        icon: SvgPicture.asset("assets/icons/announ.svg", color: Colors.orange,),
+                        annoModel: alert,
+                      );
                     },
                     childCount: state.announcements.length,
                   )
@@ -63,7 +67,8 @@ class _AnnouncementsPageState extends State<AnnouncementsPage> {
                 delegate: SliverChildBuilderDelegate(
                   (context, index) {
                     return AnnouncementContainer(
-                      announcementModel: AnnouncementModel(
+                      icon: SvgPicture.asset("assets/icons/announ.svg"),
+                        annoModel: AnnouncementModel(
                         title: "Title",
                         description: "content content content ...",
                         time: DateTime.now(),
@@ -75,6 +80,9 @@ class _AnnouncementsPageState extends State<AnnouncementsPage> {
                 ),
               );
             }
+          ),
+          SliverToBoxAdapter(
+            child: SizedBox(height: 40,),
           )
         ],
       ),

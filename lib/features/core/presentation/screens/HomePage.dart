@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:location/location.dart';
@@ -15,6 +16,7 @@ import 'package:safe_campus/features/core/presentation/bloc/recent_activity_bloc
 import 'package:safe_campus/features/core/presentation/screens/home_trusted_contact_continer.dart';
 import 'package:safe_campus/features/core/presentation/screens/panic_bottom_sheet.dart';
 import 'package:safe_campus/features/core/presentation/screens/sos_cubit/sos_cubit.dart';
+import 'package:safe_campus/features/core/presentation/screens/sos_history_page.dart';
 import 'package:safe_campus/features/core/presentation/screens/sos_home_container.dart';
 import 'package:safe_campus/features/report/presentation/bloc/report_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -508,6 +510,48 @@ class _HomePageState extends State<HomePage> {
           builder: (context, state) {
             if (state is ContactListLoaded) {
               final contacts = state.contacts;
+
+              if (contacts.isEmpty) {
+              return Padding(
+                padding: const EdgeInsets.all(24),
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.only(bottom: 16),
+                      constraints: BoxConstraints(
+                        maxHeight: MediaQuery.of(context).size.height * 0.6,
+                      ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Image(image: AssetImage("assets/images/shareRoute.png")),
+                      Text(
+                        "Share Your Location",
+                        style: GoogleFonts.poppins(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      // const SizedBox(height: 24),
+                      // const Icon(
+                      //   Icons.person_off_outlined,
+                      //   size: 48,
+                      //   color: Colors.grey,
+                      // ),
+                      const SizedBox(height: 20),
+                      Text(
+                        "No trusted contact added",
+                        style: GoogleFonts.poppins(
+                          fontSize: 16,
+                          color: Colors.grey,
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                    ],
+                  ),
+                ),
+              );
+            }
+
               // track selection per contact
               List<bool> selected = List.generate(
                 contacts.length,
@@ -520,91 +564,132 @@ class _HomePageState extends State<HomePage> {
                   BuildContext context,
                   void Function(void Function()) setState,
                 ) {
-                  return Container(
-                    padding: const EdgeInsets.only(bottom: 16),
-                    constraints: BoxConstraints(
-                      maxHeight: MediaQuery.of(context).size.height * 0.6,
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Text(
-                            "Share Your Location",
-                            style: GoogleFonts.poppins(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Container(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      constraints: BoxConstraints(
+                        maxHeight: MediaQuery.of(context).size.height * 0.6,
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // image
+                          Image(image: AssetImage("assets/images/shareRoute.png")),
+                          //SvgPicture.asset("assets/icons/shareRoute.svg"),
+                          Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Text(
+                              "Share Your Location",
+                              style: GoogleFonts.poppins(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
-                        ),
-                        Flexible(
-                          child: ListView.builder(
-                            shrinkWrap: true,
-                            itemCount: contacts.length,
-                            itemBuilder: (context, index) {
-                              return ListTile(
-                                onTap: () {
-                                  setState(() {
-                                    selected[index] = !selected[index];
-                                  });
-                                },
-                                leading: Checkbox(
-                                  value: selected[index],
-                                  onChanged: (value) {
+                          Flexible(
+                            child: ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: contacts.length,
+                              itemBuilder: (context, index) {
+                                return ListTile(
+                                  onTap: () {
                                     setState(() {
-                                      selected[index] = value ?? false;
+                                      selected[index] = !selected[index];
                                     });
                                   },
+                                  leading: Container( // coolo
+                                    padding: const EdgeInsets.all(15),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      color: const Color.fromARGB(255, 99, 94, 139).withOpacity(0.2),
+                                    ),
+                                    child: Icon(Icons.person, size: 25,),
+                                  ),
+                                  trailing: Transform.scale(
+                                    scale: 1.3,
+                                    child: Checkbox(
+                                      shape: CircleBorder(),
+                                      side: BorderSide(width: 2,color: Colors.grey[600]!),
+                                      value: selected[index],
+                                      onChanged: (value) {
+                                        setState(() {
+                                          selected[index] = value ?? false;
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                  title: Text(contacts[index].name, style: TextStyle(fontWeight: FontWeight.bold),),
+                                  subtitle: Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(contacts[index].phoneNumber, style: TextStyle( color: Colors.grey[600]),),
+                                      Text(contacts[index].email, style: TextStyle( color: Colors.grey[600])),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                          SizedBox(height: 20,),
+                    
+                          Container(
+                            
+                            width: double.infinity, 
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              gradient: const LinearGradient(
+                                colors: [
+                                  Color(0xFF7E7FB9),
+                                  Color(0xFF36374E),
+                                ],
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                              ),
+                            ),
+                    
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.transparent,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
                                 ),
-                                title: Text(contacts[index].name),
-                                subtitle: Text(contacts[index].phoneNumber),
-                              );
-                            },
-                          ),
-                        ),
-
-                        SizedBox(
-                          width: double.infinity,
-
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Color(0xFF65558F),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
+                                padding: EdgeInsets.symmetric(
+                                  vertical: 15,
+                                  horizontal: 32,
+                                ),
                               ),
-                              padding: EdgeInsets.symmetric(
-                                vertical: 15,
-                                horizontal: 32,
-                              ),
-                            ),
-                            onPressed: () {
-                              // Gather selected contacts
-                              List<Map<String, String>> selectedContacts = [];
-                              for (int i = 0; i < contacts.length; i++) {
-                                if (selected[i]) {
-                                  selectedContacts.add({
-                                    'name': contacts[i].name,
-                                    'phoneNumber': contacts[i].phoneNumber,
-                                    'email': contacts[i].email,
-                                  });
+                              onPressed: () {
+                                // Gather selected contacts
+                                List<Map<String, String>> selectedContacts = [];
+                                for (int i = 0; i < contacts.length; i++) {
+                                  if (selected[i]) {
+                                    selectedContacts.add({
+                                      'name': contacts[i].name,
+                                      'phoneNumber': contacts[i].phoneNumber,
+                                      'email': contacts[i].email,
+                                    });
+                                  }
                                 }
-                              }
-
-                              // For now, just log the selected contacts
-                              console.log(
-                                'Sharing location with: $selectedContacts',
-                              );
-
-                              Navigator.pop(context);
-                            },
-                            child: Text(
-                              "Share",
-                              style: TextStyle(color: Colors.white),
+                    
+                                // For now, just log the selected contacts
+                                console.log(
+                                  'Sharing location with: $selectedContacts',
+                                );
+                    
+                                Navigator.pop(context);
+                              },
+                              child: Text(
+                                "Share Location",
+                                style: TextStyle(color: Colors.white),
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                          
+                        ],
+                      ),
                     ),
                   );
                 },
@@ -729,7 +814,7 @@ Widget buildRecentActivities() {
             child: Container(
               height: 1,
               
-              color: Colors.grey[400],
+              color: Colors.grey[300],
             ),
           ),
           Padding(
@@ -743,11 +828,11 @@ Widget buildRecentActivities() {
             ),
           ),
           Expanded(
-            flex: 5,
+            flex: 9,
             child: Container(
               height: 1,
               
-              color: Colors.grey[400],
+              color: Colors.grey[300],
             ),
           ),
         ],
@@ -792,6 +877,7 @@ Widget buildRecentActivities() {
                   TextButton(
                     onPressed: () {
                       // TODO: open full activities page or sheet
+                      Navigator.of(context).push(MaterialPageRoute(builder: (_)=>SosHistoryPage()));
                     },
                     child: const Text("See more"),
                   ),
@@ -1032,7 +1118,7 @@ Widget buildRecentActivities() {
                 Expanded(
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.grey[400],
+                      color: Colors.grey[300],
                     ), 
                     height: 1,
                   ),
@@ -1047,22 +1133,16 @@ Widget buildRecentActivities() {
                     ),
                   ),
                 ),
-                Expanded(flex: 5, child: Container(decoration: BoxDecoration(color: Colors.grey[400],), height: 1,)),
+                Expanded(flex: 8, child: Container(decoration: BoxDecoration(color: Colors.grey[300],), height: 1,)),
                 
               ],
             ),
 
             const SizedBox(height: 5),
 
-            // ==============================
-            //     STATE - LOADING
-            // ==============================
             if (state is ContactListLoading)
               const Center(child: CircularProgressIndicator()),
 
-            // ==============================
-            //     STATE - LOADED
-            // ==============================
             if (state is ContactListLoaded)
               state.contacts.isEmpty
                   ? _buildEmptyState()
@@ -1070,6 +1150,7 @@ Widget buildRecentActivities() {
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: state.contacts.length + 1,
+                    
                     itemBuilder: (context, index) {
                       
                       if(index == state.contacts.length ){
@@ -1111,22 +1192,7 @@ Widget buildRecentActivities() {
                                           children: [
                                             const SizedBox(width: 40), // balance spacing
 
-                                            /// Drag handle
-                                            // Container(
-                                            //   height: 4,
-                                            //   width: 60,
-                                            //   decoration: BoxDecoration(
-                                            //     borderRadius: BorderRadius.circular(10),
-                                            //     gradient: const LinearGradient(
-                                            //       colors: [
-                                            //         Color(0xFF7E7FB9),
-                                            //         Color(0xFF36374E),
-                                            //       ],
-                                            //       begin: Alignment.topCenter,
-                                            //       end: Alignment.bottomCenter,
-                                            //     ),
-                                            //   ),
-                                            // ),
+                                            
 
                                             /// Popup menu
                                             PopupMenuButton<String>(
@@ -1219,9 +1285,7 @@ Widget buildRecentActivities() {
                     }, gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
                   ),
 
-            // ==============================
-            //     STATE - ERROR
-            // ==============================
+           
             if (state is ContactListError)
               Center(
                 child: Column(
