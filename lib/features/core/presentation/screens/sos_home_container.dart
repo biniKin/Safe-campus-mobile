@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:safe_campus/features/core/presentation/bloc/recent_activity_bloc/recent_activity_bloc.dart';
 import 'package:safe_campus/features/core/presentation/bloc/recent_activity_bloc/recent_activity_event.dart';
@@ -19,33 +20,29 @@ class SosHomeContainer extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 6),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      height: 100,
+      height: 95,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
-        color: Color(0xFFF9F9F9),
+        color: const Color.fromARGB(255, 241, 241, 241),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.17),
-            blurRadius: 6,
-            offset: const Offset(0, 3),
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 3,
+            offset: const Offset(0, 0),
           ),
         ],
       ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Report icon
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: Colors.amberAccent.withOpacity(0.3),
+              color: const Color.fromARGB(255, 223, 204, 139).withOpacity(0.3),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: const Icon(
-              Icons.report,
-              color: Color.fromARGB(255, 255, 200, 2),
-              size: 28,
-            ),
+            child: SvgPicture.asset("assets/icons/alertIcon.svg", height: 20,)
           ),
           const SizedBox(width: 12),
 
@@ -53,13 +50,13 @@ class SosHomeContainer extends StatelessWidget {
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
+              //mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
                   title,
                   style: const TextStyle(
                     fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w500,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -81,7 +78,7 @@ class SosHomeContainer extends StatelessWidget {
               if (value == 'delete') {
                 // Handle delete action here
                 print('Delete tapped for: $title');
-                onDelete;
+                onDelete();
                 
               }
             },

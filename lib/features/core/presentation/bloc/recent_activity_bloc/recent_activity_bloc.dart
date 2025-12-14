@@ -41,20 +41,20 @@ class RecentActivityBloc extends Bloc<RecentActivityEvent, RecentActivityState>{
 
   Future<void> _loadActivity(
       LoadActivitiesEvent event, Emitter<RecentActivityState> emit) async {
-    // final activities = recentBox.values
-    //     .map((hiveModel) => ActivityModel(
-    //           id: hiveModel.id,
-    //           time: hiveModel.time,
-    //         ))
-    //     .toList()
-    //     .reversed
-    //     .toList();
-        final activities = [
-          ActivityModel(id: '12', time: DateTime.now()),
-          ActivityModel(id: '12', time: DateTime.now()),
-          ActivityModel(id: '12', time: DateTime.now()),
-          ActivityModel(id: '12', time: DateTime.now()),
-        ];
+    final activities = recentBox.values
+        .map((hiveModel) => ActivityModel(
+              id: hiveModel.id,
+              time: hiveModel.time,
+            ))
+        .toList()
+        .reversed
+        .toList();
+        // final activities = [
+        //   ActivityModel(id: '12', time: DateTime.now()),
+        //   ActivityModel(id: '12', time: DateTime.now()),
+        //   ActivityModel(id: '12', time: DateTime.now()),
+        //   ActivityModel(id: '12', time: DateTime.now()),
+        // ];
     emit(RecentActivitiesLoaded(activities: activities));
   }
 
@@ -73,7 +73,7 @@ class RecentActivityBloc extends Bloc<RecentActivityEvent, RecentActivityState>{
   Future<void> _onDeleteActivity(
       DeleteActivityEvent event, Emitter<RecentActivityState> emit) async {
         print("on delete bloc");
-    await recentBox.delete(event.id);
+    await recentBox.delete(event.id.trim());
     // Listener will update state
   }
 

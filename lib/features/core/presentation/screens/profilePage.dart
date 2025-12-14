@@ -39,10 +39,10 @@ class _ProfilepageState extends State<Profilepage> {
         }
       },
       child: Scaffold(
-        backgroundColor: Color(0xFFF8F9FA),
+        backgroundColor: Color(0xFFF3F3F3),
         appBar: AppBar(
           automaticallyImplyLeading: false,
-          backgroundColor: Colors.white,
+          backgroundColor: Color(0xFFF3F3F3),
           elevation: 0,
           title: Text(
             "Profile",
@@ -62,11 +62,15 @@ class _ProfilepageState extends State<Profilepage> {
                   width: double.infinity,
                   height: 110,
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [Color(0xFF65558F), Color(0xFF8B7CB5)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
+                    
+                    gradient: const LinearGradient(
+                                        colors: [
+                                          Color(0xFF7E7FB9),
+                                          Color(0xFF36374E),
+                                        ],
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter 
+                                      ),
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
@@ -101,7 +105,7 @@ class _ProfilepageState extends State<Profilepage> {
                             child: Icon(
                               Icons.person,
                               size: 40,
-                              color: Color(0xFF65558F),
+                              color: Colors.black,
                             ),
                           ),
                         ),
@@ -137,6 +141,7 @@ class _ProfilepageState extends State<Profilepage> {
                                       ),
                                     ),
                                   ),
+                                  
                                 ],
                               );
                             }
@@ -277,12 +282,15 @@ class _ProfilepageState extends State<Profilepage> {
                   width: double.infinity,
                   height: 56,
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [Color(0xFF65558F), Color(0xFF8B7CB5)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: BorderRadius.circular(28),
+                    gradient: const LinearGradient(
+                                        colors: [
+                                          Color(0xFF7E7FB9),
+                                          Color(0xFF36374E),
+                                        ],
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter 
+                                      ),
+                    borderRadius: BorderRadius.circular(10),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.grey.withOpacity(0.2),
@@ -360,7 +368,7 @@ Widget displayContainer(
       children: [
         Row(
           children: [
-            Icon(firsticon, size: 24, color: Color(0xFF65558F)),
+            Icon(firsticon, size: 24, color: Colors.black),
             SizedBox(width: 16),
             Text(
               label,

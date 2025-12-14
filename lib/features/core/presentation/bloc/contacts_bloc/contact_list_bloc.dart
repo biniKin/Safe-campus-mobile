@@ -123,6 +123,11 @@ class ContactListBloc extends Bloc<ContactListEvent, ContactListState> {
     try {
       final contacts = await repository.fetchContacts();
       print(contacts.length);
+      //final contacts = [
+      //  Contact(name: "Biniyam", phoneNumber: "09459094523", email: "biniyamkinfe122@gmail.com"),
+      //  Contact(name: "Alex", phoneNumber: "09459094523", email: "Alexkinfe122@gmail.com"),
+      //  Contact(name: "Biniyam", phoneNumber: "09459094523", email: "biniyamkinfe122@gmail.com"),
+      //];
       // Hive listener will emit loaded state
       emit(ContactListLoaded(contacts));
     } catch (e) {
@@ -147,6 +152,7 @@ class ContactListBloc extends Bloc<ContactListEvent, ContactListState> {
     Emitter<ContactListState> emit,
   ) async {
     try {
+      print("on delete trusted contacts bloc");
       await repository.deleteContact(event.email);
     } catch (e) {
       emit(ContactListError(e.toString()));

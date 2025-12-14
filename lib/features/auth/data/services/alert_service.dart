@@ -6,7 +6,7 @@ import 'package:safe_campus/features/core/data/models/announcement_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AlertService {
-  final baseUri = "http://10.2.75.1:5000/api/notification";
+  final baseUri = "http://10.2.78.92:5000/api/notification";
 
   Future<List<AlertsModel>> fetchAlerts() async {
     final uri = "$baseUri/alerts";

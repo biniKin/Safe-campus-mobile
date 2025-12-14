@@ -18,9 +18,9 @@ abstract class MapRemoteDataSource {
 }
 
 class MapRemoteDataSourceImpl implements MapRemoteDataSource {
-  static const _host = '10.2.66.138:8000';
+  static const _host = '10.2.78.92:5000';
   static const _path = '/api/dangerArea'; // set to your actual route
-  static const _authBase = 'http://10.2.66.138:8000/api/auth';
+  static const _authBase = 'http://10.2.78.92:5000/api/auth';
 
   final Location _location = Location();
   final HttpClient httpClient;
