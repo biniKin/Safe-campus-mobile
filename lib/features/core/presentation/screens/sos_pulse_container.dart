@@ -74,13 +74,10 @@ class _SosPulseButtonState extends State<SosPulseButton>
             gradient: widget.isEmergency
                 ? null
                 : const LinearGradient(
-                    colors: [
-                      Color.fromARGB(255, 118, 120, 230),
-                      Color.fromARGB(255, 69, 70, 99),
-                    ],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                  ),
+                  colors: [Color(0xFF65558F), Color(0xFF8B7CB1)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
             boxShadow: widget.isEmergency
                 ? [
                     BoxShadow(

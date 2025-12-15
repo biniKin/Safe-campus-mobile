@@ -197,6 +197,9 @@ class _MyAppState extends State<MyApp> {
     }
   }
 
+  String parseAlertTitle(Map<String, dynamic> data) {
+    return data['userName'] ?? 'Panic Alert';
+  }
 
 
   @override
@@ -209,7 +212,7 @@ class _MyAppState extends State<MyApp> {
       print(message.data['user']);
       await showNotification(
         title,
-        'Tap to view location',
+        message.data['message'],
       );
     });
 

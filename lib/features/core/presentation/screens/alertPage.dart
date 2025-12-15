@@ -12,9 +12,9 @@ class Alertpage extends StatelessWidget {
     return DefaultTabController(
       length: 3,
       child: Scaffold(
-        backgroundColor: Color(0xFFF3F3F3),
+        backgroundColor: Colors.white,
         appBar: AppBar(
-          backgroundColor: Color(0xFFF3F3F3),
+          backgroundColor: Colors.white,
           automaticallyImplyLeading: false,
           
           title: TabBar(

@@ -41,14 +41,15 @@ class RecentActivityBloc extends Bloc<RecentActivityEvent, RecentActivityState>{
 
   Future<void> _loadActivity(
       LoadActivitiesEvent event, Emitter<RecentActivityState> emit) async {
-    final activities = recentBox.values
+    final activities = (recentBox.values
         .map((hiveModel) => ActivityModel(
               id: hiveModel.id,
               time: hiveModel.time,
             ))
         .toList()
         .reversed
-        .toList();
+        .toList())
+        ..sort((b, a) => a.time.compareTo(b.time));
         // final activities = [
         //   ActivityModel(id: '12', time: DateTime.now()),
         //   ActivityModel(id: '12', time: DateTime.now()),

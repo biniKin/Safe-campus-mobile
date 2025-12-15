@@ -46,7 +46,11 @@ class _ContactFormBottomSheetState extends State<ContactFormBottomSheet> {
               labelText: "Name",
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(
+                  color: Colors.grey.shade700,
+                )
               ),
+              
               prefixIcon: const Icon(Icons.person),
             ),
           ),
@@ -78,14 +82,7 @@ class _ContactFormBottomSheetState extends State<ContactFormBottomSheet> {
           Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
-              gradient: const LinearGradient(
-                colors: [
-                  Color(0xFF7E7FB9),
-                  Color(0xFF36374E),
-                ],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-              ),
+              //color: 
             ),
             width: double.infinity,
             child: ElevatedButton(
@@ -112,7 +109,7 @@ class _ContactFormBottomSheetState extends State<ContactFormBottomSheet> {
                 Navigator.pop(context); // close the bottom sheet after dispatch
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.transparent,
+                backgroundColor: const Color(0xFF65558F),
 
                 padding: const EdgeInsets.symmetric(vertical: 15),
                 shape: RoundedRectangleBorder(

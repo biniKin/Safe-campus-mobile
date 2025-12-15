@@ -1,11 +1,11 @@
-import 'package:safe_campus/features/core/data/models/notification_model.dart';
+// import 'package:safe_campus/features/core/data/models/notification_model.dart';
 
-abstract class PanicNotificationState {}
+// abstract class PanicNotificationState {}
 
-class PanicNotificationInitial extends PanicNotificationState {}
+// class PanicNotificationInitial extends PanicNotificationState {}
 
-class PanicNotificationReceived extends PanicNotificationState {
-  final PanicNotification notification;
+// class PanicNotificationReceived extends PanicNotificationState {
+//   final PanicNotification notification;
 
-  PanicNotificationReceived(this.notification);
-}
+//   PanicNotificationReceived(this.notification);
+// }

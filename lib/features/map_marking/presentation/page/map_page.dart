@@ -275,6 +275,36 @@ class _MapPageState extends State<MapPage> {
     context.read<MapBloc>().add(MapLoadRequested());
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    final args =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+
+    if (args != null) {
+      final lat = double.tryParse(args['lat'] ?? '');
+      final lng = double.tryParse(args['lng'] ?? '');
+
+      if (lat != null && lng != null) {
+        _moveCameraToLocation(lat, lng);
+      }
+    }
+  }
+
+  void _moveCameraToLocation(double lat, double lng) {
+    mapController?.animateCamera(
+      CameraUpdate.newLatLngZoom(
+        LatLng(lat, lng),
+        17,
+      ),
+    );
+  }
+
+
+
+
+
   Future<void> _loadIcons() async {
     activeIcon = await createBitmapDescriptorFromIcon(Icons.report_problem_rounded,  Colors.red);
     resolvedIcon = await createBitmapDescriptorFromIcon(Icons.check_circle, Colors.green);
