@@ -36,20 +36,14 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   List<Map<String, String>> contacts = []; // Lifted contacts state to Home
 
-  final List<Widget> pages = []; // Will initialize in initState
-
-  @override
-  void initState() {
-    super.initState();
-    // Initialize pages with contacts
-    pages.addAll([
-      HomePage(
-        onContactsUpdated: (updatedContacts) {
-          setState(() {
-            contacts = updatedContacts;
-          });
-        },
-        initialContacts: contacts,
+  final List<Widget> pages = [
+    HomePage(
+        // onContactsUpdated: (updatedContacts) {
+        //   setState(() {
+        //     contacts = updatedContacts;
+        //   });
+        // },
+        // initialContacts: contacts,
       ),
       MapPage(
         /*  contacts: contacts,
@@ -61,7 +55,15 @@ class _HomeState extends State<Home> {
       ), // Added onContactsUpdated
       Alertpage(),
       Profilepage(),
-    ]);
+  ]; // Will initialize in initState
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize pages with contacts
+    // pages.addAll([
+      
+    // ]);
   }
 
   
@@ -243,109 +245,126 @@ class _HomeState extends State<Home> {
     // });
   }
 
+  int selectedIndex = 0;
+
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<NavigationCubit, int>(    
-        builder: (context, selectedIndex) {
-          return BlocBuilder<SosCubit, SosState>(
-            builder: (context, state) {
-              return Scaffold(
-                backgroundColor: Color(0xFFF3F3F3),
-                body: pages[selectedIndex],
-                floatingActionButtonLocation:
-                    FloatingActionButtonLocation.centerDocked,
-                 floatingActionButton: SosPulseButton(
-                  isEmergency: state.isEmergencyMode,
-                  onPressed: state.isEmergencyMode
-                      ? showSOSActivity
-                      : openDialogeBox,
-                ),
-
-                //FloatingActionButton(
-                //   onPressed: state.isEmergencyMode
-                //       ? showSOSActivity
-                //       : openDialogeBox,
-                //   backgroundColor: Colors.transparent,
-                //   elevation: 6,
-                //   shape: const CircleBorder(),
-                  
-                  // child: AnimatedContainer(
-                  //   duration: Duration(milliseconds: 1),
-                  //   width: 56,
-                  //   height: 56,
-                  //   alignment: Alignment.center,
-                  //   decoration: BoxDecoration(
-                  //     shape: BoxShape.circle,
-                  //     color: state.isEmergencyMode
-                  //         ? Colors.redAccent
-                  //         : null,
-                  //     gradient: state.isEmergencyMode
-                  //         ? null
-                  //         : const LinearGradient(
-                  //             colors: [
-                  //               Color.fromARGB(255, 118, 120, 230),
-                  //               Color.fromARGB(255, 69, 70, 99),
-                  //             ],
-                  //             begin: Alignment.topCenter,
-                  //             end: Alignment.bottomCenter,
-                  //           ),
-                  //   ),
-                  //   child: const Text(
-                  //     "SOS",
-                  //     style: TextStyle(
-                  //       color: Colors.white,
-                  //       fontWeight: FontWeight.bold,
-                  //     ),
-                  //   ),
-                  // ),
-                
-
-                bottomNavigationBar: BottomAppBar(
-                  notchMargin: 7,
-                  color: const Color.fromARGB(255, 218, 218, 227),
-                  height: 70,
-                  shape: const CircularNotchedRectangle(),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      navItem(
-                        context,
-                        icon:  "assets/icons/home.svg",
-                        //icon: Icon(Icons.home),
-                        label: "",
-                        index: 0,
-                        selected: selectedIndex,
-                      ),
-                      navItem(
-                        context,
-                        icon: "assets/icons/map.svg",
-                        label: "",
-                        index: 1,
-                        selected: selectedIndex,
-                      ),
-                      const SizedBox(width: 40),
-                      navItem(
-                        context,
-                        icon: "assets/icons/alert.svg",
-                        label: "",
-                        index: 2,
-                        selected: selectedIndex,
-                      ),
-                      navItem(
-                        context,
-                        icon: "assets/icons/profile.svg",
-                        label: "",
-                        index: 3,
-                        selected: selectedIndex,
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            }
-          );
-        }
+    return BlocBuilder<SosCubit, SosState>(
+      builder: (context, state) {
+        return Scaffold(
+          backgroundColor: Color(0xFFF3F3F3),
+          body: pages[selectedIndex],
+          floatingActionButtonLocation:
+              FloatingActionButtonLocation.centerDocked,
+           floatingActionButton: SosPulseButton(
+            isEmergency: state.isEmergencyMode,
+            onPressed: state.isEmergencyMode
+                ? showSOSActivity
+                : openDialogeBox,
+          ),
     
+          //FloatingActionButton(
+          //   onPressed: state.isEmergencyMode
+          //       ? showSOSActivity
+          //       : openDialogeBox,
+          //   backgroundColor: Colors.transparent,
+          //   elevation: 6,
+          //   shape: const CircleBorder(),
+            
+            // child: AnimatedContainer(
+            //   duration: Duration(milliseconds: 1),
+            //   width: 56,
+            //   height: 56,
+            //   alignment: Alignment.center,
+            //   decoration: BoxDecoration(
+            //     shape: BoxShape.circle,
+            //     color: state.isEmergencyMode
+            //         ? Colors.redAccent
+            //         : null,
+            //     gradient: state.isEmergencyMode
+            //         ? null
+            //         : const LinearGradient(
+            //             colors: [
+            //               Color.fromARGB(255, 118, 120, 230),
+            //               Color.fromARGB(255, 69, 70, 99),
+            //             ],
+            //             begin: Alignment.topCenter,
+            //             end: Alignment.bottomCenter,
+            //           ),
+            //   ),
+            //   child: const Text(
+            //     "SOS",
+            //     style: TextStyle(
+            //       color: Colors.white,
+            //       fontWeight: FontWeight.bold,
+            //     ),
+            //   ),
+            // ),
+          
+    
+          bottomNavigationBar: BottomAppBar(
+            notchMargin: 7,
+            color: const Color.fromARGB(255, 240, 240, 245),
+            height: 70,
+            shape: const CircularNotchedRectangle(),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                navItem(
+                  context,
+                  icon:  "assets/icons/home.svg",
+                  //icon: Icon(Icons.home),
+                  label: "",
+                  index: 0,
+                  selected: selectedIndex,
+                  onTap: (){
+                    setState(() {
+                      selectedIndex = 0;
+                    });
+                  }
+                ),
+                navItem(
+                  context,
+                  icon: "assets/icons/map.svg",
+                  label: "",
+                  index: 1,
+                  selected: selectedIndex,
+                  onTap: (){
+                    setState(() {
+                      selectedIndex = 1;
+                    });
+                  }
+                ),
+                const SizedBox(width: 40),
+                navItem(
+                  context,
+                  icon: "assets/icons/alert.svg",
+                  label: "",
+                  index: 2,
+                  selected: selectedIndex,
+                  onTap: (){
+                    setState(() {
+                      selectedIndex = 2;
+                    });
+                  }
+                ),
+                navItem(
+                  context,
+                  icon: "assets/icons/profile.svg",
+                  label: "",
+                  index: 3,
+                  selected: selectedIndex,
+                  onTap: (){
+                    setState(() {
+                      selectedIndex = 3;
+                    });
+                  }
+                ),
+              ],
+            ),
+          ),
+        );
+      }
     );
   }
 }
@@ -357,6 +376,7 @@ Widget navItem(
   required String label,
   required int index,
   required int selected,
+  required VoidCallback onTap,
 }) {
   final isSelected = selected == index;
   final color =
@@ -365,7 +385,7 @@ Widget navItem(
           : const Color.fromARGB(255, 124, 124, 124);
 
   return InkWell(
-    onTap: () => context.read<NavigationCubit>().updateIndex(index),
+    onTap: onTap,
     child: Container(
       width: 60,
       height: 60,

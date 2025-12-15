@@ -39,10 +39,10 @@ class _ProfilepageState extends State<Profilepage> {
         }
       },
       child: Scaffold(
-        backgroundColor: Color(0xFFF3F3F3),
+        backgroundColor: Colors.white,
         appBar: AppBar(
           automaticallyImplyLeading: false,
-          backgroundColor: Color(0xFFF3F3F3),
+          backgroundColor: Colors.white,
           elevation: 0,
           title: Text(
             "Profile",
@@ -64,13 +64,10 @@ class _ProfilepageState extends State<Profilepage> {
                   decoration: BoxDecoration(
                     
                     gradient: const LinearGradient(
-                                        colors: [
-                                          Color(0xFF7E7FB9),
-                                          Color(0xFF36374E),
-                                        ],
-                                        begin: Alignment.topCenter,
-                                        end: Alignment.bottomCenter 
-                                      ),
+                  colors: [Color(0xFF65558F), Color(0xFF8B7CB1)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
@@ -183,6 +180,7 @@ class _ProfilepageState extends State<Profilepage> {
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Colors.grey.shade200),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.grey.withOpacity(0.1),
@@ -226,6 +224,7 @@ class _ProfilepageState extends State<Profilepage> {
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Colors.grey.shade200),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.grey.withOpacity(0.1),
@@ -255,10 +254,17 @@ class _ProfilepageState extends State<Profilepage> {
                           });
                         },
                         label: "Sound alerts",
-                        lasticon:
-                            isPressedAlert ? Icons.toggle_on : Icons.toggle_off,
+                        lasticon: Switch(
+                          value: isPressedAlert,
+                          onChanged: (value) {
+                            setState(() {
+                              isPressedAlert = value;
+                            });
+                          },
+                        ),
                         isActive: isPressedAlert,
                       ),
+
                       SizedBox(height: 12),
                       displayContainer2(
                         context,
@@ -268,10 +274,15 @@ class _ProfilepageState extends State<Profilepage> {
                           });
                         },
                         label: "Vibrations",
-                        lasticon:
-                            isPressedVibration
-                                ? Icons.toggle_on
-                                : Icons.toggle_off,
+                        lasticon: Switch(
+                          value: isPressedVibration,
+                           
+                          onChanged: (value){
+                            setState(() {
+                              isPressedVibration = value;
+                          });
+                          }
+                        ),
                         isActive: isPressedVibration,
                       ),
                     ],
@@ -283,13 +294,10 @@ class _ProfilepageState extends State<Profilepage> {
                   height: 56,
                   decoration: BoxDecoration(
                     gradient: const LinearGradient(
-                                        colors: [
-                                          Color(0xFF7E7FB9),
-                                          Color(0xFF36374E),
-                                        ],
-                                        begin: Alignment.topCenter,
-                                        end: Alignment.bottomCenter 
-                                      ),
+                  colors: [Color(0xFF65558F), Color(0xFF8B7CB1)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
                     borderRadius: BorderRadius.circular(10),
                     boxShadow: [
                       BoxShadow(
@@ -393,7 +401,7 @@ Widget displayContainer2(
   BuildContext context, {
   required String label,
   required VoidCallback onPress,
-  required IconData lasticon,
+  required lasticon,
   required bool isActive,
 }) {
   return Container(
@@ -415,14 +423,9 @@ Widget displayContainer2(
             color: Color(0xFF2D2D2D),
           ),
         ),
-        IconButton(
-          onPressed: onPress,
-          icon: Icon(
+        
             lasticon,
-            size: 40,
-            color: isActive ? Color(0xFF65558F) : Colors.grey[400],
-          ),
-        ),
+            
       ],
     ),
   );

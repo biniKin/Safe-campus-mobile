@@ -27,7 +27,7 @@ class _AnnouncementsPageState extends State<AnnouncementsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFF3F3F3),
+      backgroundColor: Colors.white,
       body: CustomScrollView(
         slivers: [
           BlocBuilder<AnnouncementBloc, AnnouncementState>(

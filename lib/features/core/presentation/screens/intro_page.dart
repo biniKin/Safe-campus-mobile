@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:safe_campus/features/core/presentation/screens/sign_in_page.dart';
 
 class IntroPage extends StatelessWidget {
   const IntroPage({super.key});
@@ -61,7 +62,7 @@ class IntroPage extends StatelessWidget {
                             const SizedBox(width: 10),
                             OutlinedButton(
                               onPressed: () {
-                                Navigator.pushNamed(context, '/signin');
+                                Navigator.of(context).push(MaterialPageRoute(builder: (_)=>SignInPage()));
                               },
                               child: const Text('Sign In'),
                             ),

@@ -103,7 +103,7 @@ class ReportDataSourceImpl implements ReportDataSource {
     final authService = AuthService(prefs);
     final refToken = prefs.getString("ref_token") ?? '';
 
-    final uri = Uri.parse('http://10.2.75.1:5000/api/report');
+    final uri = Uri.parse('http://10.2.78.92:5000/api/report');
 
     // Wrap upload logic so it can be reused after refresh
     Future<http.StreamedResponse> _send() async {
