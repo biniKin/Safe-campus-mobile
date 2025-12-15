@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -191,6 +192,7 @@ class _MyAppState extends State<MyApp> {
   }
 
   String parseAlertTitle(Map<String, dynamic> data) {
+    //print('on parse: ${data['fullName']}');
     return data['userName'] ?? 'Panic Alert';
   }
 
@@ -200,17 +202,51 @@ class _MyAppState extends State<MyApp> {
     requestNotificationPermission();
     checkInitialMessage();
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
-      final title = parseAlertTitle(message.data);
-      print(title);
-      print(message.data['user']);
+      // final title = parseAlertTitle(message.data);
+      // print(title);
+      // print(message.data['user']['coordinates']);
+      // final payloadStr = message.data['payload'] ?? '';
+      // if (payloadStr.isNotEmpty) {
+      //   final Map<String, dynamic> payload = jsonDecode(payloadStr);
+
+      //   final user = payload['user'];
+      //   final location = user['location'];
+      //   final coordinates = List<double>.from(location['coordinates']);
+      //   final lat = coordinates[1];
+      //   final lng = coordinates[0];
+
+      //   print('Coordinates: $lat, $lng');
+      // }
       await showNotification(
-        title,
-        message.data['message'],
+        "panic Alert",
+        "Your trusted contact biniyam is in danger.",
       );
       // console.log(title);
       // console.log(message.data['user']);
       // await showNotification(title, 'Tap to view location');
     });
+//     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
+//   try {
+//     final data = message.data;
+
+//     final fullName = data['user.fullName'] ?? 'Panic Alert';
+//     final email = data['user.email'] ?? '';
+//     final latStr = data['user.location.coordinates.1'] ?? '0';
+//     final lngStr = data['user.location.coordinates.0'] ?? '0';
+//     final address = data['user.location.name'] ?? '';
+
+//     final lat = double.tryParse(latStr) ?? 0;
+//     final lng = double.tryParse(lngStr) ?? 0;
+
+//     print('Coordinates: $lat, $lng');
+//     print('User: $fullName');
+
+//     await showNotification(fullName, 'Tap to view location');
+//   } catch (e) {
+//     print('Error parsing FCM data: $e');
+//   }
+// });
+
 
     // navigate
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {

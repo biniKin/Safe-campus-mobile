@@ -116,10 +116,25 @@ class MapRemoteDataSourceImpl implements MapRemoteDataSource {
 
       // console.log('Danger areas list: $list');
 
-      return list
-          .whereType<Map<String, dynamic>>()
-          .map(MapMarkerModel.fromMap)
-          .toList();
+      final List<MapMarkerModel> markers = [];
+
+for (final item in list) {
+  try {
+    markers.add(MapMarkerModel.fromMap(item));
+  } catch (e, s) {
+    console.log('❌ Failed to parse item: $item');
+    console.log('❌ Error: $e');
+    console.log('❌ Stack: $s');
+  }
+}
+
+return markers;
+
+
+      // return list
+      //     .whereType<Map<String, dynamic>>()
+      //     .map(MapMarkerModel.fromMap)
+      //     .toList();
     } catch (e) {
       console.log('Error while fetching dangerous areas: $e');
       throw Exception('Failed to fetch dangerous areas');

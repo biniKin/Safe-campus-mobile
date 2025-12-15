@@ -29,9 +29,10 @@ class MapRepositoryImpl implements MapRepository {
         source: source,
       );
       return dangersArea;
-    } catch (e) {
-      console.log('Error is happend $e');
-      throw Exception('Failed to get danger areas: $e');
-    }
+    } catch (e, s) {
+  print('MapRemoteDataSource error: $e');
+  print('$s');
+  rethrow;
+}
   }
 }

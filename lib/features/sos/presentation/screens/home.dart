@@ -165,45 +165,49 @@ class _HomeState extends State<Home> {
                 },
                 child: Text("Cancel"),
               ),
-              ElevatedButton(
-                onPressed: () {
-                  //Navigator.of(context).pop();
-                  // developer.log('SOS button pressed');
-
-                  context.read<PanicAlertBloc>().add(TriggerPanicAlert());
-
-                  // _startSOSMode();
-                  // Notify trusted contacts and security
-                  // Fluttertoast.showToast(msg: 'Emergency alert sent to trusted contacts and security personnel!', backgroundColor: Colors.red);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                child: BlocListener<PanicAlertBloc, PanicAlertState>(
-                  listener: (context, state) {
-                    if (state is PanicSuccess) {
-                      Navigator.of(context).pop(); // close dialog
-                      // showSOSBottomSheet(context: context, onCancel: (){Navigator.of(context).pop();});
-                      _startSOSMode();             // turn SOS ON
-                    }
+              SizedBox(
+                height: 40,
+                width: 150,
+                child: ElevatedButton(
+                  onPressed: () {
+                    //Navigator.of(context).pop();
+                    // developer.log('SOS button pressed');
+                
+                    context.read<PanicAlertBloc>().add(TriggerPanicAlert());
+                
+                    // _startSOSMode();
+                    // Notify trusted contacts and security
+                    // Fluttertoast.showToast(msg: 'Emergency alert sent to trusted contacts and security personnel!', backgroundColor: Colors.red);
                   },
-                  child: BlocBuilder<PanicAlertBloc, PanicAlertState>(
-                    builder: (context, state) {
-                      if (state is PanicLoading) {
-                        return SizedBox(
-                          height: 15,
-                          width: 15,
-                          child: CircularProgressIndicator(color: Colors.black),
-                        );
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  child: BlocListener<PanicAlertBloc, PanicAlertState>(
+                    listener: (context, state) {
+                      if (state is PanicSuccess) {
+                        Navigator.of(context).pop(); // close dialog
+                        // showSOSBottomSheet(context: context, onCancel: (){Navigator.of(context).pop();});
+                        _startSOSMode();             // turn SOS ON
                       }
-                      return Text(
-                        "Send Alert",
-                        style: GoogleFonts.poppins(color: Colors.white),
-                      );
                     },
+                    child: BlocBuilder<PanicAlertBloc, PanicAlertState>(
+                      builder: (context, state) {
+                        if (state is PanicLoading) {
+                          return SizedBox(
+                            height: 15,
+                            width: 15,
+                            child: CircularProgressIndicator(color: Colors.black),
+                          );
+                        }
+                        return Text(
+                          "Send Alert",
+                          style: GoogleFonts.poppins(color: Colors.white),
+                        );
+                      },
+                    ),
                   ),
                 ),
               ),
@@ -211,6 +215,99 @@ class _HomeState extends State<Home> {
           ),
     );
   }
+//   void openDialogeBox() {
+//   showDialog(
+//     context: context,
+//     builder: (context) => AlertDialog(
+//       backgroundColor: Colors.white,
+//       shape: RoundedRectangleBorder(
+//         borderRadius: BorderRadius.circular(20),
+//       ),
+//       title: Text(
+//         "Confirm your request",
+//         style: GoogleFonts.poppins(
+//           fontWeight: FontWeight.w600,
+//           fontSize: 22,
+//         ),
+//       ),
+//       content: SingleChildScrollView(
+//         child: Column(
+//           mainAxisSize: MainAxisSize.min,
+//           children: [
+//             Icon(
+//               Icons.report_problem_rounded,
+//               size: 120,
+//               color: Colors.redAccent,
+//             ),
+//             const SizedBox(height: 20),
+//             Text(
+//               "The alert will be sent to security personnel and trusted contacts with your location and personal information. Make sure you made the right request before sending the alert!",
+//               style: GoogleFonts.poppins(
+//                 fontSize: 14,
+//                 height: 1.5,
+//                 color: Colors.black87,
+//               ),
+//               //textAlign: TextAlign.center,
+//             ),
+//           ],
+//         ),
+//       ),
+//       actionsPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+//       actionsAlignment: MainAxisAlignment.spaceBetween,
+//       actions: [
+//         TextButton(
+//           onPressed: () => Navigator.of(context).pop(),
+//           child: Text(
+//             "Cancel",
+//             style: GoogleFonts.poppins(
+//               fontSize: 14,
+//               color: Colors.grey[700],
+//             ),
+//           ),
+//         ),
+//         SizedBox(
+//           height: 45,
+//           width: 150,
+//           child: ElevatedButton(
+//             onPressed: () {
+//               context.read<PanicAlertBloc>().add(TriggerPanicAlert());
+//             },
+//             style: ElevatedButton.styleFrom(
+//               backgroundColor: Colors.red,
+//               shape: RoundedRectangleBorder(
+//                 borderRadius: BorderRadius.circular(10),
+//               ),
+//               padding: const EdgeInsets.symmetric(horizontal: 20),
+//             ),
+//             child: BlocBuilder<PanicAlertBloc, PanicAlertState>(
+//               builder: (context, state) {
+//                 if (state is PanicLoading) {
+//                   return SizedBox(
+//                     height: 20,
+//                     width: 20,
+//                     child: CircularProgressIndicator(
+//                       color: Colors.white,
+//                       strokeWidth: 2.5,
+//                     ),
+//                   );
+//                 }
+//                 return Text(
+//                   "Send Alert",
+//                   style: GoogleFonts.poppins(
+//                     fontSize: 14,
+//                     color: Colors.white,
+//                     //fontWeight: FontWeight.w500,
+//                   ),
+//                 );
+//               },
+//             ),
+//           ),
+//         ),
+//       ],
+//     ),
+//   );
+// }
+
 
   void _startSOSMode() {
     context.read<SosCubit>().onEmergencyMode();
@@ -280,7 +377,7 @@ class _HomeState extends State<Home> {
     
           bottomNavigationBar: BottomAppBar(
             notchMargin: 7,
-            color: const Color.fromARGB(255, 240, 240, 245),
+            color: const Color.fromARGB(255, 217, 217, 226),
             height: 70,
             shape: const CircularNotchedRectangle(),
             child: Row(

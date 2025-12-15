@@ -23,6 +23,7 @@ import 'package:safe_campus/features/sos/presentation/bloc/recent_activity_bloc/
 import 'package:safe_campus/features/sos/presentation/bloc/recent_activity_bloc/recent_activity_state.dart';
 import 'package:safe_campus/features/sos/presentation/bloc/share_route_bloc/share_route_bloc.dart';
 import 'package:safe_campus/features/sos/presentation/bloc/share_route_bloc/share_route_event.dart';
+import 'package:safe_campus/features/sos/presentation/bloc/share_route_bloc/share_route_state.dart';
 import 'package:safe_campus/features/sos/presentation/screens/sos_cubit/sos_cubit.dart';
 import 'package:safe_campus/features/sos/presentation/screens/sos_history_page.dart';
 import 'package:safe_campus/features/sos/presentation/widgets/contact_form_bottom_sheet.dart';
@@ -31,6 +32,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:safe_campus/features/core/presentation/bloc/recent_activity_bloc/recent_activity_bloc.dart';
 
 import 'package:safe_campus/features/report/presentation/bloc/report_bloc.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 
 class HomePage extends StatefulWidget {
@@ -58,6 +60,16 @@ class _ModernHomePageState extends State<HomePage> {
   void dispose() {
     _sosPulseTimer?.cancel();
     super.dispose();
+  }
+
+  Future<void> openDialer(String phoneNumber) async {
+    final Uri uri = Uri(scheme: 'tel', path: phoneNumber);
+
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    } else {
+      throw 'Could not launch dialer';
+    }
   }
 
   void _stopSOSMode() {
@@ -336,27 +348,240 @@ class _ModernHomePageState extends State<HomePage> {
   }
 
   // Updated modern share route sheet
+  // void openShareRouteSheet() {
+  //   showModalBottomSheet(
+  //     context: context,
+  //     isScrollControlled: true,
+  //     backgroundColor: Colors.transparent,
+  //     builder: (context) {
+  //       return BlocBuilder<ContactListBloc, ContactListState>(
+  //         builder: (context, state) {
+  //           if (state is ContactListLoaded) {
+  //             final contacts = state.contacts;
+
+  //             if (contacts.isEmpty) {
+  //               return _buildEmptyContactsSheet();
+  //             }
+
+  //             // Track selection per contact
+  //             List<bool> selected = List.generate(contacts.length, (_) => false);
+
+  //             return StatefulBuilder(
+  //               builder: (context, setState) {
+  //                 return Container(
+  //                   decoration: const BoxDecoration(
+  //                     color: Colors.white,
+  //                     borderRadius: BorderRadius.only(
+  //                       topLeft: Radius.circular(24),
+  //                       topRight: Radius.circular(24),
+  //                     ),
+  //                   ),
+  //                   child: Column(
+  //                     mainAxisSize: MainAxisSize.min,
+  //                     children: [
+  //                       // Header
+  //                       Padding(
+  //                         padding: const EdgeInsets.only(top: 20, left: 24, right: 24),
+  //                         child: Column(
+  //                           children: [
+  //                             Center(
+  //                               child: Container(
+  //                                 width: 40,
+  //                                 height: 4,
+  //                                 decoration: BoxDecoration(
+  //                                   color: Colors.grey.shade300,
+  //                                   borderRadius: BorderRadius.circular(2),
+  //                                 ),
+  //                               ),
+  //                             ),
+  //                             const SizedBox(height: 20),
+  //                             Row(
+  //                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //                               children: [
+  //                                 Text(
+  //                                   "Share Location",
+  //                                   style: GoogleFonts.poppins(
+  //                                     fontSize: 24,
+  //                                     fontWeight: FontWeight.w700,
+  //                                     color: const Color(0xFF65558F),
+  //                                   ),
+  //                                 ),
+  //                                 IconButton(
+  //                                   onPressed: () => Navigator.pop(context),
+  //                                   icon: const Icon(Icons.close_rounded),
+  //                                   color: Colors.grey.shade600,
+  //                                 ),
+  //                               ],
+  //                             ),
+  //                             const SizedBox(height: 8),
+  //                             Text(
+  //                               "Select contacts to share your real-time location",
+  //                               style: GoogleFonts.poppins(
+  //                                 fontSize: 14,
+  //                                 color: Colors.grey.shade600,
+  //                               ),
+  //                             ),
+  //                           ],
+  //                         ),
+  //                       ),
+  //                       const SizedBox(height: 24),
+
+  //                       // Contact List
+  //                       Expanded(
+  //                         child: ListView.builder(
+  //                           padding: const EdgeInsets.symmetric(horizontal: 16),
+  //                           shrinkWrap: true,
+  //                           itemCount: contacts.length,
+  //                           itemBuilder: (context, index) {
+  //                             final contact = contacts[index];
+  //                             return _buildContactListItem(
+  //                               contact: contact,
+  //                               isSelected: selected[index],
+  //                               onTap: () {
+  //                                 setState(() => selected[index] = !selected[index]);
+  //                               },
+  //                             );
+  //                           },
+  //                         ),
+  //                       ),
+
+  //                       // Share Button
+  //                       // Padding(
+  //                       //   padding: const EdgeInsets.all(24),
+  //                       //   child: _buildModernButton(
+  //                       //     text: "Share Location",
+  //                       //     type: ButtonType.filled,
+  //                       //     icon: Icons.share_outlined,
+  //                       //     onPressed: () {
+  //                       //       print("on sharing contacts............");
+  //                       //       // Collect selected contacts
+  //                       //       List<Contact> selectedContacts = [];
+  //                       //       for (int i = 0; i < contacts.length; i++) {
+  //                       //         if (selected[i]) {
+  //                       //           selectedContacts.add(contacts[i]);
+  //                       //         }
+  //                       //       }
+
+  //                       //       if (selectedContacts.isEmpty) {
+  //                       //         ScaffoldMessenger.of(context).showSnackBar(
+  //                       //           const SnackBar(content: Text("Please select at least one contact")),
+  //                       //         );
+  //                       //         return;
+  //                       //       }
+
+  //                       //       // Trigger Bloc event
+  //                       //       context.read<ShareRouteBloc>().add(
+  //                       //             ShareRouteRequested(
+  //                       //               coordinates: {"coordinates": [18.0093, 20.3848]},
+  //                       //               contacts: selectedContacts,
+  //                       //             ),
+  //                       //           );
+
+  //                       //       print('Sharing location with: ${selectedContacts.map((c) => c.email).toList()}');
+  //                       //       Navigator.pop(context);
+  //                       //     },
+
+  //                       //   ),
+  //                       // ),
+  //                       // Share Button with BlocBuilder
+  //                       Padding(
+  //                         padding: const EdgeInsets.all(24),
+  //                         child: BlocBuilder<ShareRouteBloc, ShareRouteState>(
+  //                           builder: (context, state) {
+  //                             // Show loader while sharing
+  //                             if (state is ShareRouteLoading) {
+  //                               return const Center(
+  //                                 child: CircularProgressIndicator(),
+  //                               );
+  //                             }
+                        
+  //                             return _buildModernButton(
+  //                               text: "Share Location",
+  //                               type: ButtonType.filled,
+  //                               icon: Icons.share_outlined,
+  //                               onPressed: () {
+  //                                 print("on sharing contacts............");
+  //                                 // Collect selected contacts
+  //                                 List<Contact> selectedContacts = [];
+  //                                 for (int i = 0; i < contacts.length; i++) {
+  //                                   if (selected[i]) {
+  //                                     selectedContacts.add(contacts[i]);
+  //                                   }
+  //                                 }
+                        
+  //                                 if (selectedContacts.isEmpty) {
+  //                                   ScaffoldMessenger.of(context).showSnackBar(
+  //                                     const SnackBar(content: Text("Please select at least one contact")),
+  //                                   );
+  //                                   return;
+  //                                 }
+                        
+  //                                 // Trigger Bloc event
+  //                                 context.read<ShareRouteBloc>().add(
+  //                                       ShareRouteRequested(
+  //                                         coordinates: {"coordinates": [18.0093, 20.3848]},
+  //                                         contacts: selectedContacts,
+  //                                       ),
+  //                                     );
+                        
+  //                                 print('Sharing location with: ${selectedContacts.map((c) => c.email).toList()}');
+  //                                 // Optionally do NOT pop immediately; wait for success/failure
+  //                               },
+  //                             );
+  //                           },
+  //                         ),
+  //                       ),
+
+  //                     ],
+  //                   ),
+  //                 );
+  //               },
+  //             );
+  //           }
+  //           return const Center(child: CircularProgressIndicator());
+  //         },
+  //       );
+  //     },
+  //   );
+  // }
   void openShareRouteSheet() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) {
-        return BlocBuilder<ContactListBloc, ContactListState>(
-          builder: (context, state) {
-            if (state is ContactListLoaded) {
-              final contacts = state.contacts;
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    builder: (context) {
+      return BlocBuilder<ContactListBloc, ContactListState>(
+        builder: (context, state) {
+          if (state is ContactListLoaded) {
+            final contacts = state.contacts;
 
-              if (contacts.isEmpty) {
-                return _buildEmptyContactsSheet();
-              }
+            if (contacts.isEmpty) {
+              return _buildEmptyContactsSheet();
+            }
 
-              // Track selection per contact
-              List<bool> selected = List.generate(contacts.length, (_) => false);
+            // Track selection per contact
+            List<bool> selected = List.generate(contacts.length, (_) => false);
 
-              return StatefulBuilder(
-                builder: (context, setState) {
-                  return Container(
+            return StatefulBuilder(
+              builder: (context, setState) {
+                return BlocListener<ShareRouteBloc, ShareRouteState>(
+                  listener: (context, shareState) {
+                    if (shareState is ShareRouteSuccess) {
+                      Navigator.pop(context); // Close sheet on success
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("Location shared successfully!")),
+                      );
+
+                      Fluttertoast.showToast(msg: "Location shared successfully!");
+                      
+                    } else if (shareState is ShareRouteFailure) {
+                      // ScaffoldMessenger.of(context).showSnackBar(
+                      //   SnackBar(content: Text(shareState.message)),
+                      // );
+                      Fluttertoast.showToast(msg: shareState.message);
+                    }
+                  },
+                  child: Container(
                     decoration: const BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.only(
@@ -433,56 +658,66 @@ class _ModernHomePageState extends State<HomePage> {
                           ),
                         ),
 
-                        // Share Button
+                        // Share Button with BlocBuilder
                         Padding(
                           padding: const EdgeInsets.all(24),
-                          child: _buildModernButton(
-                            text: "Share Location",
-                            type: ButtonType.filled,
-                            icon: Icons.share_outlined,
-                            onPressed: () {
-                              print("on sharing contacts............");
-                              // Collect selected contacts
-                              List<Contact> selectedContacts = [];
-                              for (int i = 0; i < contacts.length; i++) {
-                                if (selected[i]) {
-                                  selectedContacts.add(contacts[i]);
-                                }
-                              }
-
-                              if (selectedContacts.isEmpty) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text("Please select at least one contact")),
+                          child: BlocBuilder<ShareRouteBloc, ShareRouteState>(
+                            builder: (context, shareState) {
+                              if (shareState is ShareRouteLoading) {
+                                return const Center(
+                                  child: CircularProgressIndicator(),
                                 );
-                                return;
                               }
 
-                              // Trigger Bloc event
-                              context.read<ShareRouteBloc>().add(
-                                    ShareRouteRequested(
-                                      coordinates: {"coordinates": [18.0093, 20.3848]},
-                                      contacts: selectedContacts,
-                                    ),
-                                  );
+                              return _buildModernButton(
+                                text: "Share Location",
+                                type: ButtonType.filled,
+                                icon: Icons.share_outlined,
+                                onPressed: () {
+                                  // Collect selected contacts
+                                  List<Contact> selectedContacts = [];
+                                  for (int i = 0; i < contacts.length; i++) {
+                                    if (selected[i]) {
+                                      selectedContacts.add(contacts[i]);
+                                    }
+                                  }
 
-                              print('Sharing location with: ${selectedContacts.map((c) => c.email).toList()}');
-                              Navigator.pop(context);
+                                  if (selectedContacts.isEmpty) {
+                                    // ScaffoldMessenger.of(context).showSnackBar(
+                                    //   const SnackBar(
+                                    //     content: Text("Please select at least one contact"),
+                                    //   ),
+                                    // );
+                                    Fluttertoast.showToast(msg: "Please select at least one contact");
+                                    return;
+                                  }
+
+                                  // Trigger Bloc event
+                                  context.read<ShareRouteBloc>().add(
+                                        ShareRouteRequested(
+                                          coordinates: {"coordinates": [18.0093, 20.3848]},
+                                          contacts: selectedContacts,
+                                        ),
+                                      );
+                                },
+                              );
                             },
-
                           ),
                         ),
                       ],
                     ),
-                  );
-                },
-              );
-            }
-            return const Center(child: CircularProgressIndicator());
-          },
-        );
-      },
-    );
-  }
+                  ),
+                );
+              },
+            );
+          }
+          return const Center(child: CircularProgressIndicator());
+        },
+      );
+    },
+  );
+}
+
 
   // Widget Builders
   Widget _buildModernTextField({
@@ -1039,7 +1274,7 @@ class _ModernHomePageState extends State<HomePage> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        height: 160,
+        height: 170,
         decoration: BoxDecoration(
           gradient: gradient,
           borderRadius: BorderRadius.circular(20),
@@ -1148,10 +1383,15 @@ class _ModernHomePageState extends State<HomePage> {
                           name: contact.name, 
                           email: contact.email,
                           phoneNumber: contact.phoneNumber,
-                          isOnline: true,
+                          //isOnline: true,
                           onTap: (){
                             
-                          }, 
+                          },
+                          onCall: (){
+                            /// 
+                            /// 
+                            openDialer(contact.phoneNumber);
+                          },
                           onDelete: (){
                             context.read<ContactListBloc>().add(DeleteContactEvent(contact.email));
                           },

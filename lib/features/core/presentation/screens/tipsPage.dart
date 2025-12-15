@@ -51,7 +51,7 @@ class Tipspage extends StatelessWidget {
   @override
 Widget build(BuildContext context) {
   return Scaffold(
-    backgroundColor: Colors.white,
+    backgroundColor: Color(0xFFF3F3F3),
     body: CustomScrollView(
       slivers: [
         SliverToBoxAdapter(

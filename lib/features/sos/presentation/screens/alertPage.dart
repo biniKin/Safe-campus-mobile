@@ -29,7 +29,13 @@ class Alertpage extends StatelessWidget {
             ],
           ),
         ),
-        body: TabBarView(children: [Alerts(), AnnouncementsPage(), Tipspage()]),
+        body: TabBarView(
+          children: [
+            Alerts(), 
+            AnnouncementsPage(), 
+            Tipspage(),
+          ],
+        ),
       ),
     );
   }

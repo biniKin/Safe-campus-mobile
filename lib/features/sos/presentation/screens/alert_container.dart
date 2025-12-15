@@ -253,10 +253,10 @@ class _AlertContainerState extends State<AlertContainer> {
   Color textColor;
 
   if (status == "high") {
-    bgColor = Colors.red.withOpacity(0.3);
+    bgColor = Colors.red.withOpacity(0.2);
     textColor = const Color(0xFF4B0803);
   } else if (status == "medium") {
-    bgColor = Colors.amber.withOpacity(0.3);
+    bgColor = Colors.amber.withOpacity(0.2);
     textColor = const Color(0xFF554105);
   } else {
     bgColor = Colors.deepPurpleAccent.withOpacity(0.3);
@@ -275,14 +275,14 @@ class _AlertContainerState extends State<AlertContainer> {
         ),
       ),
       Container(
-        padding: const EdgeInsets.all(5),
+        padding: const EdgeInsets.all(4),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(5),
-          color: bgColor,
+          color: Colors.grey.shade400.withOpacity(0.2),
         ),
         child: Text(
           widget.alertsModel.status,
-          style: TextStyle(color: textColor),
+          style: TextStyle(color: textColor, fontSize: 13),
         ),
       ),
     ],

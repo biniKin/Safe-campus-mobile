@@ -49,7 +49,7 @@ class _ProfilepageState extends State<Profilepage> {
           title: Text(
             "Profile",
             style: TextStyle(
-              color: Colors.white,
+              color: Colors.black,
               fontWeight: FontWeight.bold,
               fontSize: 24,
             ),

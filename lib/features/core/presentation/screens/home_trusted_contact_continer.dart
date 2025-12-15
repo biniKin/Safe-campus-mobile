@@ -68,6 +68,7 @@ class HomeTrustedContactContainer extends StatelessWidget {
   final VoidCallback onTap;
   final VoidCallback onDelete;
   final bool isOnline;
+  final VoidCallback onCall;
 
   const HomeTrustedContactContainer({
     super.key,
@@ -78,6 +79,7 @@ class HomeTrustedContactContainer extends StatelessWidget {
     this.avatarColor = const Color(0xFF65558F),
     required this.onTap,
     required this.onDelete,
+    required this.onCall,
     this.isOnline = false,
   });
 
@@ -449,10 +451,7 @@ class HomeTrustedContactContainer extends StatelessWidget {
                 title: 'Make a Call',
                 subtitle: 'Call this contact',
                 color: const Color(0xFF65558F),
-                onTap: () {
-                  Navigator.pop(context);
-                  // Implement call functionality
-                },
+                onTap: onCall
               ),
               const SizedBox(height: 32),
               SizedBox(

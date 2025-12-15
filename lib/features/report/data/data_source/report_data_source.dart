@@ -152,6 +152,7 @@ class ReportDataSourceImpl implements ReportDataSource {
     final authService = AuthService(prefs);
     final refToken = prefs.getString("ref_token") ?? '';
     final uri = Uri.parse('${Url.baseUrl}/report');
+    print("location from report...$location");
 
     String accessToken = token;
 
@@ -159,13 +160,20 @@ class ReportDataSourceImpl implements ReportDataSource {
       final request = http.MultipartRequest('POST', uri);
 
       request.headers['Authorization'] = 'Bearer $accessToken';
+      final locationJson = jsonEncode({
+        'type': 'Point',
+        'coordinates': [
+          location['coordinates'][0], // longitude
+          location['coordinates'][1], // latitude
+        ],
+      });
 
       request.fields.addAll({
         'description': description,
         'tag': tag,
         'anonymous': anonymous.toString(),
-        'latitude': location['coordinates'][1].toString(),
-        'longitude': location['coordinates'][0].toString(),
+        'location': locationJson
+        
       });
 
       request.files.add(
@@ -203,6 +211,8 @@ class ReportDataSourceImpl implements ReportDataSource {
           data: body.isNotEmpty ? jsonDecode(body) : null,
         );
       }
+
+    
 
       return ReportResponse(
         success: false,

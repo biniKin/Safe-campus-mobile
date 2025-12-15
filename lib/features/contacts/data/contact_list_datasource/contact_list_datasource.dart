@@ -77,7 +77,7 @@ class ContactListDatasourceImpl implements ContactListDataSource {
   // ---------------------------------------------------------------------------
   @override
   Future<void> addContact(Map<String, dynamic> contact) async {
-    final uri = Uri.parse('$_baseUrl/add_contacts');
+    final uri = Uri.parse('$_baseUrl/auth/add_contacts');
 
     String token = prefs.getString("token") ?? "";
     String refreshToken = prefs.getString("ref_token") ?? "";
@@ -116,8 +116,8 @@ class ContactListDatasourceImpl implements ContactListDataSource {
   // ---------------------------------------------------------------------------
   @override
   Future<void> deleteContact(String email) async {
-    console.log("on delete endpoint");
-    final uri = Uri.parse('$_baseUrl/delete_contacts');
+    print("on delete endpoint");
+    final uri = Uri.parse('$_baseUrl/auth/delete_contacts');
 
     String token = prefs.getString("token") ?? "";
     String refreshToken = prefs.getString("ref_token") ?? "";
@@ -131,17 +131,17 @@ class ContactListDatasourceImpl implements ContactListDataSource {
     }
 
     var resp = await _request(token);
-    console.log(jsonDecode(resp.body));
+    print(jsonDecode(resp.body));
 
     if (resp.statusCode == 401) {
-      console.log("Refreshing token…....from endpoint");
+      print("Refreshing token…....from endpoint");
 
       final refreshed = await authService.refreshToken(refToken: refreshToken);
       if (!refreshed) throw Exception("Session expired. Login again.");
 
       token = prefs.getString("token") ?? "";
       resp = await _request(token);
-      console.log(jsonDecode(resp.body));
+      print(jsonDecode(resp.body));
     }
 
     if (resp.statusCode < 200 || resp.statusCode >= 300) {
