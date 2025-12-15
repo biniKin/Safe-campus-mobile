@@ -1,7 +1,7 @@
 import 'dart:convert';
-import 'dart:developer';
 import 'dart:io';
 import 'package:location/location.dart';
+import 'package:safe_campus/core/constants/url.dart';
 import 'package:safe_campus/features/map_marking/data/model/map_marker_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:developer' as console show log;
@@ -20,7 +20,7 @@ abstract class MapRemoteDataSource {
 class MapRemoteDataSourceImpl implements MapRemoteDataSource {
   static const _host = '10.2.78.92:5000';
   static const _path = '/api/dangerArea'; // set to your actual route
-  static const _authBase = 'http://10.2.78.92:5000/api/auth';
+  static const _authBase = Url.baseUrl; // base URL for auth
 
   final Location _location = Location();
   final HttpClient httpClient;

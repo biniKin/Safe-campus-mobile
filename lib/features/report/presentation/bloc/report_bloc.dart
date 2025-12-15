@@ -1,8 +1,6 @@
-
-
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:safe_campus/features/report/usecases/send_report.dart';
+import 'package:safe_campus/features/report/domain/usecases/send_report.dart';
 
 part 'report_event.dart';
 part 'report_state.dart';
@@ -22,15 +20,16 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
           location: event.location,
           token: event.token,
         );
-        if(response.success){
+        if (response.success) {
           emit(ReportSuccess(message: response.message));
-        } else{
+        } else {
           emit(ReportFailed(response.message));
         }
-        
       } catch (e) {
         print("Error on report block: $e");
-        emit(ReportFailed(e.toString())); // You might want to emit an error state here
+        emit(
+          ReportFailed(e.toString()),
+        ); // You might want to emit an error state here
       }
     });
   }

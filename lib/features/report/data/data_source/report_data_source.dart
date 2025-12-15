@@ -8,8 +8,6 @@ import 'dart:developer' as console show log;
 import 'package:safe_campus/features/auth/data/services/auth_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../core/constants/url.dart';
-
 class ReportResponse {
   final bool success;
   final String message;
@@ -46,7 +44,7 @@ class ReportDataSourceImpl implements ReportDataSource {
     final authService = AuthService(prefs);
     final refToken = prefs.getString("ref_token") ?? '';
 
-    final uri = Uri.parse('${Url.baseUrl}/report');
+    final uri = Uri.parse('http://10.2.75.1:5000/api/report');
 
     // Wrap upload logic so it can be reused after refresh
     Future<http.StreamedResponse> _send() async {
@@ -76,11 +74,11 @@ class ReportDataSourceImpl implements ReportDataSource {
       // FIRST TRY
       var resp = await _send();
       var respBody = await resp.stream.bytesToString();
-      print('First attempt response: ${resp.statusCode} -> $respBody');
+      console.log('First attempt response: ${resp.statusCode} -> $respBody');
 
       // If token expired
       if (resp.statusCode == 401) {
-        print("Token expired — attempting refresh...");
+        console.log("Token expired — attempting refresh...");
 
         final refreshed = await authService.refreshToken(refToken: refToken);
 
@@ -98,7 +96,7 @@ class ReportDataSourceImpl implements ReportDataSource {
         // SECOND TRY with new token
         resp = await _send();
         respBody = await resp.stream.bytesToString();
-        print('Second attempt response: ${resp.statusCode} -> $respBody');
+        console.log('Second attempt response: ${resp.statusCode} -> $respBody');
 
         if (resp.statusCode >= 200 && resp.statusCode < 300) {
           // Success, return parsed response data

@@ -1,0 +1,137 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:safe_campus/features/contacts/domain/usecases/add_contacts.dart';
+import 'package:safe_campus/features/sos/presentation/bloc/contacts_bloc/contact_list_bloc.dart';
+import 'package:safe_campus/features/sos/presentation/bloc/contacts_bloc/contact_list_event.dart';
+
+class ContactFormBottomSheet extends StatefulWidget {
+  final Function(String, String, String) onSave;
+
+  const ContactFormBottomSheet({super.key, required this.onSave});
+
+  @override
+  State<ContactFormBottomSheet> createState() => _ContactFormBottomSheetState();
+}
+
+class _ContactFormBottomSheetState extends State<ContactFormBottomSheet> {
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController phoneController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(
+        20,
+        20,
+        20,
+        MediaQuery.of(context).viewInsets.bottom + 20,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(
+            "Add Trusted Contact",
+            style: GoogleFonts.poppins(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 20),
+          TextField(
+            controller: nameController,
+            decoration: InputDecoration(
+              labelText: "Name",
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              prefixIcon: const Icon(Icons.person),
+            ),
+          ),
+          const SizedBox(height: 15),
+          TextField(
+            controller: phoneController,
+            decoration: InputDecoration(
+              labelText: "Phone Number",
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              prefixIcon: const Icon(Icons.phone),
+            ),
+            keyboardType: TextInputType.phone,
+          ),
+          const SizedBox(height: 15),
+          TextField(
+            controller: emailController,
+            decoration: InputDecoration(
+              labelText: "Email",
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              prefixIcon: const Icon(Icons.email),
+            ),
+            keyboardType: TextInputType.emailAddress,
+          ),
+          const SizedBox(height: 25),
+          Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              gradient: const LinearGradient(
+                colors: [Color(0xFF7E7FB9), Color(0xFF36374E)],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
+            ),
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () {
+                final name = nameController.text.trim();
+                final phone = phoneController.text.trim();
+                final email = emailController.text.trim();
+
+                if (name.isEmpty || phone.isEmpty || email.isEmpty) {
+                  // optional: show a validation message
+                  return;
+                }
+
+                context.read<ContactListBloc>().add(
+                  AddContactEvent(
+                    contact: {
+                      'name': name,
+                      'phoneNumber': phone,
+                      'email': email,
+                    },
+                  ),
+                );
+
+                Navigator.pop(context); // close the bottom sheet after dispatch
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.transparent,
+
+                padding: const EdgeInsets.symmetric(vertical: 15),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              child: Text(
+                "Save Contact",
+                style: GoogleFonts.poppins(fontSize: 16, color: Colors.white),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    phoneController.dispose();
+    emailController.dispose();
+    super.dispose();
+  }
+}

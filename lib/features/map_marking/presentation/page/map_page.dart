@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:safe_campus/core/constants/colors/app_colors.dart';
 import 'package:safe_campus/features/map_marking/data/model/map_marker_model.dart';
 import 'package:safe_campus/features/map_marking/presentation/bloc/map_bloc.dart';
 import 'dart:developer' as developer;
@@ -149,10 +150,14 @@ class _MapPageState extends State<MapPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFF3F3F3),
+      backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(
-        backgroundColor: Color(0xFFF3F3F3),
-        title: const Text("AASTU Campus Map", style: TextStyle(fontWeight: FontWeight.bold),),
+        backgroundColor: AppColors.primaryColor,
+        title: const Text(
+          "AASTU Campus Map",
+
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+        ),
       ),
       body: BlocBuilder<MapBloc, MapState>(
         builder: (context, state) {
