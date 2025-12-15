@@ -1,204 +1,147 @@
-# Safe Campus 🚨
+Safe Campus - Student Safety App 🛡
 
-**🏆 AASTU GDSC Hackathon 3rd Place Overall & 1st in Flutter Development**
+One tap to safety. One platform to protect.
+A real-time safety network connecting students with campus security during emergencies.
 
-A mobile application developed for **Addis Ababa Science and Technology University (AASTU)** to enhance campus safety through real-time location tracking, incident reporting, and emergency alerts.
+🚨 Problem Statement
+62% of college students feel unsafe on campus after dark. Current emergency systems are slow, fragmented, and require multiple steps during moments of panic. Every second counts in an emergency.
 
-Safe Campus bridges communication gaps by allowing users to:
-- Share routes
-- Manage trusted contacts
-- Receive incident notifications nearby
+🛡 Our Solution
+Safe Campus is a mobile app that puts a personal safety network in every student's pocket:
 
-Fostering a **safer campus environment**.
+One-tap SOS button for instant emergency alerts
 
----
+Live location sharing with campus security and trusted contacts
 
-## 🏅 Achievements
-- 🥉 **3rd Place Overall** at AASTU GDSC Hackathon
-- 🥇 **1st Place in Flutter Development**
+Proactive safety features like danger zones and incident reporting
 
----
+Admin dashboard for real-time campus monitoring
 
-## 🧭 Project Structure
+✨ Key Features
+📱 Student App
+Emergency SOS - Single tap sends alert with live location
 
+Incident Reporting - Report non-emergency issues with photos
 
+Danger Zones - See marked unsafe areas on campus map
 
-├── android/                   # Android-specific configurations
+Safety Alerts - Receive campus-wide announcements
 
-├── ios/                       # iOS-specific configurations
+Trusted Contacts - Alert friends/family during emergencies
 
-├── lib/                       # Main Flutter source code
+🖥 Admin Dashboard
+Real-time Monitoring - View active emergencies on live map
 
-│   ├── features/              # Feature-based organization
+User Management - Manage student and staff accounts
 
-│   │   ├── core/              # Core app screens
+Analytics - Track safety trends and hotspots
 
-│   │   │   ├── presentation/
+Announcements - Broadcast alerts to all users
 
-│   │   │   │   ├── screens/
+Danger Zone Management - Mark and update risky areas
 
-│   │   │   │   │   ├── home.dart        # Home screen with SOS button
+🏗 Technology Stack
+Component  Technology
+Mobile App  Flutter (iOS & Android)
+Frontend  React.js with Material-UI
+Backend  Node.js + Express.js
+Database  Firebase Firestore
+Authentication  Firebase Auth
+Real-time  Firebase Cloud Messaging
+Maps  Google Maps API
+Hosting  Firebase Hosting & Google Cloud
 
-│   │   │   │   │   ├── homepage.dart    # Dashboard with contacts & activities
 
-│   │   │   │   │   ├── map_page.dart    # Tabbed map interface
+🚀 Quick Start
+Prerequisites
+Flutter 3.19+ (for mobile app)
 
-│   │   │   │   │   ├── live_tracker.dart # Real-time location tracking
+Node.js 20+ (for backend)
 
-│   │   │   │   │   └── safety_map.dart  # Map with route sharing & incidents
+Firebase account
 
-│   │   │   │   └── components/          # Reusable UI components
+Google Maps API key
 
-│   │   │   │       ├── contact_list.dart
+Installation
+Clone the repository
 
-│   │   │   │       └── bottom_sheets.dart
+bash
+git clone 
+cd safe-campus
+Mobile App Setup
 
-│   │   └── other_features/    # Placeholder for future features
+bash
+cd mobile_app
+flutter pub get
+flutter run
+Backend Setup
 
-│   └── main.dart              # App entry point
+bash
+cd backend
+npm install
+npm start
+Web Dashboard Setup
 
-├── assets/                    # Static assets (images, icons)
+bash
+cd dashboard
+npm install
+npm run dev
+Firebase Configuration
+Create a Firebase project
 
-│   ├── images/
+Enable Authentication, Firestore, and Cloud Messaging
 
-│   │   └── happy_ppl.png
+Add your google-services.json (Android) and GoogleService-Info.plist (iOS)
 
-├── test/                      # Unit and widget tests
+Set up Firestore security rules
 
-├── .gitignore
+🎯 Usage
+For Students
+Register with your student email
 
-├── pubspec.yaml               # Dependencies
+Add trusted contacts
 
-└── README.md                  # You're here! 📖
+Use SOS button in emergencies
 
+Report incidents when needed
 
----
+For Administrators
+Access dashboard at https://your-domain.com/admin
 
-## 📌 Project Objectives
+Monitor active incidents
 
-**Main Goal:**  
-Build a mobile app to improve campus safety by enabling:
-- Real-time location tracking
-- Incident reporting
-- Emergency communication
+Manage danger zones
 
-### Core Features:
-- ✅ Real-time location tracking with shareable tokens (`live_tracker.dart`)
-- ✅ Interactive map with route sharing and incident markers (`safety_map.dart`)
-- ✅ Anonymous incident reporting with optional media (photo/video)
-- ✅ Trusted contact management for emergency location sharing (`homepage.dart`)
-- ✅ SOS button for quick emergency alerts (`home.dart`)
-- ✅ Nearby incident notifications based on proximity
+Send campus announcements
 
----
+🤝 Contributing
+We welcome contributions! Please follow these steps:
 
+Fork the repository
 
-🌟 Key Features
-📍 Real-Time Location Tracking
-Share live location with trusted contacts via a unique token.
+Create a feature branch (git checkout -b feature/AmazingFeature)
 
-View current location (latitude, longitude, and general area) in the Live Tracker tab.
+Commit your changes (git commit -m 'Add AmazingFeature')
 
-🗺️ Interactive Safety Map
-View your location on an OpenStreetMap interface.
+Push to the branch (git push origin feature/AmazingFeature)
 
-Search destinations and get routes.
+Open a Pull Request
 
-Report incidents anonymously with optional media.
+👥 Team
+Team SafeSquade 
 
-Get alerts for nearby incidents within 0.5 km.
+Biniyam kinfe - Mobile Developer
 
-👥 Trusted Contacts Management
-Add/manage trusted contacts who can access your live location in emergencies.
+Kassahun - Mobile Dev
 
-Accessible from the dashboard and map viewer sidebar.
+Alehegne - Backend Dev
 
-🚨 SOS Emergency Button
-Instantly trigger an emergency alert to notify trusted contacts.
+Bereket Desalgn - Frontend dev
 
----
+Amen Teshome - Frontend dev
 
-🧪 Usage Guide
 
-**Launch the App**
+🙏 Acknowledgments
+Inspired by campus safety initiatives worldwide
 
-The app opens to the Home screen with the SOS button.
-
-**Navigate the Features**
-
-Home Screen: Use the SOS button or navigate to the dashboard.
-
-Dashboard: View trusted contacts and recent activities.
-
-Map Page: Switch between:
-
-Live Tracker: Share your live location.
-
-Safety Map: Report incidents and share routes.
-
-**Share Location**
-
-Go to Live Tracker tab.
-
-Tap "Share My Walk".
-
-Share the token with your trusted contacts.
-
-Report an Incident
-
-Navigate to Safety Map.
-
-Tap the Report button.
-
-Fill in the description and optionally attach media.
-
-Submit anonymously.
-
-**🔧 Technical Highlights**
-
-Location Services: Uses geolocator for real-time updates and permission handling.
-
-Mapping: Integrates flutter_map with OpenStreetMap.
-
-State Management: Combines flutter_bloc and provider for efficient state control.
-
-API Integration: Uses http for:
-
-Geocoding (via Nominatim)
-
-Route fetching (via OSRM)
-
-Dependency Management: Resolved conflicts between flutter_map_location_marker and geolocator.
-
----
-
-📈 Contribution Summary
-
-Feature Implementation:
-
-☑️ Real-time location tracking and sharing
-
-☑️ Safety map with route fetching and incident reporting
-
-☑️ Trusted contacts and emergency alerts
-
-☑️ Modular UI components (bottom sheets, contact lists)
-
-Technical Contributions:
-
-☑️ Dependency resolution for flutter_map_location_marker and geolocator
-
-☑️ Gradle build fixes (daemon issues, timeouts)
-
-☑️ Code refactoring to use geolocator exclusively
-
-Project Milestones:
-
-☑️ AASTU GDSC Hackathon submission
-
-☑️ Achieved 3rd place overall and 1st in Flutter development 🥉🏆
-
----
-🙌 Acknowledgments
-
-Built as part of the AASTU GDSC Hackathon. Special thanks to the organizing team, mentors, and our team for their dedication in creating a safer campus environment! 🌟
+⭐️ Star this repo if you find it useful!
