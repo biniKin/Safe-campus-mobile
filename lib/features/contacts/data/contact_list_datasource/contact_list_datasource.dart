@@ -1,40 +1,35 @@
 import 'dart:convert';
-import 'dart:developer' as console show log;
-import 'dart:developer';
 import 'package:http/http.dart' as http;
+import 'package:safe_campus/core/constants/url.dart';
 import 'package:safe_campus/features/auth/data/services/auth_service.dart';
 import 'package:safe_campus/features/contacts/data/model/contact_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:developer' as console show log;
 
 abstract class ContactListDataSource {
   Future<List<ContactModel>> fetchContacts();
   Future<void> addContact(Map<String, dynamic> contact);
   Future<void> deleteContact(String email);
   Future<void> updateContact(String email, Map<String, dynamic> updatedContact);
-  
 }
 
 class ContactListDatasourceImpl implements ContactListDataSource {
-  static const _baseUrl = 'http://10.2.78.92:5000/api/auth';
+  static const _baseUrl = Url.baseUrl;
 
   final SharedPreferences prefs;
   final AuthService authService;
 
-  ContactListDatasourceImpl({
-    required this.prefs,
-    required this.authService, 
-   
-  });
+  ContactListDatasourceImpl({required this.prefs, required this.authService});
 
   List<ContactModel> parseContacts(dynamic body) {
     final list =
         (body is Map && body['trustedContacts'] is List)
             ? body['trustedContacts'] as List
             : (body is Map &&
-                    body['data'] is Map &&
-                    (body['data'] as Map)['trustedContacts'] is List)
-                ? (body['data'] as Map)['trustedContacts'] as List
-                : const <dynamic>[];
+                body['data'] is Map &&
+                (body['data'] as Map)['trustedContacts'] is List)
+            ? (body['data'] as Map)['trustedContacts'] as List
+            : const <dynamic>[];
 
     return list
         .whereType<Map<String, dynamic>>()
@@ -44,19 +39,20 @@ class ContactListDatasourceImpl implements ContactListDataSource {
 
   @override
   Future<List<ContactModel>> fetchContacts() async {
-    final uri = Uri.parse('$_baseUrl/get_contacts');
+    print("on fetching contacts....");
+    final uri = Uri.parse('$_baseUrl/auth/get_contacts');
 
     String token = prefs.getString("token") ?? "";
     String refreshToken = prefs.getString("ref_token") ?? "";
 
-    Future<http.Response> _request(String tok) {
-      return http.get(uri, headers: {
-        "Authorization": "Bearer $tok",
-        "Accept": "application/json",
-      });
+    Future<http.Response> request(String tok) {
+      return http.get(
+        uri,
+        headers: {"Authorization": "Bearer $tok", "Accept": "application/json"},
+      );
     }
 
-    var resp = await _request(token);
+    var resp = await request(token);
 
     if (resp.statusCode == 401) {
       print("Token expired → refreshing...");
@@ -65,7 +61,7 @@ class ContactListDatasourceImpl implements ContactListDataSource {
       if (!refreshed) throw Exception("Session expired. Login again.");
 
       token = prefs.getString("token") ?? "";
-      resp = await _request(token); // retry
+      resp = await request(token); // retry
     }
 
     if (resp.statusCode == 200) {
@@ -86,7 +82,7 @@ class ContactListDatasourceImpl implements ContactListDataSource {
     String token = prefs.getString("token") ?? "";
     String refreshToken = prefs.getString("ref_token") ?? "";
 
-    Future<http.Response> _request(String tok) {
+    Future<http.Response> request(String tok) {
       return http.post(
         uri,
         headers: {
@@ -98,16 +94,16 @@ class ContactListDatasourceImpl implements ContactListDataSource {
       );
     }
 
-    var resp = await _request(token);
+    var resp = await request(token);
 
     if (resp.statusCode == 401) {
-      print("Refreshing token…");
+      console.log("Refreshing token…");
 
       final refreshed = await authService.refreshToken(refToken: refreshToken);
       if (!refreshed) throw Exception("Session expired. Login again.");
 
       token = prefs.getString("token") ?? "";
-      resp = await _request(token);
+      resp = await request(token);
     }
 
     if (resp.statusCode < 200 || resp.statusCode >= 300) {
@@ -120,7 +116,7 @@ class ContactListDatasourceImpl implements ContactListDataSource {
   // ---------------------------------------------------------------------------
   @override
   Future<void> deleteContact(String email) async {
-    print("on delete endpoint");
+    console.log("on delete endpoint");
     final uri = Uri.parse('$_baseUrl/delete_contacts');
 
     String token = prefs.getString("token") ?? "";
@@ -128,29 +124,24 @@ class ContactListDatasourceImpl implements ContactListDataSource {
 
     Future<http.Response> _request(String tok) {
       return http.delete(
-        uri, 
-        headers: {
-          "Authorization": "Bearer $tok",
-          "Accept": "application/json",
-        },
-        body: {
-          'email':email
-        }
+        uri,
+        headers: {"Authorization": "Bearer $tok", "Accept": "application/json"},
+        body: {'email': email},
       );
     }
 
     var resp = await _request(token);
-    print(jsonDecode(resp.body));
+    console.log(jsonDecode(resp.body));
 
     if (resp.statusCode == 401) {
-      print("Refreshing token…....from endpoint");
+      console.log("Refreshing token…....from endpoint");
 
       final refreshed = await authService.refreshToken(refToken: refreshToken);
       if (!refreshed) throw Exception("Session expired. Login again.");
 
       token = prefs.getString("token") ?? "";
       resp = await _request(token);
-      print(jsonDecode(resp.body));
+      console.log(jsonDecode(resp.body));
     }
 
     if (resp.statusCode < 200 || resp.statusCode >= 300) {
@@ -171,7 +162,7 @@ class ContactListDatasourceImpl implements ContactListDataSource {
     String token = prefs.getString("token") ?? "";
     String refreshToken = prefs.getString("ref_token") ?? "";
 
-    Future<http.Response> _request(String tok) {
+    Future<http.Response> request(String tok) {
       return http.put(
         uri,
         headers: {
@@ -183,16 +174,16 @@ class ContactListDatasourceImpl implements ContactListDataSource {
       );
     }
 
-    var resp = await _request(token);
+    var resp = await request(token);
 
     if (resp.statusCode == 401) {
-      print("Refreshing token…");
+      console.log("Refreshing token…");
 
       final refreshed = await authService.refreshToken(refToken: refreshToken);
       if (!refreshed) throw Exception("Session expired. Login again.");
 
       token = prefs.getString("token") ?? "";
-      resp = await _request(token);
+      resp = await request(token);
     }
 
     if (resp.statusCode < 200 || resp.statusCode >= 300) {

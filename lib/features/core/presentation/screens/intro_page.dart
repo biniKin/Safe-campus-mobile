@@ -55,7 +55,7 @@ class IntroPage extends StatelessWidget {
                           children: [
                             ElevatedButton(
                               onPressed: () {
-                                Navigator.pushNamed(context, '/register');
+                                // Navigator.of(context).push(MaterialPageRoute())
                               },
                               child: const Text('Register'),
                             ),

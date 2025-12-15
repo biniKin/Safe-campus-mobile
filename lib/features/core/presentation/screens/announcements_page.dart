@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:safe_campus/features/core/data/models/announcement_model.dart';
-import 'package:safe_campus/features/core/presentation/bloc/announcement_bloc/announcement_bloc.dart';
-import 'package:safe_campus/features/core/presentation/bloc/announcement_bloc/announcement_event.dart';
-import 'package:safe_campus/features/core/presentation/bloc/announcement_bloc/announcement_state.dart';
-import 'package:safe_campus/features/core/presentation/screens/announcement_container.dart';
-import 'package:safe_campus/features/core/presentation/widgets/historyPageContainer.dart';
+import 'package:safe_campus/features/sos/data/models/announcement_model.dart';
+import 'package:safe_campus/features/sos/presentation/bloc/announcement_bloc/announcement_bloc.dart';
+import 'package:safe_campus/features/sos/presentation/bloc/announcement_bloc/announcement_event.dart';
+import 'package:safe_campus/features/sos/presentation/bloc/announcement_bloc/announcement_state.dart';
+import 'package:safe_campus/features/sos/presentation/screens/announcement_container.dart';
+// import 'package:safe_campus/features/core/data/models/announcement_model.dart';
+// import 'package:safe_campus/features/core/presentation/bloc/announcement_bloc/announcement_bloc.dart';
+// import 'package:safe_campus/features/core/presentation/bloc/announcement_bloc/announcement_event.dart';
+// import 'package:safe_campus/features/core/presentation/bloc/announcement_bloc/announcement_state.dart';
+// import 'package:safe_campus/features/core/presentation/screens/announcement_container.dart';
+// import 'package:safe_campus/features/core/presentation/widgets/historyPageContainer.dart';
 
 class AnnouncementsPage extends StatefulWidget {
   const AnnouncementsPage({super.key});

@@ -3,12 +3,17 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:safe_campus/features/auth/data/services/alert_service.dart';
 import 'package:safe_campus/features/auth/data/services/auth_service.dart';
-import 'package:safe_campus/features/core/data/models/alerts_model.dart';
-import 'package:safe_campus/features/core/presentation/bloc/alerts_bloc/alerts_bloc.dart';
-import 'package:safe_campus/features/core/presentation/bloc/alerts_bloc/alerts_event.dart';
-import 'package:safe_campus/features/core/presentation/bloc/alerts_bloc/alerts_state.dart';
-import 'package:safe_campus/features/core/presentation/screens/alert_container.dart';
-import 'package:safe_campus/features/core/presentation/widgets/ongoingContainer.dart';
+import 'package:safe_campus/features/sos/data/models/alerts_model.dart';
+import 'package:safe_campus/features/sos/presentation/bloc/alerts_bloc/alerts_bloc.dart';
+import 'package:safe_campus/features/sos/presentation/bloc/alerts_bloc/alerts_event.dart';
+import 'package:safe_campus/features/sos/presentation/bloc/alerts_bloc/alerts_state.dart';
+import 'package:safe_campus/features/sos/presentation/screens/alert_container.dart';
+// import 'package:safe_campus/features/core/data/models/alerts_model.dart';
+// import 'package:safe_campus/features/core/presentation/bloc/alerts_bloc/alerts_bloc.dart';
+// import 'package:safe_campus/features/core/presentation/bloc/alerts_bloc/alerts_event.dart';
+// import 'package:safe_campus/features/core/presentation/bloc/alerts_bloc/alerts_state.dart';
+// import 'package:safe_campus/features/core/presentation/screens/alert_container.dart';
+// import 'package:safe_campus/features/core/presentation/widgets/ongoingContainer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Alerts extends StatefulWidget {

@@ -1,7 +1,7 @@
 import 'dart:convert';
-import 'dart:developer';
 import 'dart:io';
 import 'package:location/location.dart';
+import 'package:safe_campus/core/constants/url.dart';
 import 'package:safe_campus/features/auth/data/services/auth_service.dart';
 import 'package:safe_campus/features/map_marking/data/model/map_marker_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -19,9 +19,9 @@ abstract class MapRemoteDataSource {
 }
 
 class MapRemoteDataSourceImpl implements MapRemoteDataSource {
-  static const _host = '10.2.78.92:5000';
-  static const _path = '/api/dangerArea'; // set to your actual route
-  static const _authBase = 'http://10.2.78.92:5000/api/auth';
+  //static const _host = '10.2.78.92:5000';
+  static const _path = '/dangerArea'; // set to your actual route
+  static const _authBase = Url.baseUrl; // base URL for auth
 
   final Location _location = Location();
   final HttpClient httpClient;
@@ -29,31 +29,8 @@ class MapRemoteDataSourceImpl implements MapRemoteDataSource {
 
   MapRemoteDataSourceImpl(this.httpClient, {required this.prefs});
 
-  // Future<bool> _refreshAuthToken() async {
-  //   final refreshToken = prefs.getString('ref_token');
-  //   if (refreshToken == null) return false;
-
-  //   final url = Uri.parse('$_authBase/refresh');
-  //   final req = await httpClient.postUrl(url);
-  //   req.headers.set(HttpHeaders.contentTypeHeader, 'application/json');
-  //   req.add(utf8.encode(jsonEncode({'refreshToken': refreshToken})));
-
-  //   final resp = await req.close();
-  //   final body = await resp.transform(utf8.decoder).join();
-
-  //   if (resp.statusCode == 200) {
-  //     final data = jsonDecode(body);
-  //     final newToken =
-  //         (data is Map) ? (data['data']?['token'] as String?) : null;
-  //     if (newToken != null && newToken.isNotEmpty) {
-  //       await prefs.setString('token', newToken);
-  //       return true;
-  //     }
-  //   }
-  //   return false;
-  // }
-
   Future<HttpClientResponse> _sendAuthorizedGet(Uri uri) async {
+    print("on send auth get on map.....");
     final token = prefs.getString('token');
     final ref_token = prefs.getString("ref_token") ?? '';
     final authSerive = AuthService(prefs);
@@ -99,6 +76,7 @@ class MapRemoteDataSourceImpl implements MapRemoteDataSource {
     String? source,
   }) async {
     try {
+      print("on fetching danger zones..........");
       final queryParams = <String, String>{
         'page': page.toString(),
         'limit': limit.toString(),
@@ -107,26 +85,31 @@ class MapRemoteDataSourceImpl implements MapRemoteDataSource {
         if (severity != null) 'severity': severity,
         if (source != null) 'source': source,
       };
+      final uri = Uri.parse(
+  '${Url.baseUrl}$_path',
+).replace(queryParameters: queryParams);
 
-      final uri = Uri.http(_host, _path, queryParams);
+
+      //final uri = Uri.http(_authBase, _path, queryParams);
 
       final response = await _sendAuthorizedGet(uri);
+      print("respo ${response}");
       final contentType =
           response.headers.value(HttpHeaders.contentTypeHeader) ?? '';
       final body = await response.transform(utf8.decoder).join();
 
       if (response.statusCode != 200) {
-        console.log('Danger areas error ${response.statusCode}: $body');
+        print('Danger areas error ${response.statusCode}: $body');
         throw Exception('Failed to fetch dangerous areas');
       }
       if (!contentType.contains('application/json')) {
-        console.log('Unexpected content-type: $contentType\n$body');
+        print('Unexpected content-type: $contentType\n$body');
         throw Exception('Failed to fetch dangerous areas');
       }
 
       final decoded = jsonDecode(body);
 
-      console.log('Decoded danger areas: ${decoded['data']}');
+      print('Decoded danger areas: ${decoded['data']}');
 
       final List list =
           (decoded is Map) ? (decoded['data'] ?? const []) : const [];

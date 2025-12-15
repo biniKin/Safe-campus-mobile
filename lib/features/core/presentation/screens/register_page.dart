@@ -207,9 +207,12 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:safe_campus/features/core/presentation/bloc/register/register_bloc.dart';
-import 'package:safe_campus/features/core/presentation/bloc/register/register_event.dart';
-import 'package:safe_campus/features/core/presentation/bloc/register/register_state.dart';
+import 'package:safe_campus/features/sos/presentation/bloc/register/register_bloc.dart';
+import 'package:safe_campus/features/sos/presentation/bloc/register/register_event.dart';
+import 'package:safe_campus/features/sos/presentation/bloc/register/register_state.dart';
+// import 'package:safe_campus/features/core/presentation/bloc/register/register_bloc.dart';
+// import 'package:safe_campus/features/core/presentation/bloc/register/register_event.dart';
+// import 'package:safe_campus/features/core/presentation/bloc/register/register_state.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});

@@ -67,8 +67,8 @@ class _ReportIncidentBottomSheetState extends State<ReportIncidentBottomSheet> {
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () {
-                  console.log('Submitting report');
-
+                  print('Submitting report');
+                  print("current location to submit ${_currentLocation?.latitude} and ${_currentLocation?.longitude}");
                   context.read<ReportBloc>().add(
                     SendReportEvent(
                       token: 'dkdk',

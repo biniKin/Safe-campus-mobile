@@ -3,10 +3,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:safe_campus/features/auth/domain/entities/user.dart';
-import 'package:safe_campus/features/core/presentation/bloc/auth/login_bloc.dart';
-import 'package:safe_campus/features/core/presentation/bloc/auth/login_event.dart';
-import 'package:safe_campus/features/core/presentation/bloc/auth/login_state.dart';
+// import 'package:safe_campus/features/core/presentation/bloc/auth/login_bloc.dart';
+// import 'package:safe_campus/features/core/presentation/bloc/auth/login_event.dart';
+// import 'package:safe_campus/features/core/presentation/bloc/auth/login_state.dart';
 import 'dart:developer' as developer;
+
+import 'package:safe_campus/features/auth/presentation/bloc/login_bloc.dart';
+import 'package:safe_campus/features/auth/presentation/bloc/login_event.dart';
+import 'package:safe_campus/features/auth/presentation/bloc/login_state.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({super.key});

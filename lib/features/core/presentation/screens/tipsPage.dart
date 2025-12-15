@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:google_fonts/google_fonts.dart';
-import 'package:safe_campus/features/core/presentation/screens/tipcontainer.dart';
+import 'package:safe_campus/features/sos/presentation/widgets/tipcontainer.dart';
+// import 'package:safe_campus/features/core/presentation/screens/tipcontainer.dart';
 
 class Tipspage extends StatelessWidget {
   Tipspage({super.key});
